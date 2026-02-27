@@ -194,7 +194,9 @@ body{
 .portrait-wrap{
   position:relative;
   width:278px;
-  height:382px;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 278/382;
   margin:10px auto 0;
   cursor:pointer;
   overflow:hidden;
@@ -2356,5 +2358,6 @@ window.onload = () => app.init();
 </script>
 </body>
 </html>
+
 
 
