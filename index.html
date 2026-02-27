@@ -1,0 +1,2295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d0b09">
+<meta name="description" content="Stars & Sorcery — Character Sheet">
+<title>Stars & Sorcery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════
+   DESIGN SYSTEM — Dark Grimoire / OSR
+═══════════════════════════════════════════════════════════ */
+:root {
+  --void: #080705;
+  --deep: #110e0a;
+  --surface: #1a1510;
+  --raised: #231d16;
+  --panel: #2e261c;
+  --rim: #3d3225;
+  --border: #4f4236;
+  --muted: #6b5c48;
+  --dim: #8a7562;
+  --text: #d4c5a9;
+  --bright: #eaddc0;
+  --gold: #c8a96e;
+  --gold-bright: #e8c97e;
+  --crimson: #9b1c1c;
+  --blood: #c0392b;
+  --ember: #e05a2b;
+  --sapphire: #1d4e8f;
+  --ice: #4a9eca;
+  --emerald: #1a6b3a;
+  --sage: #4caf7d;
+
+  --font-title: 'Cinzel Decorative', serif;
+  --font-display: 'Cinzel', serif;
+  --font-body: 'Spectral', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --glow-gold: 0 0 12px rgba(200, 169, 110, 0.3);
+  --glow-blood: 0 0 12px rgba(192, 57, 43, 0.4);
+  --shadow-deep: 0 4px 20px rgba(0,0,0,0.6), 0 1px 4px rgba(0,0,0,0.4);
+  --shadow-card: 0 2px 12px rgba(0,0,0,0.5);
+
+  --rad: 3px;
+  --rad-lg: 6px;
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+
+::selection{background:rgba(200,169,110,.25);color:var(--bright)}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--deep)}
+::-webkit-scrollbar-thumb{background:var(--rim);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--gold)}
+
+html{scroll-behavior:smooth}
+
+body{
+  font-family:var(--font-body);
+  background:var(--void);
+  color:var(--text);
+  min-height:100vh;
+  font-size:15px;
+  line-height:1.5;
+  background-image:
+    radial-gradient(ellipse 120% 60% at 15% 0%, rgba(155,28,28,.08) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 80% at 85% 100%, rgba(29,78,143,.06) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+}
+
+/* ═══ LAYOUT ═══ */
+.app-wrapper{
+  max-width:1280px;
+  margin:0 auto;
+  padding:0 16px 40px;
+}
+
+.site-header{
+  text-align:center;
+  padding:30px 0 24px;
+  position:relative;
+}
+
+.site-header::before,
+.site-header::after{
+  content:'';
+  position:absolute;
+  left:50%;transform:translateX(-50%);
+  height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.site-header::before{top:0;width:80%}
+.site-header::after{bottom:0;width:60%}
+
+.site-title{
+  font-family:var(--font-title);
+  font-size:clamp(1.6rem,4vw,2.8rem);
+  color:var(--gold);
+  letter-spacing:.08em;
+  text-shadow:0 0 30px rgba(200,169,110,.4), 0 2px 4px rgba(0,0,0,.8);
+  line-height:1.1;
+}
+
+
+
+.main-grid{
+  display:grid;
+  grid-template-columns:minmax(0,320px) minmax(0,1fr);
+  gap:20px;
+  align-items:start;
+  margin-top:20px;
+}
+
+/* ═══ SIDEBAR ═══ */
+.sidebar{
+  width:100%;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+/* ═══ PANELS / CARDS ═══ */
+.panel{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--rad-lg);
+  padding:18px;
+  box-shadow:var(--shadow-card);
+  position:relative;
+  overflow:hidden;
+  min-width:0;
+  width:100%;
+  box-sizing:border-box;
+}
+.panel::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.02) 0%,transparent 50%);
+  pointer-events:none;
+}
+
+.panel-accent{border-color:var(--gold);box-shadow:var(--shadow-card),inset 0 0 30px rgba(200,169,110,.04)}
+
+.panel-header{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:14px;
+  padding-bottom:10px;
+  border-bottom:1px solid var(--rim);
+}
+
+.panel-title{
+  font-family:var(--font-display);
+  font-size:.95rem;
+  font-weight:600;
+  color:var(--gold);
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+
+.section-num{
+  font-family:var(--font-mono);
+  font-size:.65rem;
+  color:var(--muted);
+  background:var(--raised);
+  padding:2px 6px;
+  border-radius:2px;
+  letter-spacing:.05em;
+}
+
+/* ═══ PORTRAIT ═══ */
+.portrait-wrap{
+  position:relative;
+  width:100%;
+  aspect-ratio:3/4;
+  cursor:pointer;
+  overflow:hidden;
+  border-radius:0;
+  border:none;
+  background:var(--raised);
+  transition:border-color .2s;
+  display:block;
+}
+.portrait-wrap:hover{border-color:var(--gold)}
+.portrait-wrap img{
+  width:100%;height:100%;
+  object-fit:cover;
+  display:block;
+  transition:transform .3s ease;
+}
+.portrait-wrap:hover img{transform:scale(1.02)}
+.portrait-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(0deg,rgba(0,0,0,.7) 0%,transparent 50%);
+  opacity:0;transition:opacity .2s;
+  display:flex;align-items:flex-end;justify-content:center;
+  padding-bottom:12px;
+}
+.portrait-wrap:hover .portrait-overlay{opacity:1}
+.portrait-hint{
+  font-family:var(--font-mono);
+  font-size:.65rem;
+  color:var(--gold);
+  letter-spacing:.2em;
+  text-transform:uppercase;
+}
+
+/* ═══ TYPOGRAPHY ═══ */
+.field-label{
+  font-family:var(--font-display);
+  font-size:.72rem;
+  color:var(--dim);
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  display:block;
+  margin-bottom:4px;
+}
+
+h3.sub{
+  font-family:var(--font-display);
+  font-size:.85rem;
+  color:var(--gold);
+  letter-spacing:.08em;
+  margin-bottom:10px;
+}
+
+/* ═══ INPUTS ═══ */
+input[type=text],
+input[type=number],
+select,
+textarea{
+  background:var(--raised);
+  border:1px solid var(--border);
+  border-radius:var(--rad);
+  color:var(--bright);
+  font-family:var(--font-body);
+  font-size:.95rem;
+  padding:8px 10px;
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  transition:border-color .2s,box-shadow .2s;
+  appearance:none;
+  -moz-appearance:textfield;
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+
+input:focus,select:focus,textarea:focus{
+  outline:none;
+  border-color:var(--gold);
+  box-shadow:0 0 0 2px rgba(200,169,110,.15);
+}
+input::placeholder,textarea::placeholder{color:var(--muted);font-style:italic}
+
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%238a7562' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 10px center;
+  padding-right:28px;
+  cursor:pointer;
+}
+
+textarea{
+  resize:vertical;
+  min-height:70px;
+  font-size:.875rem;
+  line-height:1.5;
+  color:var(--text);
+}
+
+.stat-big-input{
+  text-align:center;
+  font-family:var(--font-display);
+  font-size:1.6rem !important;
+  font-weight:700;
+  padding:6px !important;
+  background:var(--deep) !important;
+  border-color:var(--rim) !important;
+  color:var(--gold) !important;
+}
+.stat-big-input:focus{border-color:var(--gold) !important;box-shadow:var(--glow-gold) !important}
+
+/* ═══ CHECKBOXES / RADIOS ═══ */
+input[type=radio],input[type=checkbox]{
+  appearance:none;-webkit-appearance:none;
+  width:16px;height:16px;
+  border:1px solid var(--border);
+  background:var(--raised);
+  cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;
+  vertical-align:middle;
+  flex-shrink:0;
+  transition:all .15s;
+  position:relative;
+}
+input[type=radio]{border-radius:50%}
+input[type=checkbox]{border-radius:2px}
+input[type=radio]:hover,input[type=checkbox]:hover{border-color:var(--gold)}
+input[type=radio]:checked,input[type=checkbox]:checked{background:var(--crimson);border-color:var(--blood)}
+
+input[type=checkbox]::after{
+  content:'';position:absolute;
+  left:4px;top:1px;width:5px;height:9px;
+  border:2px solid #fff;border-top:none;border-left:none;
+  transform:rotate(45deg) scale(0);
+  transition:transform .15s cubic-bezier(.4,0,.2,1);
+}
+input[type=checkbox]:checked::after{transform:rotate(45deg) scale(1)}
+input[type=radio]::after{
+  content:'';position:absolute;
+  width:6px;height:6px;
+  background:#fff;border-radius:50%;
+  transform:scale(0);transition:transform .15s cubic-bezier(.4,0,.2,1);
+}
+input[type=radio]:checked::after{transform:scale(1)}
+
+/* ═══ GRIDS ═══ */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.g6{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+
+/* ═══ STAT BOX ═══ */
+.stat-box{
+  background:var(--raised);
+  border:1px solid var(--rim);
+  border-radius:var(--rad);
+  text-align:center;
+  padding:6px 4px 8px;
+  cursor:pointer;
+  transition:all .15s;
+}
+.stat-box:hover{border-color:var(--gold);background:var(--panel)}
+.stat-box:active{transform:scale(.97)}
+.stat-box .mod{
+  font-family:var(--font-display);
+  font-size:1.3rem;
+  font-weight:700;
+  color:var(--gold);
+  line-height:1;
+}
+.stat-box .val{
+  font-family:var(--font-mono);
+  font-size:.75rem;
+  color:var(--muted);
+  margin-top:2px;
+  border-top:1px solid var(--rim);
+  padding-top:2px;
+}
+.stat-box .lbl{
+  font-family:var(--font-display);
+  font-size:.6rem;
+  color:var(--dim);
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  margin-bottom:3px;
+}
+
+/* ═══ FC BOXES — COMBAT STATS SIDEBAR ═══ */
+.fc-grid{display:flex;flex-direction:column;gap:8px;width:100%;min-width:0}
+.fc-row{display:grid;gap:8px;min-width:0}
+.fc-row.c2{grid-template-columns:1fr 1fr}
+.fc-row.c3{grid-template-columns:1fr 1fr 1fr}
+
+.fc-box{
+  background:var(--raised);
+  border:1px solid var(--rim);
+  border-radius:var(--rad);
+  overflow:hidden;
+  transition:border-color .15s;
+  display:flex;flex-direction:column;
+  min-width:0;
+}
+.fc-box.clickable{cursor:pointer}
+.fc-box.clickable:hover{border-color:var(--gold)}
+.fc-box.clickable:active{transform:scale(.98)}
+
+.fc-lbl{
+  font-family:var(--font-display);
+  font-size:.6rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--dim);
+  padding:5px 8px 3px;
+  border-bottom:1px solid var(--rim);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.fc-lbl.r{color:var(--blood)}
+.fc-lbl.b{color:var(--ice)}
+.fc-lbl.g{color:var(--gold)}
+
+.fc-val{
+  flex:1;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);
+  font-weight:600;
+  font-size:1.1rem;
+  color:var(--bright);
+  padding:6px 8px;
+}
+
+.pv-display{
+  display:flex;align-items:center;gap:2px;
+  font-family:var(--font-display);font-weight:700;font-size:1.5rem;
+}
+.pv-display .slash{color:var(--blood);font-size:1rem;margin:0 1px}
+.pv-display .max-val{color:var(--blood)}
+
+.res-display{display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-weight:600;font-size:1.05rem}
+.res-r,.res-r input,.res-r .slash,.res-r .max-val{color:var(--blood) !important}
+.res-b,.res-b input,.res-b .slash,.res-b .max-val{color:var(--ice) !important}
+
+.fc-input{
+  border:none !important;background:transparent !important;
+  text-align:right;font-family:inherit;font-size:inherit;
+  font-weight:inherit;color:inherit;padding:0;width:3ch;
+  box-shadow:none !important;
+}
+.fc-input:focus{outline:none;background:rgba(255,255,255,.05) !important}
+
+.load-bar-bg{height:3px;background:var(--rim);width:100%;margin-top:4px}
+.load-bar-fill{height:100%;background:var(--gold);width:0%;transition:width .3s}
+
+/* ═══ SKILL AREA ═══ */
+.skill-area{
+  background:var(--deep);
+  border:1px solid var(--rim);
+  border-radius:var(--rad);
+  padding:10px;
+  max-height:220px;
+  overflow-y:auto;
+}
+.skill-opt{
+  display:flex;align-items:center;gap:8px;
+  cursor:pointer;
+  padding:5px 6px;
+  border-radius:2px;
+  font-size:.875rem;
+  transition:background .1s;
+}
+.skill-opt:hover{background:rgba(255,255,255,.04)}
+
+.skill-tag{
+  display:inline-flex;align-items:center;
+  padding:3px 10px;margin:3px;
+  border:1px solid var(--border);
+  border-radius:20px;
+  font-family:var(--font-mono);
+  font-size:.75rem;
+  color:var(--text);
+  background:var(--raised);
+}
+.skill-tag.g1{border-color:var(--blood);color:var(--ember);background:rgba(155,28,28,.15)}
+
+/* ═══ BUTTONS ═══ */
+.btn{
+  font-family:var(--font-display);
+  font-size:.8rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  padding:10px 16px;
+  cursor:pointer;
+  border-radius:var(--rad);
+  transition:all .15s;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  font-weight:600;
+  white-space:nowrap;
+}
+.btn:active{transform:translateY(1px)}
+
+.btn-primary{
+  background:var(--crimson);
+  border:1px solid var(--blood);
+  color:#fff;
+  box-shadow:0 2px 8px rgba(155,28,28,.4);
+}
+.btn-primary:hover{background:var(--blood);box-shadow:var(--glow-blood)}
+
+.btn-ghost{
+  background:transparent;
+  border:1px solid var(--border);
+  color:var(--dim);
+}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+
+.btn-gold{
+  background:linear-gradient(135deg,var(--gold),var(--gold-bright));
+  border:1px solid var(--gold-bright);
+  color:var(--void);
+  box-shadow:0 2px 8px rgba(200,169,110,.3);
+}
+.btn-gold:hover{box-shadow:var(--glow-gold);transform:translateY(-1px)}
+
+.btn-confirm{
+  width:100%;
+  background:var(--panel);
+  border:1px solid var(--gold);
+  color:var(--gold);
+  font-size:.8rem;
+  letter-spacing:.1em;
+  padding:10px;
+  cursor:pointer;
+  border-radius:var(--rad);
+  margin-top:14px;
+  font-family:var(--font-display);
+  text-transform:uppercase;
+  transition:all .15s;
+}
+.btn-confirm:hover{background:var(--gold);color:var(--void)}
+
+.btn-edit{
+  display:inline-flex;align-items:center;gap:6px;
+  background:transparent;
+  border:1px solid var(--rim);
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:.7rem;
+  padding:5px 12px;
+  cursor:pointer;
+  border-radius:var(--rad);
+  margin:12px auto 0;
+  transition:all .15s;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+.btn-edit:hover{border-color:var(--gold);color:var(--gold)}
+
+.action-bar{display:grid;grid-template-columns:1fr 1fr 42px;gap:8px;width:100%;min-width:0}
+.btn-settings{
+  background:var(--raised);border:1px solid var(--border);
+  color:var(--dim);cursor:pointer;border-radius:var(--rad);
+  font-size:1rem;display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.btn-settings:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ═══ COMBAT INFO ═══ */
+.combat-card{
+  background:var(--raised);border:1px solid var(--rim);
+  border-radius:var(--rad);padding:10px 12px;
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:6px;
+}
+.combat-card .c-label{font-size:.7rem;color:var(--muted);font-family:var(--font-display);text-transform:uppercase;letter-spacing:.08em}
+.combat-card .c-val{font-family:var(--font-mono);font-weight:600;font-size:1rem;color:var(--bright)}
+.combat-alert{color:var(--ember);font-size:.75rem;text-align:center;margin-top:3px;min-height:.9em}
+
+/* ═══ INVENTORY ═══ */
+.inv-item{
+  display:grid;grid-template-columns:80px 1fr 48px 26px;
+  gap:5px;align-items:center;
+  background:var(--raised);border:1px solid var(--rim);
+  border-radius:var(--rad);padding:5px 6px;
+}
+.inv-type-sel{
+  background:transparent;border:none;
+  font-family:var(--font-mono);font-size:.65rem;
+  color:var(--gold);cursor:pointer;appearance:none;
+  text-transform:uppercase;letter-spacing:.05em;padding:0;
+}
+.inv-name{
+  background:transparent;border:none;border-bottom:1px dotted var(--rim);
+  font-family:var(--font-body);font-size:.875rem;color:var(--text);
+  padding:2px 4px;
+}
+.inv-name:focus{outline:none;border-bottom-color:var(--gold)}
+.inv-slots{
+  background:var(--deep);border:1px solid var(--rim);
+  border-radius:2px;text-align:center;font-family:var(--font-mono);
+  font-weight:600;font-size:.8rem;color:var(--gold);
+  padding:3px;width:100%;
+}
+.inv-slots:focus{outline:none;border-color:var(--gold)}
+.inv-del{
+  background:transparent;border:none;color:var(--muted);
+  cursor:pointer;font-size:1rem;display:flex;align-items:center;
+  justify-content:center;transition:color .15s;
+  padding:2px;
+}
+.inv-del:hover{color:var(--blood)}
+.inv-summary-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:5px 0;border-bottom:1px solid var(--rim);
+  font-size:.875rem;
+}
+
+/* ═══ COIN POUCH ═══ */
+.coin-pouch{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(200,169,110,.08);
+  border:1px solid rgba(200,169,110,.2);
+  border-radius:var(--rad);padding:5px 10px;
+}
+.coin-pouch label{font-size:.75rem;color:var(--gold);font-family:var(--font-display);letter-spacing:.06em;text-transform:uppercase}
+.coin-pouch input{
+  width:80px;background:transparent;border:none;
+  border-bottom:1px solid var(--rim);color:var(--gold-bright);
+  font-family:var(--font-mono);font-weight:600;text-align:right;
+  padding:2px 4px;font-size:.95rem;
+}
+.coin-pouch input:focus{outline:none;border-bottom-color:var(--gold)}
+
+/* ═══ TALENT CARDS ═══ */
+.talent-card{
+  background:var(--raised);border:1px solid var(--rim);
+  border-radius:var(--rad);padding:12px 14px;
+  display:flex;align-items:flex-start;gap:10px;
+  cursor:pointer;transition:all .15s;
+}
+.talent-card:hover{border-color:var(--gold);background:var(--panel)}
+.talent-card.selected{
+  background:rgba(26,107,58,.15);
+  border-color:var(--sage);
+  box-shadow:0 0 0 1px rgba(76,175,125,.2);
+}
+.talent-card h4{
+  font-family:var(--font-display);font-size:.9rem;
+  color:var(--gold);margin-bottom:3px;letter-spacing:.04em;
+}
+.talent-card p{font-size:.82rem;color:var(--text);line-height:1.4}
+
+/* ═══ MODALS ═══ */
+dialog.osr-modal{
+  background:var(--deep);
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:var(--rad-lg);
+  width:95%;max-width:920px;
+  padding:0;
+  box-shadow:0 20px 60px rgba(0,0,0,.8),0 0 0 1px rgba(200,169,110,.1);
+  position:fixed;inset:0;margin:auto;
+  max-height:90vh;
+  display:none;flex-direction:column;
+  z-index:1000;overflow:hidden;
+}
+dialog.osr-modal[open]{
+  display:flex;
+  animation:popIn .25s cubic-bezier(.18,.89,.32,1.28) forwards;
+}
+dialog::backdrop{background:rgba(0,0,0,.75);backdrop-filter:blur(6px)}
+@keyframes popIn{from{opacity:0;transform:scale(.96) translateY(16px)}to{opacity:1;transform:none}}
+
+.modal-header{
+  background:var(--surface);
+  padding:14px 20px;
+  display:flex;justify-content:space-between;align-items:center;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.modal-title{font-family:var(--font-display);font-size:1rem;color:var(--gold);letter-spacing:.06em}
+.modal-body{padding:20px;overflow-y:auto;flex:1}
+.btn-close{
+  background:transparent;border:1px solid var(--border);color:var(--dim);
+  font-size:1rem;cursor:pointer;width:30px;height:30px;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.btn-close:hover{border-color:var(--blood);color:var(--blood);transform:rotate(90deg)}
+
+/* Talent manager layout */
+.tm-layout{display:grid;grid-template-columns:200px 1fr;height:100%;overflow:hidden;padding:0}
+.tm-sidebar{
+  background:var(--void);padding:12px;
+  border-right:1px solid var(--border);
+  overflow-y:auto;display:flex;flex-direction:column;gap:4px;
+}
+.cat-btn{
+  display:block;width:100%;text-align:left;
+  padding:8px 12px;
+  background:transparent;border:1px solid transparent;
+  border-radius:var(--rad);cursor:pointer;
+  font-family:var(--font-display);font-size:.82rem;
+  color:var(--dim);letter-spacing:.05em;
+  transition:all .15s;
+}
+.cat-btn:hover{background:var(--surface);border-color:var(--rim);color:var(--text)}
+.cat-btn.active{background:var(--panel);border-color:var(--gold);color:var(--gold)}
+.tm-list{padding:14px;overflow-y:auto;background:var(--surface)}
+
+/* ═══ DB Editor ═══ */
+.db-layout{display:grid;grid-template-columns:180px 1fr;height:100%;overflow:hidden}
+.db-sidebar{background:var(--void);padding:12px;border-right:1px solid var(--border)}
+.db-content{padding:16px;overflow-y:auto}
+.db-item{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:7px 10px;background:var(--raised);border:1px solid var(--rim);
+  border-radius:var(--rad);margin-bottom:4px;font-size:.85rem;
+}
+.btn-mini{
+  font-family:var(--font-mono);font-size:.65rem;
+  padding:3px 8px;cursor:pointer;border-radius:2px;
+  border:1px solid;letter-spacing:.05em;text-transform:uppercase;
+  transition:all .15s;
+}
+.btn-mini.load{background:rgba(29,78,143,.2);border-color:var(--sapphire);color:var(--ice)}
+.btn-mini.load:hover{background:var(--sapphire);color:#fff}
+.btn-mini.del{background:rgba(155,28,28,.2);border-color:var(--crimson);color:var(--ember)}
+.btn-mini.del:hover{background:var(--crimson);color:#fff}
+.btn-mini.safe{background:rgba(26,107,58,.2);border-color:var(--emerald);color:var(--sage)}
+.btn-mini.safe:hover{background:var(--emerald);color:#fff}
+
+.char-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px;background:var(--raised);border:1px solid var(--rim);
+  border-radius:var(--rad);margin-bottom:6px;
+}
+.char-name-display{font-family:var(--font-display);font-size:.95rem;color:var(--bright)}
+
+/* ═══ TOAST ═══ */
+#toast-container{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  z-index:2000;display:flex;flex-direction:column;gap:8px;pointer-events:none;
+}
+.toast{
+  background:var(--panel);color:var(--bright);
+  padding:10px 20px;border-radius:var(--rad);
+  border:1px solid var(--border);
+  font-family:var(--font-mono);font-size:.8rem;
+  box-shadow:var(--shadow-deep);
+  display:flex;align-items:center;gap:10px;
+  animation:slideUp .25s ease forwards;min-width:220px;justify-content:center;
+}
+.toast.crit{border-color:var(--blood);background:rgba(155,28,28,.3)}
+.toast-die{font-size:1.4rem;font-weight:700;color:var(--gold)}
+.toast-die.crit-die{color:var(--ember)}
+.toast-info{display:flex;flex-direction:column}
+.toast-lbl{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+
+/* ═══ CROPPER ═══ */
+.crop-layout{display:flex;height:100%}
+.crop-workspace{flex:1;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.crop-container{width:240px;height:320px;flex-shrink:0;border:2px solid var(--blood);box-shadow:0 0 0 1000px rgba(0,0,0,.85);position:relative;overflow:hidden;touch-action:none;z-index:10}
+.crop-img{position:absolute;top:0;left:0;transform-origin:top left;cursor:grab}
+.crop-sidebar{
+  width:230px;flex-shrink:0;
+  background:var(--deep);border-left:1px solid var(--border);
+  padding:16px;display:flex;flex-direction:column;gap:16px;
+}
+.crop-sidebar p{font-size:.8rem;color:var(--muted);line-height:1.4}
+.crop-sidebar label{font-size:.72rem;color:var(--dim);font-family:var(--font-display);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:6px}
+.zoom-slider{width:100%;accent-color:var(--gold)}
+.crop-save{
+  background:var(--blood);color:#fff;border:none;
+  padding:12px;cursor:pointer;border-radius:var(--rad);
+  font-family:var(--font-display);font-size:.85rem;letter-spacing:.08em;
+  text-transform:uppercase;transition:all .15s;
+}
+.crop-save:hover{background:var(--ember)}
+
+/* ═══ STATUS BADGE ═══ */
+.status-badge{
+  text-align:center;padding:8px;
+  background:rgba(155,28,28,.15);
+  border:1px solid var(--crimson);
+  border-radius:var(--rad);
+  font-family:var(--font-mono);font-size:.72rem;
+  color:var(--ember);letter-spacing:.05em;
+  margin-bottom:8px;
+}
+
+/* ═══ SECTION DIVIDER ═══ */
+.divider{
+  display:flex;align-items:center;gap:8px;
+  margin:10px 0;color:var(--rim);font-size:.6rem;
+}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--rim)}
+
+/* ═══ INFO BOX ═══ */
+.info-box{
+  background:var(--deep);border:1px solid var(--rim);
+  border-radius:var(--rad);padding:8px 10px;
+  font-size:.8rem;color:var(--muted);
+  font-style:italic;line-height:1.4;margin-top:5px;
+}
+
+/* ═══ ATTR PICKER ═══ */
+.attr-picker{
+  background:var(--raised);border:1px solid var(--rim);
+  font-family:var(--font-mono);font-size:.75rem;
+  color:var(--gold);padding:5px 6px;border-radius:var(--rad);
+  cursor:pointer;appearance:none;
+  width:auto;
+}
+.attr-picker:focus{outline:none;border-color:var(--gold)}
+
+/* ═══ SAVES DISPLAY ═══ */
+.saves-display{
+  display:grid;grid-template-columns:repeat(6,1fr);
+  gap:8px;margin-top:12px;
+  border-top:1px solid var(--rim);padding-top:12px;
+}
+.save-item{
+  text-align:center;padding:5px;
+  background:var(--raised);border-radius:var(--rad);
+  font-family:var(--font-mono);font-weight:600;font-size:.9rem;
+  cursor:pointer;transition:all .15s;
+}
+.save-item:hover{background:var(--panel)}
+.save-item.prof{color:var(--blood)}
+.save-item .s-lbl{font-size:.55rem;font-family:var(--font-display);color:var(--muted);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:1px}
+
+/* Combat summary boxes */
+.sum-wep{
+  background:var(--raised);border:1px solid var(--rim);
+  border-radius:var(--rad);padding:10px 12px;
+  cursor:pointer;transition:all .15s;margin-bottom:8px;
+}
+.sum-wep:hover{border-color:var(--gold);background:var(--panel)}
+.sum-wep:active{transform:scale(.99)}
+.sum-wep .w-lbl{font-size:.65rem;color:var(--dim);font-family:var(--font-display);text-transform:uppercase;letter-spacing:.08em}
+.sum-wep .w-name{font-weight:600;color:var(--bright);font-size:.95rem;margin:2px 0}
+.sum-wep .w-stats{font-family:var(--font-mono);color:var(--gold);font-size:.85rem}
+
+/* ═══ TALENT MODAL FOOTER ═══ */
+.tm-footer{
+  padding:10px 16px;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+  flex-shrink:0;
+}
+
+/* ═══ DETAIL/SUMMARY ═══ */
+details>summary{
+  cursor:pointer;
+  font-family:var(--font-mono);font-size:.7rem;
+  color:var(--muted);letter-spacing:.1em;text-transform:uppercase;
+  list-style:none;outline:none;padding:4px 0;
+  display:flex;align-items:center;gap:6px;
+}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:'▸';color:var(--gold);font-size:.6rem}
+details[open]>summary::before{content:'▾'}
+
+/* ═══ DB FORM ═══ */
+.db-form-label{
+  font-family:var(--font-display);font-size:.72rem;
+  color:var(--dim);letter-spacing:.1em;text-transform:uppercase;
+  display:block;margin:10px 0 4px;
+}
+.grade-entry{
+  border-left:2px solid var(--crimson);padding-left:10px;margin-top:8px;
+}
+.grade-entry b{font-family:var(--font-display);font-size:.78rem;color:var(--blood);margin-right:6px}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:800px){
+  .main-grid{grid-template-columns:1fr}
+  .sidebar{position:static;max-height:none;overflow:visible}
+  .g6{grid-template-columns:repeat(3,1fr)}
+  .tm-layout{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .tm-sidebar{border-right:none;border-bottom:1px solid var(--border);flex-direction:row;flex-wrap:wrap}
+  .cat-btn{width:auto}
+  dialog.osr-modal{width:100%;height:100%;max-height:100%;border-radius:0;border:none}
+  .db-layout{grid-template-columns:1fr}
+  .crop-layout{flex-direction:column}
+  .crop-sidebar{width:100%;flex-direction:row;align-items:center;justify-content:space-between;padding:12px;border-left:none;border-top:1px solid var(--border)}
+}
+
+@media print{
+  body{background:#fff;color:#000}
+  .main-grid{display:block}
+  .action-bar,.btn-confirm,.btn-edit,.btn-settings{display:none!important}
+  .panel{box-shadow:none;border:1px solid #ccc;margin-bottom:16px;page-break-inside:avoid;background:#fff}
+}
+
+/* Overscroll protection */
+.modal-body{overscroll-behavior:contain}
+</style>
+</head>
+<body>
+
+<div id="toast-container"></div>
+<input type="file" id="img_input" accept="image/*" style="display:none" onchange="app.startCrop(this)">
+<input type="file" id="json_char_input" accept=".json" style="display:none" onchange="app.loadJSON(this)">
+<input type="file" id="json_rules_input" accept=".json" style="display:none" onchange="app.loadRulesFile(this)">
+
+<div class="app-wrapper">
+  <header class="site-header">
+    <h1 class="site-title">Stars &amp; Sorcery</h1>
+
+  </header>
+
+  <div class="main-grid">
+    <!-- ══════ SIDEBAR ══════ -->
+    <aside class="sidebar">
+      <!-- PERSONAL -->
+      <div class="panel panel-accent" style="padding:0;overflow:hidden">
+        <div id="personal_edit_view">
+          <div class="portrait-wrap" onclick="document.getElementById('img_input').click()">
+            <img id="char_img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 24 24' fill='%234a3b2a'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E" alt="Portrait">
+            <div class="portrait-overlay"><span class="portrait-hint">Change Portrait</span></div>
+          </div>
+          <div style="padding:14px 16px 16px">
+            <span class="field-label">Character Name</span>
+            <input type="text" id="char_name" placeholder="e.g. Valerius the Bold" style="font-family:var(--font-display);font-size:1rem;font-weight:600;margin-bottom:8px">
+            <div class="g2" style="gap:8px">
+              <div><span class="field-label">Level</span><input type="number" id="char_lvl" value="1" min="1" max="10"></div>
+              <div><span class="field-label">XP</span><input type="number" id="char_xp" value="0" min="0"></div>
+            </div>
+            <span class="field-label" style="margin-top:10px">Biography / Concept</span>
+            <textarea id="char_concept" placeholder="Brief bio, concept or character notes…" style="margin-top:4px"></textarea>
+            <button class="btn-confirm" onclick="app.togglePersonal(false)">Confirm</button>
+          </div>
+        </div>
+        <div id="personal_summary_view" style="display:none">
+          <div class="portrait-wrap" style="cursor:default;border-radius:0;border-left:none;border-right:none;border-top:none">
+            <img id="char_img_summary" src="" alt="">
+          </div>
+          <div style="padding:12px 16px 16px;text-align:center">
+            <div style="font-family:var(--font-display);font-size:1.15rem;color:var(--gold);margin-bottom:3px" id="summary_name">—</div>
+            <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted);margin-bottom:8px">
+              LVL <span id="summary_lvl">1</span> &bull; XP <span id="summary_xp">0</span>
+            </div>
+            <div id="summary_concept" style="font-size:.82rem;font-style:italic;color:var(--text);white-space:pre-wrap;text-align:left"></div>
+            <button class="btn-edit" onclick="app.togglePersonal(true)">✏ Edit</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="panel">
+        <div class="action-bar">
+          <button class="btn btn-ghost" onclick="app.randomize()">⚄ Random</button>
+          <button class="btn btn-ghost" onclick="app.clear()">↺ Reset</button>
+          <button class="btn-settings" onclick="document.getElementById('settings_modal').showModal()">⚙</button>
+        </div>
+      </div>
+
+      <!-- COMBAT STATS -->
+      <div class="panel" style="padding:12px">
+        <div id="db-status-overlay" class="status-badge">⚠ RULES NOT LOADED</div>
+        <div class="fc-grid">
+          <!-- HP -->
+          <div class="fc-box">
+            <div class="fc-lbl r">Hit Points</div>
+            <div class="fc-val">
+              <div class="pv-display res-r">
+                <input type="number" id="cur_pv" value="0" class="fc-input">
+                <span class="slash">/</span>
+                <span id="max_pv" class="max-val">0</span>
+              </div>
+            </div>
+          </div>
+          <!-- Row: AC INI FLESH -->
+          <div class="fc-row c3">
+            <div class="fc-box">
+              <div class="fc-lbl g">AC</div>
+              <div class="fc-val" style="font-size:1.2rem;color:var(--gold)"><span id="res_ca">10</span></div>
+            </div>
+            <div class="fc-box clickable" onclick="app.rollCheck('Initiative', parseInt(document.getElementById('res_ini').innerText))">
+              <div class="fc-lbl">INI</div>
+              <div class="fc-val"><span id="res_ini">+0</span></div>
+            </div>
+            <div class="fc-box">
+              <div class="fc-lbl">Flesh</div>
+              <div class="fc-val"><span id="res_carne">0</span></div>
+            </div>
+          </div>
+          <!-- Row: Mag Atk / Edge -->
+          <div class="fc-row c2">
+            <div class="fc-box clickable" onclick="app.rollCheck('Magic Attack', parseInt(document.getElementById('res_atq_mag').innerText))">
+              <div class="fc-lbl">Mag. Atk</div>
+              <div class="fc-val"><span id="res_atq_mag">+2</span></div>
+            </div>
+            <div class="fc-box">
+              <div class="fc-lbl">Edge</div>
+              <div class="fc-val" style="font-size:.9rem"><span id="res_filo_val">Physical</span></div>
+            </div>
+          </div>
+          <!-- ADR / ING -->
+          <div class="fc-row c2">
+            <div class="fc-box">
+              <div class="fc-lbl r">Adrenaline</div>
+              <div class="fc-val">
+                <div class="res-display res-r">
+                  <input type="number" id="cur_adr" value="0" class="fc-input">
+                  <span class="slash">/</span>
+                  <span id="max_adr" class="max-val">0</span>
+                </div>
+              </div>
+            </div>
+            <div class="fc-box">
+              <div class="fc-lbl b">Ingenuity</div>
+              <div class="fc-val">
+                <div class="res-display res-b">
+                  <input type="number" id="cur_ing" value="0" class="fc-input">
+                  <span class="slash">/</span>
+                  <span id="max_ing" class="max-val">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- LOAD -->
+          <div class="fc-box" style="padding:8px 10px 6px;display:block">
+            <div style="display:flex;justify-content:space-between;align-items:center;font-family:var(--font-display);font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--dim)">
+              <span>Encumbrance</span>
+              <span id="res_carga" style="color:var(--text);font-family:var(--font-mono);font-size:.8rem">0 / 0</span>
+            </div>
+            <div class="load-bar-bg"><div id="carga_bar" class="load-bar-fill"></div></div>
+            <p id="carga_warn" style="display:none;color:var(--ember);font-size:.7rem;text-align:center;margin-top:4px;font-family:var(--font-mono)">⚠ OVERLOADED</p>
+            <details style="margin-top:8px">
+              <summary>Quick Notes</summary>
+              <textarea id="char_notes" style="min-height:70px;margin-top:6px;font-size:.8rem" placeholder="Notes…"></textarea>
+            </details>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ══════ MAIN CONTENT ══════ -->
+    <main id="main_content" style="opacity:.4;pointer-events:none;display:flex;flex-direction:column;gap:16px">
+
+      <!-- § I — STATS -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="section-num">I</span>
+          <span class="panel-title">The Six Pillars</span>
+        </div>
+        <div id="stats_edit_view">
+          <div class="g6" style="margin-bottom:14px">
+            <div><span class="field-label">STR</span><input type="number" id="base_FUE" value="8" min="3" max="18" onchange="app.calc()" class="stat-big-input"></div>
+            <div><span class="field-label">DEX</span><input type="number" id="base_DES" value="8" min="3" max="18" onchange="app.calc()" class="stat-big-input"></div>
+            <div><span class="field-label">CON</span><input type="number" id="base_CON" value="8" min="3" max="18" onchange="app.calc()" class="stat-big-input"></div>
+            <div><span class="field-label">INT</span><input type="number" id="base_INT" value="8" min="3" max="18" onchange="app.calc()" class="stat-big-input"></div>
+            <div><span class="field-label">WIS</span><input type="number" id="base_SAB" value="8" min="3" max="18" onchange="app.calc()" class="stat-big-input"></div>
+            <div><span class="field-label">CHA</span><input type="number" id="base_CAR" value="8" min="3" max="18" onchange="app.calc()" class="stat-big-input"></div>
+          </div>
+          <div id="stats_final_display" class="g6"></div>
+          <button class="btn-confirm" onclick="app.toggleSection('stats',false)">Confirm</button>
+        </div>
+        <div id="stats_summary_view" style="display:none">
+          <div id="stats_summary_text" class="g6"></div>
+          <button class="btn-edit" onclick="app.toggleSection('stats',true)">✏ Edit</button>
+        </div>
+      </div>
+
+      <!-- § II — IDENTITY -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="section-num">II</span>
+          <span class="panel-title">Identity &amp; Origin</span>
+        </div>
+        <div id="identity_edit_view">
+          <div class="g2">
+            <div>
+              <span class="field-label">Lineage (Race)</span>
+              <select id="sel_desc" onchange="app.updateOptions()"></select>
+              <div id="desc_info" class="info-box"></div>
+            </div>
+            <div>
+              <span class="field-label">Archetype (Class)</span>
+              <select id="sel_arq" onchange="app.updateOptions()"></select>
+              <div id="arq_info" class="info-box"></div>
+              <span class="field-label" style="margin-top:10px">Edge Selection</span>
+              <select id="sel_filo" onchange="app.calc()"></select>
+            </div>
+          </div>
+          <div style="margin-top:12px">
+            <span class="field-label">Background</span>
+            <select id="sel_bg" onchange="app.updateOptions()"></select>
+            <div id="bg_info" class="info-box"></div>
+          </div>
+          <button class="btn-confirm" onclick="app.toggleSection('identity',false)">Confirm</button>
+        </div>
+        <div id="identity_summary_view" style="display:none;text-align:center">
+          <div id="identity_summary_text" style="font-family:var(--font-display);font-size:1.1rem;color:var(--gold);padding:8px 0"></div>
+          <button class="btn-edit" onclick="app.toggleSection('identity',true)">✏ Edit</button>
+        </div>
+      </div>
+
+      <!-- § III — SAVES -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="section-num">III</span>
+          <span class="panel-title">Saving Throws</span>
+        </div>
+        <div id="saves_edit_view">
+          <div class="g2">
+            <div>
+              <h3 class="sub">Common</h3>
+              <label class="skill-opt"><input type="radio" name="save_common" value="DES" onchange="app.calc()"> Dexterity (DEX)</label>
+              <label class="skill-opt"><input type="radio" name="save_common" value="CON" onchange="app.calc()"> Constitution (CON)</label>
+              <label class="skill-opt"><input type="radio" name="save_common" value="SAB" onchange="app.calc()"> Wisdom (WIS)</label>
+            </div>
+            <div>
+              <h3 class="sub">Uncommon</h3>
+              <label class="skill-opt"><input type="radio" name="save_uncommon" value="FUE" onchange="app.calc()"> Strength (STR)</label>
+              <label class="skill-opt"><input type="radio" name="save_uncommon" value="INT" onchange="app.calc()"> Intellect (INT)</label>
+              <label class="skill-opt"><input type="radio" name="save_uncommon" value="CAR" onchange="app.calc()"> Charisma (CHA)</label>
+            </div>
+          </div>
+          <div id="saves_display" class="saves-display"></div>
+          <button class="btn-confirm" onclick="app.toggleSection('saves',false)">Confirm</button>
+        </div>
+        <div id="saves_summary_view" style="display:none">
+          <div id="saves_summary_text" class="saves-display" style="margin-top:0;border-top:none;padding-top:0"></div>
+          <button class="btn-edit" onclick="app.toggleSection('saves',true)">✏ Edit</button>
+        </div>
+      </div>
+
+      <!-- § IV — SKILLS -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="section-num">IV</span>
+          <span class="panel-title">Skills &amp; Proficiency</span>
+        </div>
+        <div id="skills_edit_view">
+          <div class="g2">
+            <div>
+              <h3 class="sub">By Archetype (Choose <span id="limit_arq">2</span>)</h3>
+              <div id="skills_arq" class="skill-area"></div>
+            </div>
+            <div>
+              <h3 class="sub">By Background (Choose 2)</h3>
+              <div id="skills_bg" class="skill-area"></div>
+            </div>
+          </div>
+          <button class="btn-confirm" onclick="app.toggleSection('skills',false)">Confirm</button>
+        </div>
+        <div id="skills_summary_view" style="display:none;text-align:center">
+          <div id="final_skills_list" style="display:flex;flex-wrap:wrap;justify-content:center;gap:5px;padding:8px 0"></div>
+          <button class="btn-edit" onclick="app.toggleSection('skills',true)">✏ Edit</button>
+        </div>
+      </div>
+
+      <!-- § V — TALENTS -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="section-num">V</span>
+          <span class="panel-title">Talents (Choose 3)</span>
+        </div>
+        <div style="text-align:center;padding:4px 0 8px">
+          <div style="font-family:var(--font-mono);font-size:.8rem;color:var(--muted);margin-bottom:10px">
+            Selected: <span id="talent_count_main" style="color:var(--gold);font-weight:600">0</span>/3
+          </div>
+          <button class="btn btn-ghost" onclick="app.openTalentManager()">Open Talent Manager</button>
+        </div>
+        <div id="talents_summary_view" style="display:none">
+          <div class="divider">Active Talents</div>
+          <div id="talents_summary_list" style="display:flex;flex-direction:column;gap:6px"></div>
+        </div>
+      </div>
+
+      <!-- § VI — COMBAT GEAR -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="section-num">VI</span>
+          <span class="panel-title">Combat Gear</span>
+        </div>
+        <div id="combat_edit_view">
+          <div class="g2">
+            <div>
+              <span class="field-label">Armor</span>
+              <select id="sel_armor" onchange="app.calc()"></select>
+              <div class="combat-card">
+                <span class="c-label">AC Base</span>
+                <span class="c-val" id="armor_base_val">—</span>
+              </div>
+              <div id="armor_desc" class="info-box"></div>
+            </div>
+            <div>
+              <span class="field-label">Shield &amp; Extras</span>
+              <select id="sel_shield" onchange="app.calc()"></select>
+              <select id="sel_magic_bonus" onchange="app.calc()" style="margin-top:6px;font-size:.83rem;color:var(--ice)">
+                <option value="0">Magic Bonus: None</option>
+                <option value="1">Magic Bonus: +1 AC</option>
+                <option value="2">Magic Bonus: +2 AC</option>
+                <option value="3">Magic Bonus: +3 AC</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Weapon 1 -->
+          <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin-top:14px">
+            <div><span class="field-label">Primary Weapon</span><select id="sel_weapon" onchange="app.onWeaponChange('w1')"></select></div>
+            <div><span class="field-label" style="font-size:.65rem">Use stat</span><select id="w1_attr" class="attr-picker" onchange="app.calc()"><option value="FUE">STR</option><option value="DES">DEX</option><option value="CON">CON</option><option value="INT">INT</option><option value="SAB">WIS</option><option value="CAR">CHA</option></select></div>
+          </div>
+          <div class="combat-card">
+            <div><span class="c-label">Attack</span><div class="c-val" id="w1_atk_val">—</div></div>
+            <div style="text-align:right"><span class="c-label">Damage</span><div class="c-val" id="w1_dmg_val">—</div></div>
+          </div>
+          <div class="combat-alert" id="w1_alert"></div>
+
+          <!-- Weapon 2 -->
+          <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin-top:12px">
+            <div><span class="field-label">Secondary Weapon</span><select id="sel_weapon_sec" onchange="app.onWeaponChange('w2')"></select></div>
+            <div><span class="field-label" style="font-size:.65rem">Use stat</span><select id="w2_attr" class="attr-picker" onchange="app.calc()"><option value="FUE">STR</option><option value="DES">DEX</option><option value="CON">CON</option><option value="INT">INT</option><option value="SAB">WIS</option><option value="CAR">CHA</option></select></div>
+          </div>
+          <div class="combat-card">
+            <div><span class="c-label">Attack</span><div class="c-val" id="w2_atk_val">—</div></div>
+            <div style="text-align:right"><span class="c-label">Damage</span><div class="c-val" id="w2_dmg_val">—</div></div>
+          </div>
+          <div class="combat-alert" id="w2_alert"></div>
+
+          <button class="btn-confirm" onclick="app.toggleSection('combat',false)">Confirm</button>
+        </div>
+
+        <div id="combat_summary_view" style="display:none">
+          <div class="g3" style="margin-bottom:10px">
+            <div class="fc-box"><div class="fc-lbl g">AC</div><div class="fc-val" style="color:var(--gold);font-size:1.3rem"><span id="sum_ac">10</span></div></div>
+            <div class="fc-box"><div class="fc-lbl">Armor</div><div class="fc-val" style="font-size:.85rem;flex-direction:column;gap:1px"><span id="sum_armor_name">—</span><span style="font-size:.65rem;color:var(--muted)" id="sum_armor_type">Normal</span></div></div>
+            <div class="fc-box"><div class="fc-lbl">Shield</div><div class="fc-val" style="font-size:.85rem"><span id="sum_shield">—</span></div></div>
+          </div>
+          <div class="sum-wep" onclick="app.rollWeaponAtk(1)">
+            <div class="w-lbl">Primary Weapon · Click to roll</div>
+            <div class="w-name" id="sum_wep1_name">—</div>
+            <div class="w-stats" id="sum_wep1_stats">—</div>
+          </div>
+          <div class="sum-wep" onclick="app.rollWeaponAtk(2)">
+            <div class="w-lbl">Secondary Weapon · Click to roll</div>
+            <div class="w-name" id="sum_wep2_name">—</div>
+            <div class="w-stats" id="sum_wep2_stats">—</div>
+          </div>
+          <button class="btn-edit" onclick="app.toggleSection('combat',true)">✏ Edit</button>
+        </div>
+      </div>
+
+      <!-- § VII — EQUIPMENT -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="section-num">VII</span>
+          <span class="panel-title">Equipment &amp; Treasure</span>
+        </div>
+        <div id="equipment_edit_view">
+          <div style="background:var(--deep);border:1px solid var(--rim);border-radius:var(--rad);padding:10px;margin-bottom:12px">
+            <div style="display:grid;grid-template-columns:auto auto 1fr auto;gap:8px;align-items:end">
+              <div>
+                <span class="field-label">Category</span>
+                <select id="inv_db_category" onchange="app.updateDbSelect()" style="font-size:.83rem">
+                  <option value="weapons">Weapons</option>
+                  <option value="armors">Armors</option>
+                  <option value="shields">Shields</option>
+                  <option value="misc">Misc</option>
+                </select>
+              </div>
+              <div>
+                <span class="field-label">Item</span>
+                <select id="inv_db_item" style="font-size:.83rem"></select>
+              </div>
+              <div></div>
+              <button class="btn btn-primary" style="font-size:.75rem;padding:8px 12px;align-self:end" onclick="app.addFromDB()">+ Add</button>
+            </div>
+          </div>
+
+          <div class="coin-pouch" style="margin-bottom:10px">
+            <label>Gold (GP)</label>
+            <input type="number" id="gold_coins_edit" value="0" min="0" onchange="app.syncGold('edit')">
+          </div>
+
+          <div id="inv_backpack_list" style="display:flex;flex-direction:column;gap:4px"></div>
+
+          <div style="text-align:center;margin-top:10px">
+            <button class="btn-edit" onclick="app.addCustomItem()">+ Custom Item</button>
+          </div>
+          <button class="btn-confirm" onclick="app.toggleSection('equipment',false)">Confirm</button>
+        </div>
+        <div id="equipment_summary_view" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;background:var(--deep);border:1px solid var(--rim);border-radius:var(--rad);padding:8px 12px;margin-bottom:10px">
+            <span style="font-family:var(--font-display);font-size:.82rem;color:var(--dim);text-transform:uppercase;letter-spacing:.06em">Treasury</span>
+            <span style="font-family:var(--font-mono);color:var(--gold);font-weight:600"><span id="gold_coins_display">0</span> GP</span>
+          </div>
+          <div id="inv_summary_list" style="display:flex;flex-direction:column;gap:3px"></div>
+          <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--rim);display:flex;justify-content:space-between">
+            <span style="font-family:var(--font-display);font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;color:var(--dim)">Total Load</span>
+            <span id="load_summary_display" style="font-family:var(--font-mono);font-weight:600;color:var(--gold)">0 / 10</span>
+          </div>
+          <button class="btn-edit" onclick="app.toggleSection('equipment',true)">✏ Edit</button>
+        </div>
+      </div>
+    </main><!-- /main_content -->
+  </div><!-- /main-grid -->
+</div><!-- /app-wrapper -->
+
+<!-- ══════ MODALS ══════ -->
+
+<!-- Settings -->
+<dialog id="settings_modal" class="osr-modal">
+  <div class="modal-header">
+    <span class="modal-title">Settings &amp; Data</span>
+    <button class="btn-close" onclick="document.getElementById('settings_modal').close()">✕</button>
+  </div>
+  <div class="modal-body" style="display:flex;flex-direction:column;gap:20px;max-width:480px">
+    <div>
+      <div class="divider">Game Rules</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn btn-ghost" onclick="document.getElementById('json_rules_input').click()">↑ Import Rules (JSON)</button>
+        <button class="btn btn-gold" onclick="app.openDatabaseEditor()">⚙ Database Editor</button>
+      </div>
+    </div>
+    <div>
+      <div class="divider">Local Save</div>
+      <div class="g2">
+        <button class="btn btn-ghost" onclick="app.saveChar()">💾 Save</button>
+        <button class="btn btn-ghost" onclick="app.openLoadMenu()">📂 Load</button>
+      </div>
+    </div>
+    <div>
+      <div class="divider">JSON Files</div>
+      <div class="g2">
+        <button class="btn btn-ghost" onclick="app.exportJSON()">↓ Export Character</button>
+        <button class="btn btn-ghost" onclick="app.triggerLoadJSON()">↑ Import Character</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<!-- DB Editor -->
+<dialog id="db_editor_modal" class="osr-modal" style="max-width:1000px;height:88vh">
+  <div class="modal-header" style="background:var(--panel)">
+    <span class="modal-title" style="color:var(--ice)">Database Editor</span>
+    <button class="btn-close" onclick="document.getElementById('db_editor_modal').close()">✕</button>
+  </div>
+  <div class="modal-body db-layout" style="padding:0">
+    <div class="db-sidebar">
+      <button class="cat-btn" onclick="app.dbEditCategory('descriptors')">Lineages</button>
+      <button class="cat-btn" onclick="app.dbEditCategory('archetypes')">Archetypes</button>
+      <button class="cat-btn" onclick="app.dbEditCategory('talents')">Talents</button>
+      <button class="cat-btn" onclick="app.dbEditCategory('weapons')">Weapons</button>
+      <button class="cat-btn" onclick="app.dbEditCategory('armors')">Armors</button>
+      <button class="cat-btn" onclick="app.dbEditCategory('spells')">Powers/Spells</button>
+      <hr style="border-color:var(--rim);margin:10px 0">
+      <button class="btn btn-ghost" style="font-size:.72rem;padding:7px;width:100%" onclick="app.exportRulesDB()">↓ Export All</button>
+    </div>
+    <div class="db-content">
+      <div id="db_list_container"><p style="color:var(--muted)">Select a category to begin editing.</p></div>
+      <div id="db_form_container" style="display:none;margin-top:16px;border-top:1px solid var(--border);padding-top:16px"></div>
+    </div>
+  </div>
+</dialog>
+
+<!-- Talent Manager -->
+<dialog id="talent_modal" class="osr-modal" style="height:85vh;max-width:960px">
+  <div class="modal-header">
+    <span class="modal-title">Talent Manager</span>
+    <button class="btn-close" onclick="app.closeTalentManager()">✕</button>
+  </div>
+  <div class="modal-body tm-layout" style="padding:0">
+    <div class="tm-sidebar" id="tm_categories"></div>
+    <div class="tm-list" id="tm_list"><p style="color:var(--muted);margin-top:40px;text-align:center">Select a category.</p></div>
+  </div>
+  <div class="tm-footer">
+    <button class="btn btn-ghost" style="font-size:.72rem;padding:6px 12px;color:var(--blood);border-color:var(--blood)" onclick="app.clearTalents()">Clear</button>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-family:var(--font-mono);font-size:.8rem;color:var(--dim)">Selected: <span id="talent_count_modal" style="color:var(--gold);font-weight:600">0</span>/3</span>
+      <button class="btn btn-gold" style="font-size:.78rem;padding:7px 16px" onclick="app.closeTalentManager()">Confirm</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Char Manager -->
+<dialog id="char_manager" class="osr-modal">
+  <div class="modal-header">
+    <span class="modal-title">Hero Roster</span>
+    <button class="btn-close" onclick="document.getElementById('char_manager').close()">✕</button>
+  </div>
+  <div id="char_list" class="modal-body"></div>
+</dialog>
+
+<!-- Crop -->
+<dialog id="crop_modal" class="osr-modal" style="max-width:760px;height:80vh">
+  <div class="modal-header" style="background:#000;border-bottom-color:var(--rim)">
+    <span class="modal-title" style="color:var(--text)">Adjust Portrait</span>
+    <button class="btn-close" onclick="document.getElementById('crop_modal').close()">✕</button>
+  </div>
+  <div class="modal-body" style="padding:0;height:100%">
+    <div class="crop-layout">
+      <div class="crop-workspace">
+        <div class="crop-container" id="crop_container" onmousedown="app.startDrag(event)" ontouchstart="app.startDrag(event)">
+          <img id="crop_preview" class="crop-img" draggable="false">
+        </div>
+      </div>
+      <div class="crop-sidebar">
+        <p>Drag the image inside the red frame.</p>
+        <div>
+          <label>Zoom</label>
+          <input type="range" id="crop_zoom" class="zoom-slider" step="0.01" oninput="app.updateCropView()">
+        </div>
+        <button class="crop-save" onclick="app.applyCrop()">Save Crop</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   DEFAULT RULES DATA
+═══════════════════════════════════════════════════════════ */
+const defaultRules = {
+  descriptors: {
+    "humano":    {name:"Human",    bonus:"+1 Two Attributes", mods:{}, grant:["Extra Language","Choice Skill"], txt:"Versatile and ambitious."},
+    "enano":     {name:"Dwarf",    bonus:"+2 CON, +1 STR",   mods:{CON:2,FUE:1}, grant:["Darkvision"], txt:"Robust and stubborn."},
+    "elfo":      {name:"Elf",      bonus:"+2 DEX, +1 WIS",   mods:{DES:2,SAB:1}, grant:["Physical Feat","Darkvision"], txt:"Mystical and graceful."},
+    "medioelfo": {name:"Half-Elf", bonus:"+1 Two Attributes",mods:{}, grant:["Darkvision"], txt:"Between two worlds."},
+    "infernal":  {name:"Tiefling", bonus:"+2 CHA, +1 INT",   mods:{CAR:2,INT:1}, grant:["Darkvision","Fire Resistance"], txt:"Marked by the pact."},
+    "sintetico": {name:"Synthetic",bonus:"+1 CON",            mods:{CON:1}, grant:["Poison Immunity"], txt:"Logical and resilient."},
+    "aesir":     {name:"Aesir",    bonus:"+2 CHA, +1 WIS",   mods:{CAR:2,SAB:1}, grant:["Fear Resistance"], txt:"Divine heir."},
+    "mutante":   {name:"Mutant",   bonus:"+2 Free, +1 CON",  mods:{CON:1}, grant:["Poison Resistance"], txt:"Unstable DNA."},
+    "medioorco": {name:"Half-Orc", bonus:"+2 STR, +1 CON",   mods:{FUE:2,CON:1}, grant:["Relentless"], txt:"Fury and strength."},
+    "draconido": {name:"Dragonborn",bonus:"+2 STR, +1 CHA",  mods:{FUE:2,CAR:1}, grant:["Elemental Resistance"], txt:"Ancestral pride."}
+  },
+  archetypes: {
+    "luchador": {name:"Fighter (Bold)", pv:8,adr:6,ing:2,ca:1,limit:2,skills:["Physical Feat","Intimidation","Perception","Survival"],edges:["Physical","Mental"],txt:"Resilient vanguard."},
+    "experto":  {name:"Expert (Subtle)",pv:6,adr:4,ing:4,ca:0,limit:2,skills:["Stealth","Deception","Investigation","Perception","Technology"],edges:["Flexible"],txt:"Technical specialist."},
+    "adepto":   {name:"Adept (Wise)",   pv:4,adr:0,ing:10,ca:0,limit:4,skills:["Arcana","History","Medicine","Nature","Insight","Religion"],edges:["Mental","Physical"],txt:"Source channeler."}
+  },
+  backgrounds: {
+    "soldado":  {name:"Soldier",    skills:["Physical Feat","Intimidation","Technology"]},
+    "picaro":   {name:"Rogue",      skills:["Stealth","Deception","Street Knowledge"]},
+    "acolito":  {name:"Acolyte",    skills:["Religion","Insight","History"]},
+    "erudito":  {name:"Scholar",    skills:["Arcana","Investigation","Nature"]},
+    "salvaje":  {name:"Savage",     skills:["Survival","Perception","Nature"]},
+    "artesano": {name:"Artisan",    skills:["Technology","Crafting","Investigation"]},
+    "forastero":{name:"Outlander",  skills:["Survival","Stealth","Deception"]},
+    "noble":    {name:"Noble",      skills:["Influence","History","Deception"]},
+    "mercenario":{name:"Mercenary", skills:["Intimidation","Perception","Physical Feat"]}
+  },
+  weapons: {
+    "daga":        {name:"Dagger",       dmg:"1d4",slots:1,cat:"simple",stat:"FIN"},
+    "espada_corta":{name:"Short Sword",  dmg:"1d6",slots:1,cat:"marcial",stat:"FIN"},
+    "espada_larga":{name:"Long Sword",   dmg:"1d8",slots:2,cat:"marcial",stat:"FUE"},
+    "hacha":       {name:"Battle Axe",   dmg:"1d8",slots:2,cat:"marcial",stat:"FUE"},
+    "espadon":     {name:"Greatsword",   dmg:"2d6",slots:3,cat:"marcial",stat:"FUE"},
+    "arco_corto":  {name:"Short Bow",    dmg:"1d6",slots:2,cat:"simple",stat:"DES"},
+    "ballesta":    {name:"Light Crossbow",dmg:"1d8",slots:2,cat:"simple",stat:"DES"},
+    "baston":      {name:"Quarterstaff", dmg:"1d6",slots:2,cat:"simple",stat:"FUE"},
+    "maza":        {name:"Mace",         dmg:"1d6",slots:2,cat:"simple",stat:"FUE"}
+  },
+  armors: {
+    "pieles": {name:"Hides (Light)",      ca:12,type:"light",slots:1},
+    "cuero":  {name:"Studded Leather",    ca:12,type:"light",slots:1},
+    "malla":  {name:"Chain Mail (Heavy)", ca:16,type:"heavy",slots:3},
+    "placas": {name:"Plate Armor (Heavy)",ca:18,type:"heavy",slots:3},
+    "coraza": {name:"Breastplate (Medium)",ca:14,type:"medium",slots:2}
+  },
+  talents: {
+    "steel":   [
+      {name:"Shield Master",   desc:"Use reaction to strike with shield.",grades:[{g:1,d:"Reaction strike."}]},
+      {name:"Precise Shot",    desc:"Spend Adrenaline for ranged bonus damage.",grades:[{g:1,d:"+Adr bonus dmg"}]},
+      {name:"Tactical Duelist",desc:"Spend Adrenaline to impose disadvantage.",grades:[{g:1,d:"Impose disadv."}]}
+    ],
+    "adrenaline":[
+      {name:"Relentless Defender",desc:"Impose disadvantage on attacks against allies.",grades:[{g:1,d:"Disadv on allies"}]},
+      {name:"Fury",desc:"+2 Damage and resistance to Fear.",grades:[{g:1,d:"+2 Damage"}]},
+      {name:"Natural Defense",desc:"AC = 10 + DEX + CON without armor.",id:"def_nat",grades:[{g:1,d:"Bonus AC"}]}
+    ],
+    "cunning":  [
+      {name:"Sneak Attack",   desc:"+1d6 Damage when you have advantage or ally nearby.",grades:[{g:1,d:"+1d6 dmg"}]},
+      {name:"Hunter's Mark",  desc:"Advantage to track and +1d6 damage.",grades:[{g:1,d:"Advantage"}]}
+    ],
+    "supernatural":[
+      {name:"Supernatural Awakening",desc:"Access to magic. +6 Ingenuity.",id:"despertar",grades:[{g:1,d:"+6 Ing"}]},
+      {name:"Divine Channeling",     desc:"Heal or turn undead.",grades:[{g:1,d:"Heal"}]}
+    ],
+    "general":  [
+      {name:"Alert",    desc:"+5 Initiative. Cannot be surprised.",id:"alerta",grades:[{g:1,d:"+5 Init"}]},
+      {name:"Athlete",  desc:"+1 STR or DEX. Standing up costs 5ft.",id:"atleta",grades:[{g:1,d:"+1 Attr"}]}
+    ]
+  },
+  spells: {},
+  shields: {
+    "rodela": {name:"Small Shield",  slots:1,bonus:1},
+    "basic":  {name:"Shield (Basic)",slots:1,bonus:2},
+    "tower":  {name:"Tower Shield",  slots:2,bonus:3}
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════
+   APP
+═══════════════════════════════════════════════════════════ */
+const app = {
+  DB: {},
+  inventory: [],
+  gold: 0,
+  cropState: {img:null,x:0,y:0,zoom:1,isDragging:false,lastX:0,lastY:0},
+  activeTalentCategory: null,
+  currentEditorCat: '',
+
+  init() {
+    const saved = localStorage.getItem('sands_game_rules');
+    if (saved) { try { this.DB = JSON.parse(saved) } catch(e) { this.DB = JSON.parse(JSON.stringify(defaultRules)) } }
+    else { this.DB = JSON.parse(JSON.stringify(defaultRules)) }
+    if (this.DB.descriptors) this.unlockApp();
+    window.addEventListener('mouseup', () => app.endDrag());
+    window.addEventListener('touchend', () => app.endDrag());
+    window.addEventListener('mousemove', e => app.doDrag(e));
+    window.addEventListener('touchmove', e => app.doDrag(e), {passive:false});
+  },
+
+  loadRulesFile(input) {
+    if (!input.files?.[0]) return;
+    const r = new FileReader();
+    r.onload = e => {
+      try {
+        const rules = JSON.parse(e.target.result);
+        if (!rules.descriptors || !rules.archetypes || !rules.weapons) throw new Error();
+        app.DB = rules; app.saveRulesToLocal(); app.unlockApp();
+        document.getElementById('settings_modal').close();
+        app.toast('Rules loaded successfully', 'System');
+      } catch { app.toast('Invalid JSON format', 'Error') }
+    };
+    r.readAsText(input.files[0]); input.value = '';
+  },
+
+  saveRulesToLocal() {
+    try { localStorage.setItem('sands_game_rules', JSON.stringify(this.DB)) } catch {}
+  },
+
+  unlockApp() {
+    if (!this.DB?.descriptors) return;
+    document.getElementById('main_content').style.opacity = '1';
+    document.getElementById('main_content').style.pointerEvents = 'auto';
+    document.getElementById('db-status-overlay').style.display = 'none';
+    this.fillSelect('sel_desc', this.DB.descriptors);
+    this.fillSelect('sel_arq', this.DB.archetypes);
+    this.fillSelect('sel_bg', this.DB.backgrounds);
+    this.updateDbSelect();
+    this.syncCombatOptions();
+    this.initTalentManager();
+    this.updateOptions(true);
+  },
+
+  /* ─── DATABASE EDITOR ─── */
+  openDatabaseEditor() {
+    document.getElementById('settings_modal').close();
+    document.getElementById('db_editor_modal').showModal();
+    this.dbEditCategory('descriptors');
+  },
+
+  dbEditCategory(cat) {
+    this.currentEditorCat = cat;
+    const lc = document.getElementById('db_list_container');
+    document.getElementById('db_form_container').style.display = 'none';
+    const src = this.DB[cat] || {};
+    lc.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h3 style="font-family:var(--font-display);color:var(--gold);font-size:.9rem;text-transform:uppercase;letter-spacing:.08em">${cat}</h3><button class="btn btn-ghost" style="font-size:.72rem;padding:5px 10px" onclick="app.dbEditEntry('new')">+ Add New</button></div>`;
+    if (cat === 'talents') {
+      Object.keys(src).forEach(sub => {
+        const h = document.createElement('div');
+        h.style.cssText = 'font-family:var(--font-mono);font-size:.65rem;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;padding:5px 0;border-bottom:1px solid var(--rim);margin:8px 0 4px';
+        h.innerText = sub; lc.appendChild(h);
+        src[sub].forEach((item,i) => this.renderDbItem(lc, item.name, `${sub}|${i}`));
+      });
+    } else {
+      Object.keys(src).forEach(k => this.renderDbItem(lc, src[k].name || k, k));
+    }
+  },
+
+  renderDbItem(c, name, key) {
+    const d = document.createElement('div'); d.className = 'db-item';
+    d.innerHTML = `<span style="font-size:.85rem">${name}</span><div style="display:flex;gap:4px"><button class="btn-mini load" onclick="app.dbEditEntry('${key}')">Edit</button><button class="btn-mini del" onclick="app.dbDeleteEntry('${key}')">Del</button></div>`;
+    c.appendChild(d);
+  },
+
+  dbEditEntry(key) {
+    const cat = this.currentEditorCat;
+    const fc = document.getElementById('db_form_container');
+    fc.style.display = 'block'; fc.innerHTML = '';
+    let item = {};
+    if (key !== 'new') {
+      if (key.includes('|')) { const [s,i] = key.split('|'); item = this.DB[cat][s][i]; }
+      else item = this.DB[cat][key];
+    }
+    let html = `<div style="font-family:var(--font-display);font-size:.85rem;color:var(--gold);margin-bottom:12px">${key==='new'?'New Entry':'Edit Entry'}</div>`;
+    if (cat === 'talents') {
+      html += `<label class="db-form-label">Category</label><input type="text" id="edit_subcat" value="${key==='new'?'general':key.split('|')[0]}">
+               <label class="db-form-label">Talent Name</label><input type="text" id="edit_name" value="${item.name||''}">
+               <label class="db-form-label">Special ID (internal logic)</label><input type="text" id="edit_special_id" value="${item.id||''}">
+               <label class="db-form-label">Description</label><textarea id="edit_desc">${item.desc||''}</textarea>
+               <div id="grades_container"><div style="font-family:var(--font-display);font-size:.75rem;color:var(--dim);margin:10px 0 5px;text-transform:uppercase;letter-spacing:.08em">Grades</div>
+               ${(item.grades||[{g:1,d:''}]).map(g=>`<div class="grade-entry"><b>Grade ${g.g}:</b><input type="text" class="grade-desc" data-grade="${g.g}" value="${g.d}" placeholder="Effect at this grade" style="display:inline-block;width:calc(100% - 70px)"></div>`).join('')}
+               </div><button class="btn-mini safe" style="margin-top:6px" onclick="app.addGradeField()">+ Grade</button>`;
+    } else {
+      html += `<label class="db-form-label">Key / ID (unique)</label><input type="text" id="edit_id" value="${key==='new'?'':key}" ${key!=='new'?'disabled':''}>
+               <label class="db-form-label">Name</label><input type="text" id="edit_name" value="${item.name||''}">
+               <label class="db-form-label">Text / Description / Damage / CA</label><textarea id="edit_txt">${item.txt||item.dmg||item.ca||''}</textarea>`;
+    }
+    html += `<div style="display:flex;gap:8px;margin-top:14px">
+               <button class="btn btn-primary" style="font-size:.78rem;padding:8px 14px" onclick="app.dbSaveEntry('${key}')">Save</button>
+               <button class="btn btn-ghost" style="font-size:.78rem;padding:8px 14px" onclick="document.getElementById('db_form_container').style.display='none'">Cancel</button>
+             </div>`;
+    fc.innerHTML = html; fc.scrollIntoView({behavior:'smooth'});
+  },
+
+  addGradeField() {
+    const c = document.getElementById('grades_container');
+    const n = c.querySelectorAll('.grade-entry').length + 1;
+    const d = document.createElement('div'); d.className = 'grade-entry';
+    d.innerHTML = `<b>Grade ${n}:</b><input type="text" class="grade-desc" data-grade="${n}" value="" style="display:inline-block;width:calc(100% - 70px)">`;
+    c.appendChild(d);
+  },
+
+  dbSaveEntry(key) {
+    const cat = this.currentEditorCat;
+    if (cat === 'talents') {
+      const sub = document.getElementById('edit_subcat').value.toLowerCase().trim();
+      const grades = Array.from(document.querySelectorAll('.grade-desc')).map(el=>({g:parseInt(el.dataset.grade),d:el.value}));
+      const t = {name:document.getElementById('edit_name').value,desc:document.getElementById('edit_desc').value,id:document.getElementById('edit_special_id').value,grades};
+      if (!this.DB.talents[sub]) this.DB.talents[sub] = [];
+      if (key !== 'new' && key.includes('|')) { const [os,oi] = key.split('|'); this.DB.talents[os].splice(oi,1) }
+      this.DB.talents[sub].push(t);
+    } else {
+      const id = document.getElementById('edit_id').value;
+      if (!this.DB[cat]) this.DB[cat] = {};
+      this.DB[cat][id] = {name:document.getElementById('edit_name').value,txt:document.getElementById('edit_txt').value};
+    }
+    this.saveRulesToLocal(); this.unlockApp(); this.dbEditCategory(cat); this.toast('Database updated');
+  },
+
+  dbDeleteEntry(key) {
+    if (!confirm('Permanently delete this entry?')) return;
+    const cat = this.currentEditorCat;
+    if (key.includes('|')) { const [s,i] = key.split('|'); this.DB[cat][s].splice(i,1) }
+    else delete this.DB[cat][key];
+    this.saveRulesToLocal(); this.unlockApp(); this.dbEditCategory(cat);
+  },
+
+  exportRulesDB() {
+    const a = document.createElement('a');
+    a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(this.DB,null,2));
+    a.download = 'SANDS_Rules.json'; document.body.appendChild(a); a.click(); a.remove();
+  },
+
+  /* ─── INVENTORY ─── */
+  updateDbSelect() {
+    const cat = document.getElementById('inv_db_category').value;
+    const sel = document.getElementById('inv_db_item');
+    sel.innerHTML = '';
+    const misc = {rope:{name:'Rope (15m)',slots:1},torch:{name:'Torches (5)',slots:1},rations:{name:'Rations (3)',slots:1},bedroll:{name:'Bedroll',slots:1},spellbook:{name:'Spellbook',slots:1},wand:{name:'Wand',slots:1},scepter:{name:'Scepter',slots:1}};
+    const src = cat==='misc' ? misc : cat==='shields' ? (this.DB.shields||defaultRules.shields) : (this.DB[cat]||{});
+    for (const k in src) {
+      const item = src[k]; const opt = document.createElement('option'); opt.value = k;
+      let det='';
+      if(cat==='weapons') det=` [${item.dmg||'—'}]`;
+      if(cat==='armors') det=` [AC ${item.ca||'—'}]`;
+      if(cat==='shields') det=` [+${item.bonus||0} AC]`;
+      opt.innerText = `${item.name}${det} (${item.slots} slots)`; sel.appendChild(opt);
+    }
+  },
+
+  addFromDB() {
+    const cat = document.getElementById('inv_db_category').value;
+    const key = document.getElementById('inv_db_item').value;
+    const misc = {rope:{name:'Rope',slots:1},torch:{name:'Torches',slots:1},rations:{name:'Rations',slots:1},bedroll:{name:'Bedroll',slots:1},spellbook:{name:'Spellbook',slots:1},wand:{name:'Wand',slots:1},scepter:{name:'Scepter',slots:1}};
+    let d = cat==='misc' ? misc[key] : cat==='shields' ? (this.DB.shields?.[key]||defaultRules.shields[key]) : this.DB[cat]?.[key];
+    if (!d) return;
+    let name = d.name;
+    if(cat==='weapons'&&d.dmg) name+=` [${d.dmg}]`;
+    if(cat==='armors'&&d.ca) name+=` [AC ${d.ca}]`;
+    if(cat==='shields'&&d.bonus) name+=` [+${d.bonus} AC]`;
+    this.inventory.push({uid:Date.now()+Math.random(),name,slots:d.slots,type:cat,dbKey:key});
+    this.renderInventory(); this.syncCombatOptions();
+  },
+
+  addCustomItem() {
+    this.inventory.push({uid:Date.now()+Math.random(),name:'New Item',slots:1,type:'misc',dbKey:null});
+    this.renderInventory();
+  },
+
+  removeInvItem(idx) { this.inventory.splice(idx,1); this.renderInventory(); this.syncCombatOptions() },
+
+  updateInvItem(idx, field, value) {
+    if(field==='slots') value = parseInt(value)||0;
+    this.inventory[idx][field] = value;
+    if(field==='name'||field==='type') this.syncCombatOptions();
+    this.calc();
+  },
+
+  syncGold(src) {
+    if(src==='edit') this.gold = parseInt(document.getElementById('gold_coins_edit').value)||0;
+    this.renderInventory();
+  },
+
+  renderInventory() {
+    const list = document.getElementById('inv_backpack_list');
+    if (list) {
+      list.innerHTML = '';
+      this.inventory.forEach((item, i) => {
+        const row = document.createElement('div'); row.className = 'inv-item';
+        const typeOpts = [{val:'misc',lbl:'ITEM'},{val:'weapons',lbl:'WEAP'},{val:'armors',lbl:'ARMR'},{val:'shields',lbl:'SHLD'}];
+        let sel = `<select class="inv-type-select" onchange="app.updateInvItem(${i},'type',this.value)">`;
+        typeOpts.forEach(o => { sel += `<option value="${o.val}"${item.type===o.val?' selected':''}>${o.lbl}</option>` });
+        sel += '</select>';
+        row.innerHTML = `${sel}<input type="text" class="inv-name" value="${item.name}" onchange="app.updateInvItem(${i},'name',this.value)"><input type="number" class="inv-slots" value="${item.slots}" min="0" max="20" onchange="app.updateInvItem(${i},'slots',this.value)"><button class="inv-del" onclick="app.removeInvItem(${i})">×</button>`;
+        list.appendChild(row);
+      });
+    }
+    const sumList = document.getElementById('inv_summary_list');
+    if (sumList) {
+      sumList.innerHTML = this.inventory.length ? '' : '<div style="font-style:italic;color:var(--muted);text-align:center;padding:8px">Empty pack.</div>';
+      this.inventory.forEach(item => {
+        const row = document.createElement('div'); row.className = 'inv-summary-row';
+        row.innerHTML = `<span>${item.name}</span><span style="font-family:var(--font-mono);font-size:.85rem;color:var(--gold)">${item.slots}</span>`;
+        sumList.appendChild(row);
+      });
+    }
+    const gd = document.getElementById('gold_coins_display');
+    if(gd) gd.innerText = this.gold;
+    const ge = document.getElementById('gold_coins_edit');
+    if(ge && document.activeElement !== ge) ge.value = this.gold;
+    this.calc();
+  },
+
+  calcInventory() {
+    const cur = this.inventory.reduce((s,item) => s+(item.slots||0), 0);
+    const max = parseInt(document.getElementById('base_FUE').value)||10;
+    return {current:cur, max};
+  },
+
+  syncCombatOptions() {
+    const prev = {armor:document.getElementById('sel_armor').value,shield:document.getElementById('sel_shield').value,w1:document.getElementById('sel_weapon').value,w2:document.getElementById('sel_weapon_sec').value};
+    const fill = (id, type, defVal, defTxt) => {
+      const s = document.getElementById(id); s.innerHTML = `<option value="${defVal}">${defTxt}</option>`;
+      this.inventory.filter(i=>i.type===type).forEach(item => {
+        const o = document.createElement('option'); o.value = item.uid; o.innerText = item.name; s.appendChild(o);
+      });
+    };
+    fill('sel_armor','armors','none','No Armor');
+    fill('sel_shield','shields','none','No Shield');
+    fill('sel_weapon','weapons','unarmed','Unarmed');
+    fill('sel_weapon_sec','weapons','unarmed','Unarmed');
+    const restore = (id, val) => { const s = document.getElementById(id); if(s.querySelector(`option[value="${val}"]`)) s.value = val; else s.value = s.options[0].value; };
+    restore('sel_armor',prev.armor); restore('sel_shield',prev.shield);
+    restore('sel_weapon',prev.w1); restore('sel_weapon_sec',prev.w2);
+  },
+
+  /* ─── PERSONAL ─── */
+  togglePersonal(showEdit) {
+    if (!showEdit) {
+      document.getElementById('char_img_summary').src = document.getElementById('char_img').src;
+      document.getElementById('summary_name').innerText = document.getElementById('char_name').value || 'Unknown Adventurer';
+      document.getElementById('summary_lvl').innerText = document.getElementById('char_lvl').value;
+      document.getElementById('summary_xp').innerText = document.getElementById('char_xp').value;
+      document.getElementById('summary_concept').innerText = document.getElementById('char_concept').value || 'No biography.';
+    }
+    document.getElementById('personal_edit_view').style.display = showEdit ? 'block' : 'none';
+    document.getElementById('personal_summary_view').style.display = showEdit ? 'none' : 'block';
+  },
+
+  /* ─── DICE ROLLS ─── */
+  rollCheck(label, mod) {
+    const d20 = Math.floor(Math.random()*20)+1;
+    const total = d20 + mod;
+    const isCrit = d20===20, isFail = d20===1;
+    const dieClass = isCrit||isFail ? 'crit-die' : '';
+    const toastClass = isCrit ? 'crit' : '';
+    const dieSymbol = isCrit ? '★' : isFail ? '☠' : d20;
+    this.toastHtml(`<span class="toast-die ${dieClass}">${dieSymbol}</span><div class="toast-info"><span class="toast-lbl">${label}</span><span>Total: <b>${total}</b> (d20:${d20}, mod:${mod>=0?'+':''}${mod})</span></div>`, toastClass);
+  },
+
+  rollStat(stat, val) { this.rollCheck(stat, this.getMod(val)) },
+
+  rollWeaponAtk(n) {
+    const name = document.getElementById(`sum_wep${n}_name`).innerText;
+    const statsStr = document.getElementById(`sum_wep${n}_stats`).innerText;
+    const atk = parseInt(statsStr.split('/')[0]) || 0;
+    this.rollCheck(`Attack: ${name}`, atk);
+  },
+
+  toast(msg, lbl='Info') { this.toastHtml(`<div class="toast-info"><span class="toast-lbl">${lbl}</span><span>${msg}</span></div>`) },
+
+  toastHtml(html, cls='') {
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div'); t.className = `toast ${cls}`; t.innerHTML = html;
+    c.appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; t.style.transform='translateY(8px)'; t.style.transition='.3s'; setTimeout(()=>t.remove(),300) }, 3000);
+  },
+
+  /* ─── TALENT MANAGER ─── */
+  initTalentManager() {
+    if (!this.DB.talents) return;
+    const cc = document.getElementById('tm_categories'); cc.innerHTML = '';
+    Object.keys(this.DB.talents).forEach(k => {
+      const btn = document.createElement('button'); btn.className = 'cat-btn'; btn.type = 'button';
+      btn.innerText = k.charAt(0).toUpperCase()+k.slice(1);
+      btn.onclick = () => app.showTalentCategory(k, btn); cc.appendChild(btn);
+    });
+  },
+
+  openTalentManager() {
+    if (!this.DB.talents) return;
+    document.getElementById('talent_modal').showModal();
+    const firstKey = Object.keys(this.DB.talents)[0];
+    const firstBtn = document.querySelector('#tm_categories .cat-btn');
+    if (this.activeTalentCategory) {
+      const ab = Array.from(document.querySelectorAll('#tm_categories .cat-btn')).find(b=>b.innerText.toLowerCase()===this.activeTalentCategory.toLowerCase());
+      this.showTalentCategory(this.activeTalentCategory, ab);
+    } else if (firstKey) this.showTalentCategory(firstKey, firstBtn);
+    this.updateTalentCount();
+  },
+
+  closeTalentManager() {
+    document.getElementById('talent_modal').close();
+    this.showTalentSummary(); this.updateTalentCount(); this.calc();
+  },
+
+  showTalentCategory(key, btn) {
+    this.activeTalentCategory = key;
+    document.querySelectorAll('#tm_categories .cat-btn').forEach(b=>b.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+    const list = document.getElementById('tm_list'); list.innerHTML = '';
+    const talents = this.DB.talents[key]; if(!talents) return;
+    talents.forEach(t => {
+      const sel = !!document.querySelector(`input[name="chk_talents_hidden"][value="${t.name}"]`);
+      const card = document.createElement('div'); card.className = `talent-card ${sel?'selected':''}`;
+      const id = t.id ? `data-id="${t.id}"` : '';
+      card.innerHTML = `<input type="checkbox" value="${t.name}" ${id} data-desc="${t.desc||''}" ${sel?'checked':''} onchange="app.toggleTalent(this,'${t.name}','${t.id||''}')"><div><h4>${t.name}</h4><p>${t.desc||''}</p></div>`;
+      list.appendChild(card);
+      card.onclick = e => { if(e.target.type==='checkbox') return; const chk=card.querySelector('input'); chk.checked=!chk.checked; app.toggleTalent(chk,t.name,t.id||'') };
+    });
+  },
+
+  toggleTalent(chk, name, id) {
+    let hidden = document.querySelector(`input[name="chk_talents_hidden"][value="${name}"]`);
+    const card = chk.closest('.talent-card');
+    if (chk.checked) {
+      const count = document.querySelectorAll('input[name="chk_talents_hidden"]').length;
+      if (count >= 3) { alert('You can only choose 3 talents.'); chk.checked=false; return }
+      if (!hidden) {
+        hidden = document.createElement('input'); hidden.type='hidden'; hidden.name='chk_talents_hidden'; hidden.value=name;
+        hidden.setAttribute('data-desc', chk.getAttribute('data-desc'));
+        if(id) hidden.setAttribute('data-id',id);
+        document.body.appendChild(hidden);
+      }
+      card?.classList.add('selected');
+    } else { hidden?.remove(); card?.classList.remove('selected') }
+    this.updateTalentCount(); this.calc();
+  },
+
+  clearTalents() {
+    if(!confirm('Clear all selected talents?')) return;
+    document.querySelectorAll('input[name="chk_talents_hidden"]').forEach(el=>el.remove());
+    document.getElementById('tm_list')?.querySelectorAll('input[type="checkbox"]').forEach(c=>{ c.checked=false; c.closest('.talent-card')?.classList.remove('selected') });
+    this.updateTalentCount(); this.calc();
+  },
+
+  updateTalentCount() {
+    const n = document.querySelectorAll('input[name="chk_talents_hidden"]').length;
+    document.getElementById('talent_count_main').innerText = n;
+    document.getElementById('talent_count_modal').innerText = n;
+  },
+
+  showTalentSummary() {
+    const items = Array.from(document.querySelectorAll('input[name="chk_talents_hidden"]'));
+    const list = document.getElementById('talents_summary_list'); list.innerHTML = '';
+    if (items.length) {
+      document.getElementById('talents_summary_view').style.display = 'block';
+      items.forEach(h => {
+        const d = document.createElement('div');
+        d.style.cssText = 'background:var(--raised);border:1px solid var(--rim);border-radius:var(--rad);padding:8px 12px';
+        d.innerHTML = `<div style="font-family:var(--font-display);font-size:.85rem;color:var(--gold);margin-bottom:2px">${h.value}</div><div style="font-size:.8rem;color:var(--text)">${h.getAttribute('data-desc')}</div>`;
+        list.appendChild(d);
+      });
+    } else { document.getElementById('talents_summary_view').style.display = 'none' }
+  },
+
+  /* ─── HELPERS ─── */
+  fillSelect(id, data) {
+    const s = document.getElementById(id);
+    s.innerHTML = '<option value="" disabled selected>— Select —</option>';
+    for (const k in data) { const o=document.createElement('option'); o.value=k; o.innerText=data[k].name; s.appendChild(o) }
+  },
+
+  getMod(val) {
+    if(val<=3) return -3; if(val<=6) return -2; if(val<=9) return -1;
+    if(val<=12) return 0; if(val<=14) return 1; if(val<=16) return 2; return 3;
+  },
+
+  /* ─── CROPPER ─── */
+  startCrop(input) {
+    if (!input.files?.[0]) return;
+    const r = new FileReader();
+    r.onload = e => {
+      app.cropState.img = new Image();
+      app.cropState.img.onload = function() {
+        const W=240,H=320;
+        const sc = Math.max(W/this.naturalWidth, H/this.naturalHeight);
+        app.cropState.zoom=sc; app.cropState.x=(W-this.naturalWidth*sc)/2; app.cropState.y=(H-this.naturalHeight*sc)/2;
+        const sl = document.getElementById('crop_zoom');
+        sl.min=sc*.1; sl.max=sc*5; sl.step=.01; sl.value=sc;
+        document.getElementById('crop_preview').src = app.cropState.img.src;
+        document.getElementById('crop_modal').showModal();
+        app.updateCropView();
+      };
+      app.cropState.img.onerror = () => app.toast('Invalid image','Error');
+      app.cropState.img.src = e.target.result;
+    };
+    r.readAsDataURL(input.files[0]); input.value='';
+  },
+
+  updateCropView() {
+    app.cropState.zoom = parseFloat(document.getElementById('crop_zoom').value);
+    const img = document.getElementById('crop_preview');
+    img.style.transform = `translate3d(${app.cropState.x}px,${app.cropState.y}px,0) scale(${app.cropState.zoom})`;
+  },
+
+  startDrag(e) {
+    app.cropState.isDragging=true;
+    const p = e.touches?.[0]||e;
+    app.cropState.lastX=p.clientX; app.cropState.lastY=p.clientY;
+    if(e.touches) e.preventDefault();
+  },
+
+  doDrag(e) {
+    if(!app.cropState.isDragging) return;
+    const p = e.touches?.[0]||e;
+    app.cropState.x += p.clientX-app.cropState.lastX;
+    app.cropState.y += p.clientY-app.cropState.lastY;
+    app.cropState.lastX=p.clientX; app.cropState.lastY=p.clientY;
+    app.updateCropView();
+    if(e.touches) e.preventDefault();
+  },
+
+  endDrag() { app.cropState.isDragging=false },
+
+  applyCrop() {
+    if(!app.cropState.img) return;
+    const canvas=document.createElement('canvas');
+    canvas.width=480; canvas.height=640;
+    const ctx=canvas.getContext('2d');
+    ctx.fillStyle='#111'; ctx.fillRect(0,0,480,640);
+    ctx.translate(app.cropState.x*2, app.cropState.y*2);
+    ctx.scale(app.cropState.zoom*2, app.cropState.zoom*2);
+    ctx.drawImage(app.cropState.img,0,0);
+    document.getElementById('char_img').src = canvas.toDataURL('image/jpeg',.92);
+    document.getElementById('crop_modal').close();
+  },
+
+  /* ─── OPTIONS UPDATE ─── */
+  updateOptions(reset=false) {
+    if(!this.DB.archetypes) return;
+    const descKey=document.getElementById('sel_desc').value;
+    const arqKey=document.getElementById('sel_arq').value;
+    const bgKey=document.getElementById('sel_bg').value;
+    const desc=this.DB.descriptors?.[descKey];
+    const arq=this.DB.archetypes?.[arqKey];
+    const bg=this.DB.backgrounds?.[bgKey];
+    document.getElementById('desc_info').innerText = desc ? `${desc.bonus}. ${desc.txt}` : '';
+    document.getElementById('arq_info').innerText = arq?.txt||'';
+    document.getElementById('bg_info').innerText = bg ? 'Grants 2 skills and a Tool Kit.' : '';
+    const filoSel=document.getElementById('sel_filo');
+    const curEdge=filoSel.value;
+    filoSel.innerHTML='<option value="" disabled selected>— Select —</option>';
+    if(arq?.edges) { arq.edges.forEach(e=>{const o=document.createElement('option');o.value=e;o.innerText=e;filoSel.appendChild(o)}); if(arq.edges.includes(curEdge)) filoSel.value=curEdge }
+    this.renderCheckboxes('skills_arq','chk_arq',arq?.skills||[],arq?.limit||0);
+    this.renderCheckboxes('skills_bg','chk_bg',bg?.skills||[],2);
+    document.getElementById('limit_arq').innerText = arq?.limit||0;
+    this.calc();
+  },
+
+  renderCheckboxes(id, name, skills, limit) {
+    const div=document.getElementById(id); div.innerHTML='';
+    skills.forEach(s=>{
+      const lbl=document.createElement('label'); lbl.className='skill-opt';
+      lbl.innerHTML=`<input type="checkbox" name="${name}" value="${s}" onchange="app.checkLimit('${name}',${limit});app.calc()"> ${s}`;
+      div.appendChild(lbl);
+    });
+  },
+
+  checkLimit(name, limit) {
+    const checked=document.querySelectorAll(`input[name="${name}"]:checked`);
+    if(checked.length>limit){ alert(`Choose at most ${limit}.`); event.target.checked=false }
+  },
+
+  toggleSection(sec, showEdit) {
+    document.getElementById(`${sec}_edit_view`).style.display = showEdit?'block':'none';
+    document.getElementById(`${sec}_summary_view`).style.display = showEdit?'none':'block';
+    if(sec==='equipment'){ if(showEdit) this.updateDbSelect(); this.renderInventory() }
+  },
+
+  /* ─── WEAPON CALC ─── */
+  onWeaponChange(prefix) {
+    const selId = prefix==='w1'?'sel_weapon':'sel_weapon_sec';
+    const uid = document.getElementById(selId).value;
+    const item = this.inventory.find(i=>i.uid==uid);
+    let attr='FUE';
+    if(item?.dbKey && this.DB.weapons?.[item.dbKey]) {
+      const w=this.DB.weapons[item.dbKey];
+      if(w.stat==='DES') attr='DES';
+      else if(w.stat==='FIN') {
+        const f=parseInt(document.getElementById('base_FUE').value)||8;
+        const d=parseInt(document.getElementById('base_DES').value)||8;
+        attr=d>f?'DES':'FUE';
+      }
+    }
+    document.getElementById(`${prefix}_attr`).value=attr; this.calc();
+  },
+
+  _calcWeapon(uid, stats, arqKey, prefix, alertId) {
+    const item=this.inventory.find(i=>i.uid==uid);
+    let w={name:'Unarmed',dmg:'1',stat:'FUE',slots:0,cat:'simple',req:0};
+    if(item) {
+      if(item.dbKey && this.DB.weapons?.[item.dbKey]) w=this.DB.weapons[item.dbKey];
+      else { w.name=item.name; w.dmg='1d6'; w.slots=item.slots }
+    }
+    const attr=document.getElementById(`${prefix}_attr`).value;
+    const atkStatVal=stats[attr];
+    const attrMod=this.getMod(atkStatVal);
+    let isProf=false, meetsReq=(w.req===0)||(stats.FUE>=w.req||stats.DES>=w.req);
+    if(arqKey==='luchador'){isProf=true;meetsReq=true}
+    else if(arqKey==='experto'){if(w.cat==='simple'||w.cat==='marcial') isProf=true}
+    else if(w.cat==='simple') isProf=true;
+    if(uid==='unarmed') isProf=true;
+    let totalAtk=attrMod+(isProf?2:0); if(!meetsReq&&isProf) totalAtk-=2;
+    const dmgMod=this.getMod(stats[attr]);
+    const dmgSign=dmgMod>0?'+'+dmgMod:(dmgMod<0?dmgMod:'');
+    const finalDmg=`${w.dmg}${dmgSign?` ${dmgSign}`:''}`;
+    const atkEl=document.getElementById(`${prefix}_atk_val`);
+    if(atkEl){atkEl.innerText=(totalAtk>=0?'+':'')+totalAtk;atkEl.style.color=totalAtk>=0?'var(--gold)':'var(--blood)'}
+    const dmgEl=document.getElementById(`${prefix}_dmg_val`);
+    if(dmgEl) dmgEl.innerText=finalDmg;
+    document.getElementById(alertId).innerText=!meetsReq?'⚠ Missing requirements':'';
+    return {summaryName:w.name, summaryStats:`${totalAtk>=0?'+':''}${totalAtk} / ${finalDmg}`};
+  },
+
+  /* ─── MAIN CALC ─── */
+  calc() {
+    if(!this.DB.descriptors) return;
+    const stats={FUE:parseInt(document.getElementById('base_FUE').value)||8,DES:parseInt(document.getElementById('base_DES').value)||8,CON:parseInt(document.getElementById('base_CON').value)||8,INT:parseInt(document.getElementById('base_INT').value)||8,SAB:parseInt(document.getElementById('base_SAB').value)||8,CAR:parseInt(document.getElementById('base_CAR').value)||8};
+    const descKey=document.getElementById('sel_desc').value;
+    const descData=this.DB.descriptors?.[descKey];
+    if(descData?.mods) for(const k in descData.mods) if(stats[k]!==undefined) stats[k]+=descData.mods[k];
+    if(document.querySelector('input[name="chk_talents_hidden"][data-id="atleta"]')) stats.FUE+=1;
+
+    // Stat displays
+    let finalHTML='', summaryHTML='';
+    const statNames={FUE:'STR',DES:'DEX',CON:'CON',INT:'INT',SAB:'WIS',CAR:'CHA'};
+    for(const k in stats){
+      const mod=this.getMod(stats[k]);
+      finalHTML+=`<div style="background:var(--raised);border:1px solid var(--rim);border-radius:var(--rad);text-align:center;padding:6px 4px;font-family:var(--font-mono);font-size:.8rem"><div style="font-family:var(--font-display);font-size:.6rem;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:2px">${statNames[k]}</div><div style="color:var(--gold);font-size:1.1rem;font-weight:700">${mod>=0?'+':''}${mod}</div><div style="color:var(--muted);font-size:.75rem;border-top:1px solid var(--rim);padding-top:2px;margin-top:2px">${stats[k]}</div></div>`;
+      summaryHTML+=`<div class="stat-box" onclick="app.rollStat('${k}',${stats[k]})"><div class="lbl">${statNames[k]}</div><div class="mod">${mod>=0?'+':''}${mod}</div><div class="val">${stats[k]}</div></div>`;
+    }
+    document.getElementById('stats_final_display').innerHTML=finalHTML;
+    document.getElementById('stats_summary_text').innerHTML=summaryHTML;
+
+    // Saving throws
+    const selCommon=document.querySelector('input[name="save_common"]:checked')?.value;
+    const selUncommon=document.querySelector('input[name="save_uncommon"]:checked')?.value;
+    let savesHTML='', savesSummary='';
+    for(const k of['FUE','DES','CON','INT','SAB','CAR']){
+      const base=this.getMod(stats[k]);
+      const isProf=k===selCommon||k===selUncommon;
+      const total=base+(isProf?2:0);
+      const sign=total>=0?'+':'';
+      savesHTML+=`<div class="save-item ${isProf?'prof':''}" onclick="app.rollCheck('${k} Save',${total})"><span class="s-lbl">${statNames[k]}</span>${sign}${total}</div>`;
+      savesSummary+=`<div class="save-item ${isProf?'prof':''}" onclick="app.rollCheck('${k} Save',${total})"><span class="s-lbl">${statNames[k]}</span>${sign}${total}</div>`;
+    }
+    document.getElementById('saves_display').innerHTML=savesHTML;
+    document.getElementById('saves_summary_text').innerHTML=savesSummary;
+
+    // Skills
+    const skillCounts={};
+    if(descData?.grant) descData.grant.forEach(s=>skillCounts[s]=(skillCounts[s]||0)+1);
+    for(const grp of['chk_arq','chk_bg']) document.querySelectorAll(`input[name="${grp}"]:checked`).forEach(c=>{skillCounts[c.value]=(skillCounts[c.value]||0)+1});
+    const skillDiv=document.getElementById('final_skills_list'); skillDiv.innerHTML='';
+    for(const s in skillCounts){const g=skillCounts[s]>=2?1:0;const tag=document.createElement('span');tag.className=`skill-tag${g?' g1':''}`;tag.innerText=`${s} [G${g}]`;skillDiv.appendChild(tag)}
+
+    // Identity summary
+    const arqKey=document.getElementById('sel_arq').value;
+    const arqData=this.DB.archetypes?.[arqKey];
+    const bgData=this.DB.backgrounds?.[document.getElementById('sel_bg').value];
+    document.getElementById('identity_summary_text').innerHTML=`<b>${descData?.name||'—'}</b> · <b>${arqData?.name||'—'}</b> · <b>${bgData?.name||'—'}</b>`;
+
+    if(!arqData) return;
+
+    // Load
+    const load=this.calcInventory(); load.max=stats.FUE;
+    document.getElementById('res_carga').innerText=`${load.current} / ${load.max}`;
+    const sumLD=document.getElementById('load_summary_display'); if(sumLD) sumLD.innerText=`${load.current} / ${load.max}`;
+    const pct=Math.min((load.current/load.max)*100,100);
+    document.getElementById('carga_bar').style.width=pct+'%';
+    const over=load.current>load.max;
+    document.getElementById('res_carga').style.color=over?'var(--ember)':'var(--text)';
+    document.getElementById('carga_bar').style.background=over?'var(--blood)':'var(--gold)';
+    document.getElementById('carga_warn').style.display=over?'block':'none';
+
+    // Armor & AC
+    const armUID=document.getElementById('sel_armor').value;
+    let armor={name:'—',ca:10,type:'none',slots:0};
+    const eqArm=this.inventory.find(i=>i.uid==armUID);
+    if(eqArm){if(eqArm.dbKey&&this.DB.armors?.[eqArm.dbKey]) armor=this.DB.armors[eqArm.dbKey]; else{armor.name=eqArm.name;armor.slots=eqArm.slots}}
+    const shUID=document.getElementById('sel_shield').value;
+    let shield={name:'',bonus:0,slots:0};
+    const eqSh=this.inventory.find(i=>i.uid==shUID);
+    if(eqSh){const sd=this.DB.shields?.[eqSh.dbKey]||defaultRules.shields?.[eqSh.dbKey];if(sd) shield=sd}
+    const modDES=this.getMod(stats.DES);
+    let ca=armor.ca;
+    const defNat=document.querySelector('input[name="chk_talents_hidden"][data-id="def_nat"]');
+    if(armor.type==='none'&&defNat) ca=10+modDES+this.getMod(stats.CON);
+    else if(armor.type==='light'||armor.type==='none') ca+=modDES;
+    else if(armor.type==='medium') ca+=Math.min(modDES,2);
+    ca+=shield.bonus+arqData.ca+(parseInt(document.getElementById('sel_magic_bonus').value)||0);
+    document.getElementById('armor_base_val').innerText=ca;
+    document.getElementById('armor_desc').innerText=`Slots used: ${armor.slots}`;
+
+    // Weapons
+    const w1=this._calcWeapon(document.getElementById('sel_weapon').value,stats,arqKey,'w1','w1_alert');
+    const w2=this._calcWeapon(document.getElementById('sel_weapon_sec').value,stats,arqKey,'w2','w2_alert');
+    document.getElementById('sum_ac').innerText=ca;
+    document.getElementById('sum_armor_name').innerText=armor.name||'None';
+    document.getElementById('sum_armor_type').innerText={light:'Light',medium:'Medium',heavy:'Heavy',none:'No Armor'}[armor.type]||'—';
+    document.getElementById('sum_shield').innerText=shield.name||'None';
+    document.getElementById('sum_wep1_name').innerText=w1.summaryName;
+    document.getElementById('sum_wep1_stats').innerText=w1.summaryStats;
+    document.getElementById('sum_wep2_name').innerText=w2.summaryName;
+    document.getElementById('sum_wep2_stats').innerText=w2.summaryStats;
+
+    // Resources
+    let bonusIng=0, bonusIni=0;
+    document.querySelectorAll('input[name="chk_talents_hidden"]').forEach(h=>{
+      if(h.getAttribute('data-id')==='despertar'||h.value==='Supernatural Awakening') bonusIng=6;
+      if(h.getAttribute('data-id')==='alerta') bonusIni=5;
+    });
+    const pv=arqData.pv+stats.CON;
+    const maxFis=Math.max(stats.FUE,stats.DES);
+    const maxMen=Math.max(stats.INT,stats.SAB,stats.CAR);
+    const adr=maxFis+1+arqData.adr;
+    const ing=maxMen+1+arqData.ing+bonusIng;
+    const magAtk=Math.max(this.getMod(stats.INT),this.getMod(stats.SAB),this.getMod(stats.CAR))+2;
+    document.getElementById('max_pv').innerText=pv;
+    document.getElementById('res_carne').innerText=stats.CON;
+    document.getElementById('max_adr').innerText=adr;
+    document.getElementById('max_ing').innerText=ing;
+    document.getElementById('res_ca').innerText=ca;
+    document.getElementById('res_ini').innerText=(modDES+bonusIni>=0?'+':'')+(modDES+bonusIni);
+    document.getElementById('res_atq_mag').innerText=(magAtk>=0?'+':'')+magAtk;
+    document.getElementById('res_filo_val').innerText=document.getElementById('sel_filo').value||'—';
+  },
+
+  /* ─── RANDOMIZE ─── */
+  randomize() {
+    if(!this.DB.descriptors) return;
+    ['base_FUE','base_DES','base_CON','base_INT','base_SAB','base_CAR'].forEach(id=>{
+      document.getElementById(id).value=Array.from({length:3},()=>Math.floor(Math.random()*6)+1).reduce((a,b)=>a+b,0)+3;
+    });
+    const rndKey=o=>Object.keys(o)[Math.floor(Math.random()*Object.keys(o).length)];
+    document.getElementById('sel_desc').value=rndKey(this.DB.descriptors);
+    document.getElementById('sel_arq').value=rndKey(this.DB.archetypes);
+    document.getElementById('sel_bg').value=rndKey(this.DB.backgrounds);
+    this.inventory=[];
+    const armKey=rndKey(this.DB.armors);
+    const armD=this.DB.armors[armKey];
+    this.inventory.push({uid:Date.now(),name:`${armD.name} [AC ${armD.ca}]`,slots:armD.slots,type:'armors',dbKey:armKey});
+    const wepKey=rndKey(this.DB.weapons);
+    const wepD=this.DB.weapons[wepKey];
+    this.inventory.push({uid:Date.now()+1,name:`${wepD.name} [${wepD.dmg}]`,slots:wepD.slots,type:'weapons',dbKey:wepKey});
+    this.inventory.push({uid:Date.now()+2,name:'Rations (3)',slots:1,type:'misc',dbKey:'rations'});
+    this.inventory.push({uid:Date.now()+3,name:'Torches (5)',slots:1,type:'misc',dbKey:'torch'});
+    this.gold=Math.floor(Math.random()*20)+10;
+    this.syncCombatOptions();
+    document.getElementById('sel_armor').value=this.inventory[0].uid;
+    document.getElementById('sel_weapon').value=this.inventory[1].uid;
+    document.getElementById('sel_shield').value='none';
+    document.getElementById('sel_weapon_sec').value='unarmed';
+    document.getElementById('sel_magic_bonus').value='0';
+    this.onWeaponChange('w1'); this.onWeaponChange('w2');
+    this.updateOptions(true);
+    const filoSel=document.getElementById('sel_filo');
+    if(filoSel.options.length>1) filoSel.selectedIndex=Math.floor(Math.random()*(filoSel.options.length-1))+1;
+    const randR=name=>{const r=Array.from(document.querySelectorAll(`input[name="${name}"]`));r.forEach(x=>x.checked=false);r[Math.floor(Math.random()*r.length)].checked=true};
+    randR('save_common'); randR('save_uncommon');
+    const randC=(name,lim)=>{const b=Array.from(document.querySelectorAll(`input[name="${name}"]`));b.forEach(x=>x.checked=false);b.sort(()=>Math.random()-.5).slice(0,lim).forEach(x=>x.checked=true)};
+    randC('chk_arq',this.DB.archetypes[document.getElementById('sel_arq').value].limit);
+    randC('chk_bg',2);
+    document.querySelectorAll('input[name="chk_talents_hidden"]').forEach(el=>el.remove());
+    const allT=[];
+    if(this.DB.talents) Object.values(this.DB.talents).forEach(arr=>arr.forEach(t=>allT.push(t)));
+    allT.sort(()=>Math.random()-.5).slice(0,3).forEach(t=>{
+      const h=document.createElement('input');h.type='hidden';h.name='chk_talents_hidden';h.value=t.name;
+      h.setAttribute('data-desc',t.desc||'');if(t.id)h.setAttribute('data-id',t.id);document.body.appendChild(h);
+    });
+    this.updateTalentCount(); this.showTalentSummary();
+    this.togglePersonal(false);
+    ['skills','stats','identity','saves','combat','equipment'].forEach(s=>this.toggleSection(s,false));
+    this.calc();
+    document.getElementById('cur_pv').value=document.getElementById('max_pv').innerText;
+    document.getElementById('cur_adr').value=document.getElementById('max_adr').innerText;
+    document.getElementById('cur_ing').value=document.getElementById('max_ing').innerText;
+    this.toast('Random character generated','Random');
+  },
+
+  /* ─── CLEAR ─── */
+  clear() {
+    ['base_FUE','base_DES','base_CON','base_INT','base_SAB','base_CAR'].forEach(id=>document.getElementById(id).value=8);
+    document.getElementById('char_name').value=''; document.getElementById('char_concept').value='';
+    document.getElementById('char_lvl').value='1'; document.getElementById('char_xp').value='0';
+    document.getElementById('char_notes').value='';
+    document.getElementById('cur_pv').value=0; document.getElementById('cur_adr').value=0; document.getElementById('cur_ing').value=0;
+    this.inventory=[]; this.gold=0; this.syncCombatOptions();
+    document.getElementById('sel_magic_bonus').value='0';
+    document.querySelectorAll('input[type=checkbox],input[type=radio]').forEach(c=>c.checked=false);
+    document.querySelectorAll('input[name="chk_talents_hidden"]').forEach(el=>el.remove());
+    document.getElementById('char_img').src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 24 24' fill='%234a3b2a'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E";
+    this.showTalentSummary(); this.updateTalentCount();
+    this.togglePersonal(true);
+    ['skills','stats','identity','saves','combat','equipment'].forEach(s=>this.toggleSection(s,true));
+    this.updateOptions(true);
+  },
+
+  /* ─── SAVE/LOAD ─── */
+  gatherCharData() {
+    const data={inputs:{},selects:{},checks:[],hidden_talents:[],portrait:document.getElementById('char_img').src,concept:document.getElementById('char_concept').value,notes:document.getElementById('char_notes').value,inventory:this.inventory,gold:this.gold};
+    document.querySelectorAll('input[type=text]:not(.inv-name),input[type=number]:not(.inv-slots):not(#gold_coins_edit)').forEach(el=>data.inputs[el.id]=el.value);
+    document.querySelectorAll('select:not(#inv_db_category):not(#inv_db_item):not(.inv-type-select)').forEach(el=>data.selects[el.id]=el.value);
+    document.querySelectorAll('input[type=checkbox]:not([type=hidden]):checked,input[type=radio]:checked').forEach(el=>data.checks.push({name:el.name,value:el.value,id:el.id}));
+    document.querySelectorAll('input[name="chk_talents_hidden"]').forEach(el=>data.hidden_talents.push({value:el.value,id:el.getAttribute('data-id'),desc:el.getAttribute('data-desc')}));
+    return data;
+  },
+
+  applyCharData(data) {
+    this.inventory=data.inventory||[]; this.gold=data.gold||0;
+    this.syncCombatOptions();
+    for(const id in data.inputs){const el=document.getElementById(id);if(el)el.value=data.inputs[id]}
+    for(const id in data.selects){const el=document.getElementById(id);if(el)el.value=data.selects[id]}
+    if(data.portrait) document.getElementById('char_img').src=data.portrait;
+    if(data.concept) document.getElementById('char_concept').value=data.concept;
+    if(data.notes) document.getElementById('char_notes').value=data.notes;
+    this.updateOptions(false);
+    document.querySelectorAll('input[type=checkbox],input[type=radio]').forEach(el=>el.checked=false);
+    document.querySelectorAll('input[name="chk_talents_hidden"]').forEach(el=>el.remove());
+    data.checks?.forEach(item=>{let el=document.getElementById(item.id)||document.querySelector(`input[name="${item.name}"][value="${item.value}"]`);if(el)el.checked=true});
+    data.hidden_talents?.forEach(t=>{
+      const h=document.createElement('input');h.type='hidden';h.name='chk_talents_hidden';h.value=t.value;
+      h.setAttribute('data-desc',t.desc||'');if(t.id)h.setAttribute('data-id',t.id);document.body.appendChild(h);
+    });
+    this.showTalentSummary(); this.updateTalentCount();
+    this.togglePersonal(false);
+    ['skills','stats','identity','saves','combat','equipment'].forEach(s=>this.toggleSection(s,false));
+    this.calc();
+  },
+
+  saveChar() {
+    const name=document.getElementById('char_name').value.trim();
+    if(!name){this.toast('Name required!','Error');return}
+    const roster=JSON.parse(localStorage.getItem('sands_roster')||'{}');
+    if(roster[name]&&!confirm(`Overwrite "${name}"?`)) return;
+    roster[name]=this.gatherCharData();
+    try{localStorage.setItem('sands_roster',JSON.stringify(roster));this.toast('Character saved')}
+    catch{alert('Storage full!')}
+  },
+
+  openLoadMenu() {
+    const roster=JSON.parse(localStorage.getItem('sands_roster')||'{}');
+    const list=document.getElementById('char_list'); list.innerHTML='';
+    if(!Object.keys(roster).length){list.innerHTML='<p style="color:var(--muted);text-align:center;padding:20px">No saved characters.</p>'}
+    Object.keys(roster).forEach(name=>{
+      const row=document.createElement('div');row.className='char-row';
+      row.innerHTML=`<span class="char-name-display">${name}</span><div style="display:flex;gap:5px"><button class="btn-mini load" onclick="app.loadChar('${name}')">Load</button><button class="btn-mini del" onclick="app.deleteChar('${name}')">Delete</button></div>`;
+      list.appendChild(row);
+    });
+    document.getElementById('char_manager').showModal();
+  },
+
+  loadChar(name) {
+    const data=JSON.parse(localStorage.getItem('sands_roster')||'{}')[name];
+    if(!data) return;
+    this.applyCharData(data);
+    document.getElementById('char_manager').close();
+    this.toast(`Loaded: ${name}`);
+  },
+
+  deleteChar(name) {
+    if(!confirm(`Delete "${name}"?`)) return;
+    const r=JSON.parse(localStorage.getItem('sands_roster')||'{}');
+    delete r[name]; localStorage.setItem('sands_roster',JSON.stringify(r)); this.openLoadMenu();
+  },
+
+  exportJSON() {
+    const name=(document.getElementById('char_name').value.trim()||'adventurer').replace(/ /g,'_');
+    const a=document.createElement('a');
+    a.href='data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(this.gatherCharData(),null,2));
+    a.download=name+'.json'; document.body.appendChild(a); a.click(); a.remove();
+  },
+
+  triggerLoadJSON(){ document.getElementById('json_char_input').click() },
+
+  loadJSON(input) {
+    if(!input.files?.[0]) return;
+    const r=new FileReader();
+    r.onload=e=>{try{app.applyCharData(JSON.parse(e.target.result));app.toast('Character imported')}catch{app.toast('Invalid JSON','Error')}};
+    r.readAsText(input.files[0]); input.value='';
+  }
+};
+
+window.onload = () => app.init();
+</script>
+</body>
+</html>
