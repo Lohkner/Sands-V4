@@ -90,8 +90,8 @@ body{
 .app-body{
   display:flex;
   align-items:flex-start;
-  gap:20px;
-  margin-top:20px;
+  gap:14px;
+  margin-top:14px;
 }
 
 .site-header{
@@ -135,7 +135,7 @@ body{
   min-width:0;
   display:flex;
   flex-direction:column;
-  gap:12px;
+  gap:8px;
   align-self:flex-start;
 }
 
@@ -144,7 +144,7 @@ body{
   background:var(--surface);
   border:1px solid var(--border);
   border-radius:var(--rad-lg);
-  padding:18px;
+  padding:14px;
   box-shadow:var(--shadow-card);
   position:relative;
   overflow:visible;
@@ -167,8 +167,8 @@ body{
   display:flex;
   align-items:center;
   gap:10px;
-  margin-bottom:14px;
-  padding-bottom:10px;
+  margin-bottom:10px;
+  padding-bottom:8px;
   border-bottom:1px solid var(--rim);
 }
 
@@ -250,7 +250,7 @@ body{
   letter-spacing:.12em;
   text-transform:uppercase;
   display:block;
-  margin-bottom:4px;
+  margin-bottom:2px;
 }
 
 h3.sub{
@@ -258,7 +258,7 @@ h3.sub{
   font-size:.85rem;
   color:var(--gold);
   letter-spacing:.08em;
-  margin-bottom:10px;
+  margin-bottom:6px;
 }
 
 /* ═══ INPUTS ═══ */
@@ -271,8 +271,8 @@ textarea{
   border-radius:var(--rad);
   color:var(--bright);
   font-family:var(--font-body);
-  font-size:.95rem;
-  padding:8px 10px;
+  font-size:.875rem;
+  padding:6px 8px;
   width:100%;
   min-width:0;
   box-sizing:border-box;
@@ -294,7 +294,7 @@ select{
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%23b0987c' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
   background-repeat:no-repeat;
   background-position:right 10px center;
-  padding-right:28px;
+  padding-right:24px;
   cursor:pointer;
 }
 
@@ -309,9 +309,9 @@ textarea{
 .stat-big-input{
   text-align:center;
   font-family:var(--font-display);
-  font-size:1.6rem !important;
+  font-size:1.35rem !important;
   font-weight:700;
-  padding:6px !important;
+  padding:4px !important;
   background:var(--deep) !important;
   border-color:var(--rim) !important;
   color:var(--gold) !important;
@@ -353,9 +353,9 @@ input[type=radio]::after{
 input[type=radio]:checked::after{transform:scale(1)}
 
 /* ═══ GRIDS ═══ */
-.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.g6{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.g6{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
 
 /* ═══ STAT BOX ═══ */
 .stat-box{
@@ -394,10 +394,11 @@ input[type=radio]:checked::after{transform:scale(1)}
 }
 
 /* ═══ FC BOXES — COMBAT STATS SIDEBAR ═══ */
-.fc-grid{display:flex;flex-direction:column;gap:8px;width:100%;min-width:0}
-.fc-row{display:grid;gap:8px;min-width:0}
+.fc-grid{display:flex;flex-direction:column;gap:5px;width:100%;min-width:0}
+.fc-row{display:grid;gap:5px;min-width:0}
 .fc-row.c2{grid-template-columns:1fr 1fr}
 .fc-row.c3{grid-template-columns:1fr 1fr 1fr}
+.fc-row.c4{grid-template-columns:1fr 1fr 1fr 1fr}
 
 .fc-box{
   background:var(--raised);
@@ -414,11 +415,11 @@ input[type=radio]:checked::after{transform:scale(1)}
 
 .fc-lbl{
   font-family:var(--font-display);
-  font-size:.6rem;
-  letter-spacing:.12em;
+  font-size:.55rem;
+  letter-spacing:.1em;
   text-transform:uppercase;
   color:var(--dim);
-  padding:5px 8px 3px;
+  padding:3px 6px 2px;
   border-bottom:1px solid var(--rim);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
@@ -431,19 +432,19 @@ input[type=radio]:checked::after{transform:scale(1)}
   display:flex;align-items:center;justify-content:center;
   font-family:var(--font-mono);
   font-weight:600;
-  font-size:1.1rem;
+  font-size:1rem;
   color:var(--bright);
-  padding:6px 8px;
+  padding:4px 6px;
 }
 
 .pv-display{
   display:flex;align-items:center;gap:2px;
-  font-family:var(--font-display);font-weight:700;font-size:1.5rem;
+  font-family:var(--font-display);font-weight:700;font-size:1.35rem;
 }
 .pv-display .slash{color:var(--blood);font-size:1rem;margin:0 1px}
 .pv-display .max-val{color:var(--blood)}
 
-.res-display{display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-weight:600;font-size:1.05rem}
+.res-display{display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-weight:600;font-size:.95rem}
 .res-r,.res-r input,.res-r .slash,.res-r .max-val{color:var(--blood) !important}
 .res-b,.res-b input,.res-b .slash,.res-b .max-val{color:var(--ice) !important}
 .res-g,.res-g input,.res-g .slash,.res-g .max-val{color:var(--sage) !important}
@@ -465,16 +466,16 @@ input[type=radio]:checked::after{transform:scale(1)}
   background:var(--deep);
   border:1px solid var(--rim);
   border-radius:var(--rad);
-  padding:10px;
-  max-height:220px;
+  padding:6px 8px;
+  max-height:180px;
   overflow-y:auto;
 }
 .skill-opt{
   display:flex;align-items:center;gap:8px;
   cursor:pointer;
-  padding:5px 6px;
+  padding:3px 6px;
   border-radius:2px;
-  font-size:.875rem;
+  font-size:.85rem;
   color:var(--text);
   transition:background .1s;
 }
@@ -495,10 +496,10 @@ input[type=radio]:checked::after{transform:scale(1)}
 /* ═══ BUTTONS ═══ */
 .btn{
   font-family:var(--font-display);
-  font-size:.8rem;
+  font-size:.78rem;
   letter-spacing:.06em;
   text-transform:uppercase;
-  padding:10px 12px;
+  padding:8px 10px;
   cursor:pointer;
   border-radius:var(--rad);
   transition:all .15s;
@@ -541,10 +542,10 @@ input[type=radio]:checked::after{transform:scale(1)}
   color:var(--gold);
   font-size:.8rem;
   letter-spacing:.1em;
-  padding:10px;
+  padding:8px;
   cursor:pointer;
   border-radius:var(--rad);
-  margin-top:14px;
+  margin-top:10px;
   font-family:var(--font-display);
   text-transform:uppercase;
   transition:all .15s;
@@ -562,28 +563,29 @@ input[type=radio]:checked::after{transform:scale(1)}
   padding:5px 18px;
   cursor:pointer;
   border-radius:var(--rad);
-  margin:12px auto 0;
+  margin:8px auto 0;
   transition:all .15s;
   text-transform:uppercase;
   letter-spacing:.08em;
 }
 .btn-edit:hover{border-color:var(--gold);color:var(--gold)}
 
-.action-bar{display:grid;grid-template-columns:1fr 1fr 42px;gap:8px;width:100%;min-width:0}
+.action-bar{display:grid;grid-template-columns:1fr 1fr 34px;gap:6px;width:100%;min-width:0}
 .btn-settings{
   background:var(--raised);border:1px solid var(--border);
   color:var(--dim);cursor:pointer;border-radius:var(--rad);
-  font-size:1rem;display:flex;align-items:center;justify-content:center;
+  font-size:.9rem;display:flex;align-items:center;justify-content:center;
   transition:all .15s;
+  padding:0;
 }
 .btn-settings:hover{border-color:var(--gold);color:var(--gold)}
 
 /* ═══ COMBAT INFO ═══ */
 .combat-card{
   background:var(--raised);border:1px solid var(--rim);
-  border-radius:var(--rad);padding:10px 12px;
+  border-radius:var(--rad);padding:6px 10px;
   display:flex;justify-content:space-between;align-items:center;
-  margin-top:6px;
+  margin-top:4px;
 }
 .combat-card .c-label{font-size:.7rem;color:var(--muted);font-family:var(--font-display);text-transform:uppercase;letter-spacing:.08em}
 .combat-card .c-val{font-family:var(--font-mono);font-weight:600;font-size:1rem;color:var(--bright)}
@@ -818,8 +820,8 @@ dialog::backdrop{background:rgba(0,0,0,.75);backdrop-filter:blur(6px)}
 /* ═══ INFO BOX ═══ */
 .info-box{
   background:var(--deep);border:1px solid var(--rim);
-  border-radius:var(--rad);padding:8px 10px;
-  font-size:.82rem;color:var(--muted);
+  border-radius:var(--rad);padding:5px 8px;
+  font-size:.8rem;color:var(--muted);
   font-style:italic;line-height:1.4;margin-top:5px;
 }
 
@@ -836,11 +838,11 @@ dialog::backdrop{background:rgba(0,0,0,.75);backdrop-filter:blur(6px)}
 /* ═══ SAVES DISPLAY ═══ */
 .saves-display{
   display:grid;grid-template-columns:repeat(6,1fr);
-  gap:8px;margin-top:12px;
-  border-top:1px solid var(--rim);padding-top:12px;
+  gap:5px;margin-top:8px;
+  border-top:1px solid var(--rim);padding-top:8px;
 }
 .save-item{
-  text-align:center;padding:5px;
+  text-align:center;padding:4px;
   background:var(--raised);border-radius:var(--rad);
   font-family:var(--font-mono);font-weight:600;font-size:.9rem;
   cursor:pointer;transition:all .15s;
@@ -853,8 +855,8 @@ dialog::backdrop{background:rgba(0,0,0,.75);backdrop-filter:blur(6px)}
 /* Combat summary boxes */
 .sum-wep{
   background:var(--raised);border:1px solid var(--rim);
-  border-radius:var(--rad);padding:10px 12px;
-  cursor:pointer;transition:all .15s;margin-bottom:8px;
+  border-radius:var(--rad);padding:7px 10px;
+  cursor:pointer;transition:all .15s;margin-bottom:5px;
 }
 .sum-wep:hover{border-color:var(--gold);background:var(--panel)}
 .sum-wep:active{transform:scale(.99)}
@@ -1019,7 +1021,7 @@ details[open]>summary::before{content:'▾'}
       </div>
 
       <!-- ACTIONS -->
-      <div class="panel">
+      <div class="panel" style="padding:8px 12px">
         <div class="action-bar">
           <button class="btn btn-ghost" onclick="app.randomize()">⚄ Aleatorio</button>
           <button class="btn btn-ghost" onclick="app.clear()">↺ Resetear</button>
@@ -1031,7 +1033,7 @@ details[open]>summary::before{content:'▾'}
       <div class="panel" style="padding:12px">
         <div id="db-status-overlay" class="status-badge">⚠ REGLAS NO CARGADAS</div>
         <div class="fc-grid">
-          <!-- HP -->
+          <!-- HP — ancho completo -->
           <div class="fc-box">
             <div class="fc-lbl r">Puntos de Golpe</div>
             <div class="fc-val">
@@ -1042,44 +1044,7 @@ details[open]>summary::before{content:'▾'}
               </div>
             </div>
           </div>
-          <!-- Row: AC INI FLESH -->
-          <div class="fc-row c3">
-            <div class="fc-box">
-              <div class="fc-lbl g">CA</div>
-              <div class="fc-val" style="font-size:1.2rem;color:var(--gold)"><span id="res_ca">10</span></div>
-            </div>
-            <div class="fc-box clickable" onclick="app.rollCheck('Iniciativa', parseInt(document.getElementById('res_ini').innerText))">
-              <div class="fc-lbl">INI</div>
-              <div class="fc-val"><span id="res_ini">+0</span></div>
-            </div>
-            <div class="fc-box">
-              <div class="fc-lbl">Carne</div>
-              <div class="fc-val"><span id="res_carne">0</span></div>
-            </div>
-          </div>
-          <!-- Row: Mag Atk / Edge -->
-          <div class="fc-row c2">
-            <div class="fc-box clickable" onclick="app.rollCheck('Ataque Mágico', parseInt(document.getElementById('res_atq_mag').innerText))">
-              <div class="fc-lbl">Atq. Mágico</div>
-              <div class="fc-val"><span id="res_atq_mag">+2</span></div>
-            </div>
-            <div class="fc-box">
-              <div class="fc-lbl">Filo</div>
-              <div class="fc-val" style="font-size:.9rem"><span id="res_filo_val">Físico</span></div>
-            </div>
-          </div>
-          <!-- Row: ATQ Físico / Competencia -->
-          <div class="fc-row c2">
-            <div class="fc-box clickable" onclick="app.rollCheck('Ataque Físico', parseInt(document.getElementById('res_atq_fis').innerText))">
-              <div class="fc-lbl g">Atq. Físico</div>
-              <div class="fc-val"><span id="res_atq_fis">+2</span></div>
-            </div>
-            <div class="fc-box">
-              <div class="fc-lbl">Competencia</div>
-              <div class="fc-val" style="color:var(--gold)"><span id="res_prof">+2</span></div>
-            </div>
-          </div>
-          <!-- ADR / ING -->
+          <!-- ADR / ING — recursos editables -->
           <div class="fc-row c2">
             <div class="fc-box">
               <div class="fc-lbl gr">Adrenalina</div>
@@ -1102,9 +1067,43 @@ details[open]>summary::before{content:'▾'}
               </div>
             </div>
           </div>
+          <!-- CA · INI · Carne · Competencia — 4 cols -->
+          <div class="fc-row c4">
+            <div class="fc-box">
+              <div class="fc-lbl g">CA</div>
+              <div class="fc-val" style="font-size:1.1rem;color:var(--gold)"><span id="res_ca">10</span></div>
+            </div>
+            <div class="fc-box clickable" onclick="app.rollCheck('Iniciativa', parseInt(document.getElementById('res_ini').innerText))">
+              <div class="fc-lbl">INI</div>
+              <div class="fc-val"><span id="res_ini">+0</span></div>
+            </div>
+            <div class="fc-box">
+              <div class="fc-lbl">Carne</div>
+              <div class="fc-val"><span id="res_carne">0</span></div>
+            </div>
+            <div class="fc-box">
+              <div class="fc-lbl g">Comp.</div>
+              <div class="fc-val" style="color:var(--gold)"><span id="res_prof">+2</span></div>
+            </div>
+          </div>
+          <!-- Atq. Fis · Atq. Mag · Filo — 3 cols -->
+          <div class="fc-row c3">
+            <div class="fc-box clickable" onclick="app.rollCheck('Ataque Físico', parseInt(document.getElementById('res_atq_fis').innerText))">
+              <div class="fc-lbl g">Atq. Fís.</div>
+              <div class="fc-val"><span id="res_atq_fis">+2</span></div>
+            </div>
+            <div class="fc-box clickable" onclick="app.rollCheck('Ataque Mágico', parseInt(document.getElementById('res_atq_mag').innerText))">
+              <div class="fc-lbl b">Atq. Mag.</div>
+              <div class="fc-val"><span id="res_atq_mag">+2</span></div>
+            </div>
+            <div class="fc-box">
+              <div class="fc-lbl">Filo</div>
+              <div class="fc-val" style="font-size:.85rem"><span id="res_filo_val">Físico</span></div>
+            </div>
+          </div>
           <!-- LOAD -->
-          <div class="fc-box" style="padding:8px 10px 6px;display:block">
-            <div style="display:flex;justify-content:space-between;align-items:center;font-family:var(--font-display);font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--dim)">
+          <div class="fc-box" style="padding:6px 8px 5px;display:block">
+            <div style="display:flex;justify-content:space-between;align-items:center;font-family:var(--font-display);font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;color:var(--dim)">
               <span>Encumbramiento</span>
               <span id="res_carga" style="color:var(--text);font-family:var(--font-mono);font-size:.8rem">0 / 0</span>
             </div>
@@ -1120,7 +1119,7 @@ details[open]>summary::before{content:'▾'}
     </aside>
 
     <!-- ══════ MAIN CONTENT ══════ -->
-    <main id="main_content" style="opacity:.4;pointer-events:none;display:flex;flex-direction:column;gap:16px;flex:1;min-width:0;">
+    <main id="main_content" style="opacity:.4;pointer-events:none;display:flex;flex-direction:column;gap:10px;flex:1;min-width:0;">
 
       <!-- § I — STATS -->
       <div class="panel">
@@ -1167,7 +1166,7 @@ details[open]>summary::before{content:'▾'}
               <select id="sel_filo" onchange="app.calc()"></select>
             </div>
           </div>
-          <div style="margin-top:12px">
+          <div style="margin-top:8px">
             <span class="field-label">Trasfondo</span>
             <select id="sel_bg" onchange="app.updateOptions()"></select>
             <div id="bg_info" class="info-box"></div>
@@ -1241,7 +1240,7 @@ details[open]>summary::before{content:'▾'}
           <span class="section-num">V</span>
           <span class="panel-title">Talentos (Elige 3)</span>
         </div>
-        <div style="text-align:center;padding:4px 0 8px">
+        <div style="text-align:center;padding:2px 0 6px">
           <div style="font-family:var(--font-mono);font-size:.8rem;color:var(--muted);margin-bottom:10px">
             Seleccionados: <span id="talent_count_main" style="color:var(--gold);font-weight:600">0</span>/3
           </div>
@@ -1249,7 +1248,7 @@ details[open]>summary::before{content:'▾'}
         </div>
         <div id="talents_summary_view" style="display:none">
           <div class="divider">Talentos Activos</div>
-          <div id="talents_summary_list" style="display:flex;flex-direction:column;gap:6px"></div>
+          <div id="talents_summary_list" style="display:flex;flex-direction:column;gap:4px"></div>
         </div>
       </div>
 
@@ -1283,7 +1282,7 @@ details[open]>summary::before{content:'▾'}
           </div>
 
           <!-- Weapon 1 -->
-          <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin-top:14px">
+          <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;margin-top:10px">
             <div><span class="field-label">Arma Principal</span><select id="sel_weapon" onchange="app.onWeaponChange('w1')"></select></div>
             <div><span class="field-label" style="font-size:.65rem">Atributo</span><select id="w1_attr" class="attr-picker" onchange="app.calc()"><option value="FUE">FUE</option><option value="DES">DES</option><option value="CON">CON</option><option value="INT">INT</option><option value="SAB">SAB</option><option value="CAR">CAR</option></select></div>
           </div>
@@ -1294,7 +1293,7 @@ details[open]>summary::before{content:'▾'}
           <div class="combat-alert" id="w1_alert"></div>
 
           <!-- Weapon 2 -->
-          <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin-top:12px">
+          <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;margin-top:8px">
             <div><span class="field-label">Arma Secundaria</span><select id="sel_weapon_sec" onchange="app.onWeaponChange('w2')"></select></div>
             <div><span class="field-label" style="font-size:.65rem">Atributo</span><select id="w2_attr" class="attr-picker" onchange="app.calc()"><option value="FUE">FUE</option><option value="DES">DES</option><option value="CON">CON</option><option value="INT">INT</option><option value="SAB">SAB</option><option value="CAR">CAR</option></select></div>
           </div>
@@ -1308,7 +1307,7 @@ details[open]>summary::before{content:'▾'}
         </div>
 
         <div id="combat_summary_view" style="display:none">
-          <div class="g3" style="margin-bottom:10px">
+          <div class="g3" style="margin-bottom:6px">
             <div class="fc-box"><div class="fc-lbl g">CA</div><div class="fc-val" style="color:var(--gold);font-size:1.3rem"><span id="sum_ac">10</span></div></div>
             <div class="fc-box"><div class="fc-lbl">Armadura</div><div class="fc-val" style="font-size:.85rem;flex-direction:column;gap:1px"><span id="sum_armor_name">—</span><span style="font-size:.65rem;color:var(--muted)" id="sum_armor_type">Normal</span></div></div>
             <div class="fc-box"><div class="fc-lbl">Escudo</div><div class="fc-val" style="font-size:.85rem"><span id="sum_shield">—</span></div></div>
@@ -1334,8 +1333,8 @@ details[open]>summary::before{content:'▾'}
           <span class="panel-title">Equipo &amp; Tesoro</span>
         </div>
         <div id="equipment_edit_view">
-          <div style="background:var(--deep);border:1px solid var(--rim);border-radius:var(--rad);padding:10px;margin-bottom:12px">
-            <div style="display:grid;grid-template-columns:auto auto 1fr auto;gap:8px;align-items:end">
+          <div style="background:var(--deep);border:1px solid var(--rim);border-radius:var(--rad);padding:7px 8px;margin-bottom:8px">
+            <div style="display:grid;grid-template-columns:auto auto 1fr auto;gap:6px;align-items:end">
               <div>
                 <span class="field-label">Categoría</span>
                 <select id="inv_db_category" onchange="app.updateDbSelect()" style="font-size:.83rem">
@@ -1354,7 +1353,7 @@ details[open]>summary::before{content:'▾'}
             </div>
           </div>
 
-          <div class="coin-pouch" style="margin-bottom:10px">
+          <div class="coin-pouch" style="margin-bottom:8px">
             <label>Oro (PO)</label>
             <input type="number" id="gold_coins_edit" value="0" min="0" onchange="app.syncGold('edit')">
           </div>
@@ -1367,12 +1366,12 @@ details[open]>summary::before{content:'▾'}
           <button class="btn-confirm" onclick="app.toggleSection('equipment',false)">Confirmar</button>
         </div>
         <div id="equipment_summary_view" style="display:none">
-          <div style="display:flex;justify-content:space-between;align-items:center;background:var(--deep);border:1px solid var(--rim);border-radius:var(--rad);padding:8px 12px;margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;background:var(--deep);border:1px solid var(--rim);border-radius:var(--rad);padding:6px 10px;margin-bottom:7px">
             <span style="font-family:var(--font-display);font-size:.82rem;color:var(--dim);text-transform:uppercase;letter-spacing:.06em">Tesoro</span>
             <span style="font-family:var(--font-mono);color:var(--gold);font-weight:600"><span id="gold_coins_display">0</span> PO</span>
           </div>
           <div id="inv_summary_list" style="display:flex;flex-direction:column;gap:3px"></div>
-          <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--rim);display:flex;justify-content:space-between">
+          <div style="margin-top:8px;padding-top:7px;border-top:1px solid var(--rim);display:flex;justify-content:space-between">
             <span style="font-family:var(--font-display);font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;color:var(--dim)">Carga Total</span>
             <span id="load_summary_display" style="font-family:var(--font-mono);font-weight:600;color:var(--gold)">0 / 10</span>
           </div>
