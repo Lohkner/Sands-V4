@@ -615,7 +615,7 @@ input[type=radio]:checked::after{transform:scale(1)}
 
 /* ═══ INVENTORY ═══ */
 .inv-item{
-  display:grid;grid-template-columns:68px minmax(0,1fr) 44px 24px;
+  display:grid;grid-template-columns:68px minmax(0,1fr) 44px 22px 22px;
   gap:4px;align-items:center;
   background:var(--raised);border:1px solid var(--rim);
   border-radius:var(--rad);padding:4px 6px;
@@ -1719,19 +1719,44 @@ const app = {
 
   dbSaveEntry(key) {
     const cat = this.currentEditorCat;
+    const gv = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+    const gi = id => parseInt(gv(id))||0;
+    const gArr = id => gv(id).split(',').map(s=>s.trim()).filter(Boolean);
+    const gJSON = (id, fallback={}) => { try { return JSON.parse(gv(id))||fallback } catch { return fallback } };
+
     if (cat === 'talents') {
-      const sub = document.getElementById('edit_subcat').value.toLowerCase().trim();
+      const sub = gv('edit_subcat').toLowerCase().trim();
       const grades = Array.from(document.querySelectorAll('.grade-desc')).map(el=>({g:parseInt(el.dataset.grade),d:el.value}));
-      const t = {name:document.getElementById('edit_name').value,desc:document.getElementById('edit_desc').value,id:document.getElementById('edit_special_id').value,grades};
+      const t = {name:gv('edit_name'), desc:gv('edit_desc'), grades};
+      const sid = gv('edit_special_id'); if(sid) t.id = sid;
       if (!this.DB.talents[sub]) this.DB.talents[sub] = [];
-      if (key !== 'new' && key.includes('|')) { const [os,oi] = key.split('|'); this.DB.talents[os].splice(oi,1) }
+      if (key !== 'new' && key.includes('|')) { const [os,oi] = key.split('|'); this.DB.talents[os].splice(parseInt(oi),1) }
       this.DB.talents[sub].push(t);
+
     } else {
-      const id = document.getElementById('edit_id').value;
+      const id = gv('edit_id').trim();
+      if (!id) { this.toast('Ingresa una Clave / ID', 'Error'); return; }
       if (!this.DB[cat]) this.DB[cat] = {};
-      this.DB[cat][id] = {name:document.getElementById('edit_name').value,txt:document.getElementById('edit_txt').value};
+
+      if (cat === 'weapons') {
+        this.DB[cat][id] = {name:gv('edit_name'), dmg:gv('edit_dmg')||'1d6', slots:gi('edit_slots')||1, cat:gv('edit_cat'), stat:gv('edit_stat'), req:gi('edit_req')};
+      } else if (cat === 'armors') {
+        this.DB[cat][id] = {name:gv('edit_name'), ca:gi('edit_ca')||10, type:gv('edit_type'), slots:gi('edit_slots')||1, txt:gv('edit_txt')};
+      } else if (cat === 'shields') {
+        this.DB[cat][id] = {name:gv('edit_name'), bonus:gi('edit_bonus')||1, slots:gi('edit_slots')||1};
+      } else if (cat === 'descriptors') {
+        this.DB[cat][id] = {name:gv('edit_name'), bonus:gv('edit_bonus'), mods:gJSON('edit_mods'), grant:gArr('edit_grant'), txt:gv('edit_txt')};
+      } else if (cat === 'archetypes') {
+        this.DB[cat][id] = {name:gv('edit_name'), pv:gi('edit_pv'), adr:gi('edit_adr'), ing:gi('edit_ing'), ca:gi('edit_ca'), limit:gi('edit_limit'), skills:gArr('edit_skills'), edges:gArr('edit_edges'), txt:gv('edit_txt')};
+      } else if (cat === 'backgrounds') {
+        this.DB[cat][id] = {name:gv('edit_name'), skills:gArr('edit_skills')};
+      } else if (cat === 'spells') {
+        this.DB[cat][id] = {name:gv('edit_name'), txt:gv('edit_txt')};
+      } else {
+        this.DB[cat][id] = {name:gv('edit_name'), txt:gv('edit_txt')};
+      }
     }
-    this.saveRulesToLocal(); this.unlockApp(); this.dbEditCategory(cat); this.toast('Base de datos actualizada');
+    this.saveRulesToLocal(); this.unlockApp(); this.dbEditCategory(cat); this.toast('Guardado correctamente', 'DB');
   },
 
   dbDeleteEntry(key) {
@@ -1780,8 +1805,113 @@ const app = {
   },
 
   addCustomItem() {
-    this.inventory.push({uid:Date.now()+Math.random(),name:'Nuevo Objeto',slots:1,type:'misc',dbKey:null});
-    this.renderInventory();
+    this._openCustomItemForm(null);
+  },
+
+  _openCustomItemForm(idx) {
+    // Build an inline overlay form inside the equipment edit view
+    const existing = document.getElementById('custom_item_overlay');
+    if (existing) existing.remove();
+    const item = idx !== null ? this.inventory[idx] : null;
+    const ov = document.createElement('div');
+    ov.id = 'custom_item_overlay';
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px';
+    ov.innerHTML = `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rad-lg);padding:18px;width:min(480px,95vw);box-shadow:var(--shadow-lg);max-height:90vh;overflow-y:auto">
+        <div style="font-family:var(--font-display);font-size:.88rem;color:var(--gold);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--rim)">
+          ${item ? 'Editar Objeto' : 'Objeto Personalizado'}
+        </div>
+        <label class="db-form-label">Nombre</label>
+        <input type="text" id="ci_name" value="${item?.name||''}" placeholder="Nombre del objeto" style="margin-bottom:6px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">
+          <div>
+            <label class="db-form-label">Tipo</label>
+            <select id="ci_type" onchange="app._updateCustomItemFields()" style="margin-bottom:0">
+              <option value="misc"${(!item||item.type==='misc')?' selected':''}>Miscelánea</option>
+              <option value="weapons"${item?.type==='weapons'?' selected':''}>Arma</option>
+              <option value="armors"${item?.type==='armors'?' selected':''}>Armadura</option>
+              <option value="shields"${item?.type==='shields'?' selected':''}>Escudo</option>
+            </select>
+          </div>
+          <div>
+            <label class="db-form-label">Huecos de Carga</label>
+            <input type="number" id="ci_slots" value="${item?.slots||1}" min="0" max="20" style="margin-bottom:0">
+          </div>
+        </div>
+        <div id="ci_extra_fields"></div>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button class="btn btn-primary" style="font-size:.78rem;padding:8px 14px" onclick="app._saveCustomItem(${idx})">💾 Guardar</button>
+          <button class="btn btn-ghost" style="font-size:.78rem;padding:8px 14px" onclick="document.getElementById('custom_item_overlay').remove()">Cancelar</button>
+        </div>
+      </div>`;
+    document.body.appendChild(ov);
+    // store editing item for field populate
+    this._editingCustomItem = item;
+    this._updateCustomItemFields();
+  },
+
+  _updateCustomItemFields() {
+    const type = document.getElementById('ci_type')?.value;
+    const item = this._editingCustomItem;
+    const c = document.getElementById('ci_extra_fields'); if (!c) return;
+    if (type === 'weapons') {
+      c.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><label class="db-form-label">Daño (ej: 1d6)</label><input type="text" id="ci_dmg" value="${item?.dmg||'1d6'}" placeholder="1d6" style="margin-bottom:0"></div>
+          <div><label class="db-form-label">Categoría</label><select id="ci_cat" style="margin-bottom:0">
+            <option value="simple"${(item?.cat||'simple')==='simple'?' selected':''}>Simple</option>
+            <option value="marcial"${item?.cat==='marcial'?' selected':''}>Marcial</option>
+          </select></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+          <div><label class="db-form-label">Atributo Base</label><select id="ci_stat" style="margin-bottom:0">
+            <option value="FUE"${(item?.stat||'FUE')==='FUE'?' selected':''}>FUE</option>
+            <option value="DES"${item?.stat==='DES'?' selected':''}>DES</option>
+            <option value="FIN"${item?.stat==='FIN'?' selected':''}>FIN (mejor FUE/DES)</option>
+          </select></div>
+          <div><label class="db-form-label">Requisito mín.</label><input type="number" id="ci_req" value="${item?.req||0}" min="0" max="18" style="margin-bottom:0"></div>
+        </div>`;
+    } else if (type === 'armors') {
+      c.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><label class="db-form-label">CA Base</label><input type="number" id="ci_ca" value="${item?.ca||12}" min="5" max="25" style="margin-bottom:0"></div>
+          <div><label class="db-form-label">Tipo</label><select id="ci_armor_type" style="margin-bottom:0">
+            <option value="light"${(item?.armorType||'light')==='light'?' selected':''}>Ligera (+MOD DES)</option>
+            <option value="medium"${item?.armorType==='medium'?' selected':''}>Media (+máx. 2 DES)</option>
+            <option value="heavy"${item?.armorType==='heavy'?' selected':''}>Pesada (sin DES)</option>
+          </select></div>
+        </div>`;
+    } else if (type === 'shields') {
+      c.innerHTML = `<label class="db-form-label">Bonus de CA</label><input type="number" id="ci_bonus" value="${item?.bonus||1}" min="0" max="10" style="margin-bottom:0">`;
+    } else {
+      c.innerHTML = `<label class="db-form-label">Notas (opcional)</label><textarea id="ci_notes" style="min-height:50px">${item?.notes||''}</textarea>`;
+    }
+  },
+
+  _saveCustomItem(idx) {
+    const name = document.getElementById('ci_name')?.value?.trim();
+    if (!name) { this.toast('El nombre es obligatorio', 'Error'); return; }
+    const type = document.getElementById('ci_type').value;
+    const slots = parseInt(document.getElementById('ci_slots').value)||1;
+    const newItem = { uid: idx !== null ? this.inventory[idx].uid : Date.now()+Math.random(), name, slots, type, dbKey: null };
+    if (type === 'weapons') {
+      newItem.dmg = document.getElementById('ci_dmg')?.value || '1d6';
+      newItem.cat = document.getElementById('ci_cat')?.value || 'simple';
+      newItem.stat = document.getElementById('ci_stat')?.value || 'FUE';
+      newItem.req  = parseInt(document.getElementById('ci_req')?.value)||0;
+    } else if (type === 'armors') {
+      newItem.ca = parseInt(document.getElementById('ci_ca')?.value)||12;
+      newItem.armorType = document.getElementById('ci_armor_type')?.value || 'light';
+    } else if (type === 'shields') {
+      newItem.bonus = parseInt(document.getElementById('ci_bonus')?.value)||1;
+    } else {
+      newItem.notes = document.getElementById('ci_notes')?.value || '';
+    }
+    if (idx !== null) { this.inventory[idx] = newItem; } else { this.inventory.push(newItem); }
+    document.getElementById('custom_item_overlay')?.remove();
+    this._editingCustomItem = null;
+    this.renderInventory(); this.syncCombatOptions();
+    this.toast(idx !== null ? 'Objeto actualizado' : 'Objeto añadido', 'Inventario');
   },
 
   removeInvItem(idx) { this.inventory.splice(idx,1); this.renderInventory(); this.syncCombatOptions() },
@@ -1808,7 +1938,7 @@ const app = {
         let sel = `<select class="inv-type-select" onchange="app.updateInvItem(${i},'type',this.value)">`;
         typeOpts.forEach(o => { sel += `<option value="${o.val}"${item.type===o.val?' selected':''}>${o.lbl}</option>` });
         sel += '</select>';
-        row.innerHTML = `${sel}<input type="text" class="inv-name" value="${item.name}" onchange="app.updateInvItem(${i},'name',this.value)"><input type="number" class="inv-slots" value="${item.slots}" min="0" max="20" onchange="app.updateInvItem(${i},'slots',this.value)"><button class="inv-del" onclick="app.removeInvItem(${i})">×</button>`;
+        row.innerHTML = `${sel}<input type=\"text\" class=\"inv-name\" value=\"${item.name}\" onchange=\"app.updateInvItem(${i},'name',this.value)\"><input type=\"number\" class=\"inv-slots\" value=\"${item.slots}\" min=\"0\" max=\"20\" onchange=\"app.updateInvItem(${i},'slots',this.value)\"><button class=\"inv-del\" title=\"Editar detalle\" onclick=\"app._openCustomItemForm(${i})\" style=\"color:var(--dim);font-size:.8rem;padding:2px 5px\">✎</button><button class=\"inv-del\" onclick=\"app.removeInvItem(${i})\">×</button>`;
         list.appendChild(row);
       });
     }
@@ -2117,8 +2247,17 @@ const app = {
     const item=this.inventory.find(i=>i.uid==uid);
     let w={name:'Desarmado',dmg:'1',stat:'FUE',slots:0,cat:'simple',req:0};
     if(item) {
-      if(item.dbKey && this.DB.weapons?.[item.dbKey]) w=this.DB.weapons[item.dbKey];
-      else { w.name=item.name; w.dmg='1d6'; w.slots=item.slots }
+      if(item.dbKey && this.DB.weapons?.[item.dbKey]) {
+        w=this.DB.weapons[item.dbKey];
+      } else {
+        // custom item — use its own fields if available
+        w.name  = item.name;
+        w.dmg   = item.dmg  || '1d6';
+        w.stat  = item.stat || 'FUE';
+        w.cat   = item.cat  || 'simple';
+        w.req   = item.req  || 0;
+        w.slots = item.slots;
+      }
     }
     const attr=document.getElementById(`${prefix}_attr`).value;
     const atkStatVal=stats[attr];
@@ -2205,11 +2344,22 @@ const app = {
     const armUID=document.getElementById('sel_armor').value;
     let armor={name:'—',ca:10,type:'none',slots:0};
     const eqArm=this.inventory.find(i=>i.uid==armUID);
-    if(eqArm){if(eqArm.dbKey&&this.DB.armors?.[eqArm.dbKey]) armor=this.DB.armors[eqArm.dbKey]; else{armor.name=eqArm.name;armor.slots=eqArm.slots}}
+    if(eqArm){
+      if(eqArm.dbKey&&this.DB.armors?.[eqArm.dbKey]) {
+        armor=this.DB.armors[eqArm.dbKey];
+      } else {
+        armor.name=eqArm.name; armor.slots=eqArm.slots;
+        armor.ca=eqArm.ca||10; armor.type=eqArm.armorType||'none';
+      }
+    }
     const shUID=document.getElementById('sel_shield').value;
     let shield={name:'',bonus:0,slots:0};
     const eqSh=this.inventory.find(i=>i.uid==shUID);
-    if(eqSh){const sd=this.DB.shields?.[eqSh.dbKey]||defaultRules.shields?.[eqSh.dbKey];if(sd) shield=sd}
+    if(eqSh){
+      const sd=this.DB.shields?.[eqSh.dbKey]||defaultRules.shields?.[eqSh.dbKey];
+      if(sd) shield=sd;
+      else if(!eqSh.dbKey) { shield.name=eqSh.name; shield.bonus=eqSh.bonus||0; shield.slots=eqSh.slots; }
+    }
     const modDES=this.getMod(stats.DES);
     let ca=armor.ca;
     const defNat=document.querySelector('input[name="chk_talents_hidden"][data-id="def_nat"]');
