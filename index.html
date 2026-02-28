@@ -446,6 +446,8 @@ input[type=radio]:checked::after{transform:scale(1)}
 .res-display{display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-weight:600;font-size:1.05rem}
 .res-r,.res-r input,.res-r .slash,.res-r .max-val{color:var(--blood) !important}
 .res-b,.res-b input,.res-b .slash,.res-b .max-val{color:var(--ice) !important}
+.res-g,.res-g input,.res-g .slash,.res-g .max-val{color:var(--sage) !important}
+.fc-lbl.gr{color:var(--sage)}
 
 .fc-input{
   border:none !important;background:transparent !important;
@@ -1066,12 +1068,23 @@ details[open]>summary::before{content:'▾'}
               <div class="fc-val" style="font-size:.9rem"><span id="res_filo_val">Físico</span></div>
             </div>
           </div>
+          <!-- Row: ATQ Físico / Competencia -->
+          <div class="fc-row c2">
+            <div class="fc-box clickable" onclick="app.rollCheck('Ataque Físico', parseInt(document.getElementById('res_atq_fis').innerText))">
+              <div class="fc-lbl g">Atq. Físico</div>
+              <div class="fc-val"><span id="res_atq_fis">+2</span></div>
+            </div>
+            <div class="fc-box">
+              <div class="fc-lbl">Competencia</div>
+              <div class="fc-val" style="color:var(--gold)"><span id="res_prof">+2</span></div>
+            </div>
+          </div>
           <!-- ADR / ING -->
           <div class="fc-row c2">
             <div class="fc-box">
-              <div class="fc-lbl r">Adrenalina</div>
+              <div class="fc-lbl gr">Adrenalina</div>
               <div class="fc-val">
-                <div class="res-display res-r">
+                <div class="res-display res-g">
                   <input type="number" id="cur_adr" value="0" class="fc-input">
                   <span class="slash">/</span>
                   <span id="max_adr" class="max-val">0</span>
@@ -2214,6 +2227,11 @@ const app = {
     const adr=maxFis+1+arqData.adr;
     const ing=maxMen+1+arqData.ing+bonusIng;
     const magAtk=Math.max(this.getMod(stats.INT),this.getMod(stats.SAB),this.getMod(stats.CAR))+2;
+    // Proficiency bonus: +2 niveles 1-4, +3 niveles 5-8, +4 niveles 9-10
+    const lvl = parseInt(document.getElementById('char_lvl').value)||1;
+    const profBonus = lvl<=4 ? 2 : lvl<=8 ? 3 : lvl<=10 ? 4 : 5;
+    // Physical attack: best of STR/DEX mod + proficiency
+    const fisAtk = Math.max(this.getMod(stats.FUE), this.getMod(stats.DES)) + profBonus;
     document.getElementById('max_pv').innerText=pv;
     document.getElementById('res_carne').innerText=stats.CON;
     document.getElementById('max_adr').innerText=adr;
@@ -2221,6 +2239,8 @@ const app = {
     document.getElementById('res_ca').innerText=ca;
     document.getElementById('res_ini').innerText=(modDES+bonusIni>=0?'+':'')+(modDES+bonusIni);
     document.getElementById('res_atq_mag').innerText=(magAtk>=0?'+':'')+magAtk;
+    document.getElementById('res_atq_fis').innerText=(fisAtk>=0?'+':'')+fisAtk;
+    document.getElementById('res_prof').innerText='+'+profBonus;
     document.getElementById('res_filo_val').innerText=document.getElementById('sel_filo').value||'—';
   },
 
