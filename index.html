@@ -246,9 +246,9 @@ body{
 /* ═══ TIPOGRAFÍA ═══ */
 .field-label{
   font-family:var(--font-display);
-  font-size:.68rem;
+  font-size:.72rem;
   color:var(--muted);
-  letter-spacing:.13em;
+  letter-spacing:.12em;
   text-transform:uppercase;
   display:block;
   margin-bottom:3px;
@@ -372,14 +372,14 @@ input[type=radio]:checked::after{transform:scale(1)}
 .stat-box:active{transform:scale(.96)}
 .stat-box .mod{
   font-family:var(--font-display);
-  font-size:1.3rem;
+  font-size:1.4rem;
   font-weight:700;
   color:var(--gold);
   line-height:1;
 }
 .stat-box .val{
   font-family:var(--font-mono);
-  font-size:.72rem;
+  font-size:.82rem;
   color:var(--dim);
   margin-top:3px;
   border-top:1px solid var(--rim);
@@ -387,7 +387,7 @@ input[type=radio]:checked::after{transform:scale(1)}
 }
 .stat-box .lbl{
   font-family:var(--font-display);
-  font-size:.58rem;
+  font-size:.68rem;
   color:var(--muted);
   letter-spacing:.15em;
   text-transform:uppercase;
@@ -418,8 +418,8 @@ input[type=radio]:checked::after{transform:scale(1)}
 
 .fc-lbl{
   font-family:var(--font-display);
-  font-size:.52rem;
-  letter-spacing:.12em;
+  font-size:.64rem;
+  letter-spacing:.1em;
   text-transform:uppercase;
   color:var(--muted);
   padding:3px 6px 2px;
@@ -436,20 +436,20 @@ input[type=radio]:checked::after{transform:scale(1)}
   display:flex;align-items:center;justify-content:center;
   font-family:var(--font-mono);
   font-weight:600;
-  font-size:1rem;
+  font-size:1.1rem;
   color:var(--bright);
-  padding:4px 6px;
+  padding:5px 6px;
   transition:color .15s;
 }
 
 .pv-display{
   display:flex;align-items:center;gap:2px;
-  font-family:var(--font-display);font-weight:700;font-size:1.35rem;
+  font-family:var(--font-display);font-weight:700;font-size:1.5rem;
 }
 .pv-display .slash{color:var(--blood);font-size:.9rem;margin:0 2px}
 .pv-display .max-val{color:var(--blood)}
 
-.res-display{display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-weight:600;font-size:.95rem}
+.res-display{display:flex;align-items:center;gap:2px;font-family:var(--font-mono);font-weight:600;font-size:1.05rem}
 .res-r,.res-r input,.res-r .slash,.res-r .max-val{color:var(--blood) !important}
 .res-b,.res-b input,.res-b .slash,.res-b .max-val{color:var(--ice) !important}
 .res-g,.res-g input,.res-g .slash,.res-g .max-val{color:var(--sage) !important}
@@ -479,7 +479,7 @@ input[type=radio]:checked::after{transform:scale(1)}
   cursor:pointer;
   padding:4px 6px;
   border-radius:3px;
-  font-size:.845rem;
+  font-size:.92rem;
   color:var(--text);
   transition:background .1s, color .1s;
 }
@@ -606,11 +606,11 @@ input[type=radio]:checked::after{transform:scale(1)}
   box-shadow:var(--shadow-inner);
 }
 .combat-card .c-label{
-  font-size:.65rem;color:var(--muted);
+  font-size:.72rem;color:var(--muted);
   font-family:var(--font-display);
   text-transform:uppercase;letter-spacing:.09em;display:block;margin-bottom:1px;
 }
-.combat-card .c-val{font-family:var(--font-mono);font-weight:600;font-size:1rem;color:var(--bright)}
+.combat-card .c-val{font-family:var(--font-mono);font-weight:600;font-size:1.1rem;color:var(--bright)}
 .combat-alert{color:var(--ember);font-size:.73rem;text-align:center;margin-top:3px;min-height:.9em}
 
 /* ═══ INVENTORY ═══ */
@@ -883,12 +883,12 @@ dialog::backdrop{background:rgba(0,0,0,.7);backdrop-filter:blur(8px)}
 .save-item{
   text-align:center;padding:4px 3px;
   background:var(--raised);border:1px solid var(--rim);border-radius:var(--rad);
-  font-family:var(--font-mono);font-weight:600;font-size:.9rem;
+  font-family:var(--font-mono);font-weight:600;font-size:1rem;
   cursor:pointer;transition:all .15s;color:var(--bright);
 }
 .save-item:hover{background:var(--panel);border-color:var(--border)}
 .save-item.prof{color:var(--blood);border-color:rgba(176,48,64,.3)}
-.save-item .s-lbl{font-size:.52rem;font-family:var(--font-display);color:var(--muted);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:1px}
+.save-item .s-lbl{font-size:.62rem;font-family:var(--font-display);color:var(--muted);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:1px}
 
 /* ═══ COMBAT SUMMARY WEAPONS ═══ */
 .sum-wep{
@@ -899,9 +899,9 @@ dialog::backdrop{background:rgba(0,0,0,.7);backdrop-filter:blur(8px)}
 }
 .sum-wep:hover{border-color:rgba(200,169,110,.4);background:var(--panel);box-shadow:0 0 0 1px var(--gold-glow)}
 .sum-wep:active{transform:scale(.99)}
-.sum-wep .w-lbl{font-size:.6rem;color:var(--muted);font-family:var(--font-display);text-transform:uppercase;letter-spacing:.09em}
-.sum-wep .w-name{font-weight:600;color:var(--bright);font-size:.92rem;margin:2px 0}
-.sum-wep .w-stats{font-family:var(--font-mono);color:var(--gold);font-size:.82rem}
+.sum-wep .w-lbl{font-size:.7rem;color:var(--muted);font-family:var(--font-display);text-transform:uppercase;letter-spacing:.09em}
+.sum-wep .w-name{font-weight:600;color:var(--bright);font-size:1rem;margin:2px 0}
+.sum-wep .w-stats{font-family:var(--font-mono);color:var(--gold);font-size:.9rem}
 
 /* ═══ TALENT MODAL FOOTER ═══ */
 .tm-footer{
@@ -950,7 +950,9 @@ details[open]>summary::before{content:'▾'}
   .sidebar{width:255px}
 }
 @media(max-width:720px){
-  body{font-size:14px}
+  body{font-size:15px}
+  .fc-lbl{font-size:.67rem}
+  .fc-val{font-size:1.05rem}
   .app-wrapper{padding:0 10px 30px}
   .main-grid{flex-direction:column}
   .sidebar{position:static;width:100%;flex-shrink:1}
@@ -995,7 +997,6 @@ details[open]>summary::before{content:'▾'}
 <div class="app-wrapper">
   <header class="site-header">
     <h1 class="site-title">Stars &amp; Sorcery</h1>
-    <p style="font-family:var(--font-mono);font-size:.62rem;color:var(--muted);letter-spacing:.35em;text-transform:uppercase;margin-top:6px;opacity:.7">Hoja de Personaje</p>
   </header>
 
   <div class="main-grid">
