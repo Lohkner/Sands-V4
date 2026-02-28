@@ -1648,7 +1648,13 @@ const app = {
     this.updateOptions(true);
   },
 
-  /* ─── DATABASE EDITOR ─── */
+  /* ═══ DATABASE EDITOR ═══════════════════════════════════════
+     Formularios completos y tipados por categoría.
+     Helpers: _dbF (field), _dbN (number), _dbSel (select),
+              _dbTA (textarea), _dbRow, _dbSec,
+              _dbChips / _dbAddChip / _dbRemoveChip (listas editables),
+              _dbAttrGrid / _dbReadAttrMods (modificadores 6 atributos).
+  ═══════════════════════════════════════════════════════════ */
   openDatabaseEditor() {
     document.getElementById('settings_modal').close();
     document.getElementById('db_editor_modal').showModal();
@@ -1660,111 +1666,371 @@ const app = {
     const lc = document.getElementById('db_list_container');
     document.getElementById('db_form_container').style.display = 'none';
     const src = this.DB[cat] || {};
-    lc.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h3 style="font-family:var(--font-display);color:var(--gold);font-size:.9rem;text-transform:uppercase;letter-spacing:.08em">${cat}</h3><button class="btn btn-ghost" style="font-size:.72rem;padding:5px 10px" onclick="app.dbEditEntry('new')">+ Añadir Nuevo</button></div>`;
+    const catLabel = {descriptors:'Linajes',archetypes:'Arquetipos',backgrounds:'Trasfondos',
+      talents:'Talentos',weapons:'Armas',armors:'Armaduras',shields:'Escudos',spells:'Poderes/Hechizos'}[cat] || cat;
+    lc.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3 style="font-family:var(--font-display);color:var(--gold);font-size:.88rem;text-transform:uppercase;letter-spacing:.08em">${catLabel}</h3>
+        <button class="btn btn-ghost" style="font-size:.72rem;padding:5px 10px" onclick="app.dbEditEntry('new')">+ Nuevo</button>
+      </div>`;
     if (cat === 'talents') {
       Object.keys(src).forEach(sub => {
         const h = document.createElement('div');
-        h.style.cssText = 'font-family:var(--font-mono);font-size:.65rem;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;padding:5px 0;border-bottom:1px solid var(--rim);margin:8px 0 4px';
+        h.style.cssText = 'font-family:var(--font-mono);font-size:.62rem;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;padding:4px 0;border-bottom:1px solid var(--rim);margin:8px 0 4px';
         h.innerText = sub; lc.appendChild(h);
-        src[sub].forEach((item,i) => this.renderDbItem(lc, item.name, `${sub}|${i}`));
+        src[sub].forEach((item,i) => this._dbListItem(lc, item.name, `${sub}|${i}`));
       });
     } else {
-      Object.keys(src).forEach(k => this.renderDbItem(lc, src[k].name || k, k));
+      Object.keys(src).forEach(k => this._dbListItem(lc, src[k].name || k, k));
     }
   },
 
-  renderDbItem(c, name, key) {
+  _dbListItem(c, name, key) {
     const d = document.createElement('div'); d.className = 'db-item';
-    d.innerHTML = `<span style="font-size:.85rem">${name}</span><div style="display:flex;gap:4px"><button class="btn-mini load" onclick="app.dbEditEntry('${key}')">Editar</button><button class="btn-mini del" onclick="app.dbDeleteEntry('${key}')">Borrar</button></div>`;
+    d.innerHTML = `<span style="font-size:.83rem">${name}</span>
+      <div style="display:flex;gap:4px">
+        <button class="btn-mini load" onclick="app.dbEditEntry('${key}')">Editar</button>
+        <button class="btn-mini del"  onclick="app.dbDeleteEntry('${key}')">Borrar</button>
+      </div>`;
     c.appendChild(d);
   },
 
+  /* ── Chips (listas editables en formulario) ── */
+  _dbChips(id, items = [], placeholder = 'Añadir…') {
+    const chip = (v, i) =>
+      `<span class="db-chip" style="display:inline-flex;align-items:center;gap:3px;background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:2px 10px 2px 8px;font-size:.74rem;color:var(--text);margin:2px">
+        ${v}<button type="button" onclick="app._dbRemoveChip('${id}',${i})"
+          style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.95rem;line-height:1;padding:0 0 0 3px">×</button>
+      </span>`;
+    return `
+      <div id="${id}_chips" style="display:flex;flex-wrap:wrap;min-height:34px;background:var(--deep);border:1px solid var(--border);border-radius:var(--rad);padding:4px 6px 2px;margin-bottom:4px">
+        ${items.map((v,i)=>chip(v,i)).join('')}
+      </div>
+      <div style="display:flex;gap:5px;margin-bottom:8px">
+        <input type="text" id="${id}_inp" placeholder="${placeholder}"
+          style="flex:1;margin:0" onkeydown="if(event.key==='Enter'){event.preventDefault();app._dbAddChip('${id}')}">
+        <button type="button" class="btn-mini safe" onclick="app._dbAddChip('${id}')" style="padding:4px 10px;white-space:nowrap">+ Añadir</button>
+      </div>
+      <input type="hidden" id="${id}_val" value='${JSON.stringify(items)}'>`;
+  },
+
+  _dbAddChip(id) {
+    const inp = document.getElementById(id + '_inp'); if (!inp) return;
+    const v = inp.value.trim(); if (!v) return;
+    const arr = this._dbReadChips(id); arr.push(v); inp.value = '';
+    document.getElementById(id + '_val').value = JSON.stringify(arr);
+    this._dbRefreshChips(id, arr);
+  },
+
+  _dbRemoveChip(id, idx) {
+    const arr = this._dbReadChips(id); arr.splice(idx, 1);
+    document.getElementById(id + '_val').value = JSON.stringify(arr);
+    this._dbRefreshChips(id, arr);
+  },
+
+  _dbRefreshChips(id, arr) {
+    const c = document.getElementById(id + '_chips'); if (!c) return;
+    c.innerHTML = arr.map((v, i) =>
+      `<span class="db-chip" style="display:inline-flex;align-items:center;gap:3px;background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:2px 10px 2px 8px;font-size:.74rem;color:var(--text);margin:2px">
+        ${v}<button type="button" onclick="app._dbRemoveChip('${id}',${i})"
+          style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.95rem;line-height:1;padding:0 0 0 3px">×</button>
+      </span>`).join('');
+  },
+
+  _dbReadChips(id) {
+    try { return JSON.parse(document.getElementById(id + '_val')?.value || '[]'); } catch { return []; }
+  },
+
+  /* ── Grid modificadores 6 atributos ── */
+  _dbAttrGrid(mods = {}) {
+    const S = ['FUE','DES','CON','INT','SAB','CAR'];
+    return `
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:8px">
+        ${S.map(s => `
+          <div style="text-align:center">
+            <div style="font-family:var(--font-display);font-size:.56rem;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px">${s}</div>
+            <input type="number" id="emod_${s}" value="${mods[s] || 0}" min="-5" max="10"
+              style="text-align:center;font-family:var(--font-mono);font-weight:700;font-size:.88rem;padding:4px 2px;color:var(--gold);margin:0">
+          </div>`).join('')}
+      </div>`;
+  },
+
+  _dbReadAttrMods() {
+    const S = ['FUE','DES','CON','INT','SAB','CAR'], mods = {};
+    S.forEach(s => { const v = parseInt(document.getElementById('emod_' + s)?.value) || 0; if (v !== 0) mods[s] = v; });
+    return mods;
+  },
+
+  /* ── Pequeños helpers HTML ── */
+  _dbSec(t) {
+    return `<div style="font-family:var(--font-display);font-size:.65rem;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;margin:12px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--rim)">${t}</div>`;
+  },
+  _dbRow(...cols) {
+    return `<div style="display:grid;grid-template-columns:${cols.map(()=>'1fr').join(' ')};gap:8px;margin-bottom:8px">${cols.join('')}</div>`;
+  },
+  _dbF(lbl, id, val = '', hint = '') {
+    return `<div><label class="db-form-label">${lbl}${hint?`<span style="color:var(--muted);font-size:.6rem;letter-spacing:0;text-transform:none;margin-left:4px">(${hint})</span>`:''}</label>
+      <input type="text" id="${id}" value="${String(val).replace(/"/g,'&quot;')}" style="margin:0"></div>`;
+  },
+  _dbN(lbl, id, val = 0, min = 0, max = 99, hint = '') {
+    return `<div><label class="db-form-label">${lbl}${hint?`<span style="color:var(--muted);font-size:.6rem;letter-spacing:0;text-transform:none;margin-left:4px">(${hint})</span>`:''}</label>
+      <input type="number" id="${id}" value="${val}" min="${min}" max="${max}" style="margin:0"></div>`;
+  },
+  _dbSel(lbl, id, opts, sel = '') {
+    return `<div><label class="db-form-label">${lbl}</label>
+      <select id="${id}" style="margin:0">${opts.map(([v,t])=>`<option value="${v}"${String(sel)===String(v)?' selected':''}>${t}</option>`).join('')}</select></div>`;
+  },
+  _dbTA(lbl, id, val = '', rows = 3) {
+    return `<div><label class="db-form-label">${lbl}</label>
+      <textarea id="${id}" style="min-height:${rows*22}px;margin:0">${val}</textarea></div>`;
+  },
+  _dbHint(txt) {
+    return `<p style="font-size:.74rem;color:var(--muted);margin:0 0 6px;line-height:1.4">${txt}</p>`;
+  },
+
+  /* ── Constructor de formularios por categoría ── */
   dbEditEntry(key) {
     const cat = this.currentEditorCat;
-    const fc = document.getElementById('db_form_container');
+    const fc  = document.getElementById('db_form_container');
     fc.style.display = 'block'; fc.innerHTML = '';
+    const isNew = (key === 'new');
     let item = {};
-    if (key !== 'new') {
-      if (key.includes('|')) { const [s,i] = key.split('|'); item = this.DB[cat][s][i]; }
-      else item = this.DB[cat][key];
+    if (!isNew) {
+      if (key.includes('|')) { const [s, i] = key.split('|'); item = this.DB[cat][s]?.[parseInt(i)] || {}; }
+      else item = this.DB[cat]?.[key] || {};
     }
-    let html = `<div style="font-family:var(--font-display);font-size:.85rem;color:var(--gold);margin-bottom:12px">${key==='new'?'Nueva Entrada':'Editar Entrada'}</div>`;
-    if (cat === 'talents') {
-      html += `<label class="db-form-label">Categoría</label><input type="text" id="edit_subcat" value="${key==='new'?'general':key.split('|')[0]}">
-               <label class="db-form-label">Nombre del Talento</label><input type="text" id="edit_name" value="${item.name||''}">
-               <label class="db-form-label">ID Especial (lógica interna)</label><input type="text" id="edit_special_id" value="${item.id||''}">
-               <label class="db-form-label">Descripción</label><textarea id="edit_desc">${item.desc||''}</textarea>
-               <div id="grades_container"><div style="font-family:var(--font-display);font-size:.75rem;color:var(--dim);margin:10px 0 5px;text-transform:uppercase;letter-spacing:.08em">Grados</div>
-               ${(item.grades||[{g:1,d:''}]).map(g=>`<div class="grade-entry"><b>Grado ${g.g}:</b><input type="text" class="grade-desc" data-grade="${g.g}" value="${g.d}" placeholder="Efecto en este grado" style="display:inline-block;width:calc(100% - 70px)"></div>`).join('')}
-               </div><button class="btn-mini safe" style="margin-top:6px" onclick="app.addGradeField()">+ Grado</button>`;
+
+    const saveBtn = `
+      <div style="display:flex;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid var(--rim)">
+        <button class="btn btn-primary" style="font-size:.78rem;padding:8px 18px" onclick="app.dbSaveEntry('${key}')">💾 Guardar</button>
+        <button class="btn btn-ghost"   style="font-size:.78rem;padding:8px 14px" onclick="document.getElementById('db_form_container').style.display='none'">Cancelar</button>
+      </div>`;
+    const titleTxt = isNew ? '✦ Nueva Entrada' : 'Editando: ' + (item.name || key);
+    let h = `<div style="font-family:var(--font-display);font-size:.88rem;color:var(--gold);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--rim)">${titleTxt}</div>`;
+
+    /* ─ ID field (no talents) ─ */
+    if (cat !== 'talents') {
+      h += this._dbRow(this._dbF('Clave / ID único', 'edit_id', isNew ? '' : key, isNew ? 'sin espacios, ej: espada_larga' : 'no editable'));
+    }
+
+    /* ════ WEAPONS ════ */
+    if (cat === 'weapons') {
+      h += this._dbRow(this._dbF('Nombre visible', 'edit_name', item.name || ''));
+      h += this._dbSec('Estadísticas de combate');
+      h += this._dbRow(
+        this._dbF('Dado de daño', 'edit_dmg', item.dmg || '1d6', 'ej: 1d6, 2d4, 1d8+1'),
+        this._dbSel('Categoría', 'edit_cat', [['simple','Simple'],['marcial','Marcial']], item.cat || 'simple'),
+        this._dbSel('Atributo base', 'edit_stat', [['FUE','FUE (Fuerza)'],['DES','DES (Destreza)'],['FIN','FIN (mayor entre FUE/DES)']], item.stat || 'FUE')
+      );
+      h += this._dbRow(
+        this._dbN('Huecos de carga', 'edit_slots', item.slots ?? 1, 0, 10),
+        this._dbN('Requisito mínimo', 'edit_req', item.req ?? 0, 0, 18, 'FUE o DES, 0 = ninguno')
+      );
+
+    /* ════ ARMORS ════ */
+    } else if (cat === 'armors') {
+      h += this._dbRow(this._dbF('Nombre visible', 'edit_name', item.name || ''));
+      h += this._dbSec('Estadísticas defensivas');
+      h += this._dbRow(
+        this._dbN('CA Base', 'edit_ca', item.ca ?? 10, 5, 25, 'antes de modificadores'),
+        this._dbSel('Tipo de armadura', 'edit_type', [
+          ['light', 'Ligera — suma MOD DES completo'],
+          ['medium','Media — suma MOD DES máx. +2'],
+          ['heavy', 'Pesada — sin bonificación DES'],
+          ['none',  'Sin armadura / Piel']
+        ], item.type || 'light'),
+        this._dbN('Huecos de carga', 'edit_slots', item.slots ?? 1, 0, 10)
+      );
+      h += this._dbTA('Descripción / propiedades especiales', 'edit_txt', item.txt || '', 2);
+
+    /* ════ SHIELDS ════ */
+    } else if (cat === 'shields') {
+      h += this._dbRow(this._dbF('Nombre visible', 'edit_name', item.name || ''));
+      h += this._dbSec('Estadísticas');
+      h += this._dbRow(
+        this._dbN('Bonus de CA', 'edit_bonus', item.bonus ?? 1, 0, 10),
+        this._dbN('Huecos de carga', 'edit_slots', item.slots ?? 1, 0, 10)
+      );
+
+    /* ════ DESCRIPTORS (Linajes) ════ */
+    } else if (cat === 'descriptors') {
+      h += this._dbRow(this._dbF('Nombre visible', 'edit_name', item.name || ''));
+      h += this._dbSec('Modificadores de atributo');
+      h += this._dbHint('Estos valores se suman directamente a las estadísticas base del personaje.');
+      h += this._dbAttrGrid(item.mods || {});
+      h += this._dbSec('Dones y aptitudes especiales');
+      h += this._dbHint('Rasgos raciales, resistencias, visiones especiales, habilidades pasivas. Se muestran en la hoja como parte de las habilidades del personaje.');
+      h += this._dbChips('edit_grant', item.grant || [], 'ej: Visión en Penumbra');
+      h += this._dbSec('Descripción e información');
+      h += this._dbRow(this._dbF('Resumen del bono (mostrado en la ficha)', 'edit_bonus', item.bonus || '', 'ej: +2 CON, +1 FUE'));
+      h += this._dbTA('Lore / descripción narrativa', 'edit_txt', item.txt || '', 2);
+
+    /* ════ ARCHETYPES ════ */
+    } else if (cat === 'archetypes') {
+      h += this._dbRow(this._dbF('Nombre visible', 'edit_name', item.name || ''));
+      h += this._dbSec('Recursos base');
+      h += this._dbHint('Se suman a los atributos del personaje: PV = base + CON · Adrenalina = base + max(FUE,DES)+1 · Ingenio = base + max(INT,SAB,CAR)+1');
+      h += this._dbRow(
+        this._dbN('PV base', 'edit_pv', item.pv ?? 6, 0, 30),
+        this._dbN('Adrenalina base', 'edit_adr', item.adr ?? 4, 0, 20),
+        this._dbN('Ingenio base', 'edit_ing', item.ing ?? 4, 0, 20)
+      );
+      h += this._dbSec('Bonificadores de combate');
+      h += this._dbRow(
+        this._dbN('Bonus fijo de CA', 'edit_ca', item.ca ?? 0, 0, 10, 'suma directa a la CA calculada'),
+        this._dbN('Límite de habilidades elegibles', 'edit_limit', item.limit ?? 2, 1, 8, 'máx. que el jugador puede tomar')
+      );
+      h += this._dbSec('Habilidades disponibles del arquetipo');
+      h += this._dbHint('El jugador elige hasta el límite definido. Añade cada habilidad como chip individual.');
+      h += this._dbChips('edit_skills', item.skills || [], 'ej: Hazaña Física');
+      h += this._dbSec('Filos disponibles');
+      h += this._dbHint('Opciones que el arquetipo pone a disposición del personaje (ej: Físico, Mental, Flexible).');
+      h += this._dbChips('edit_edges', item.edges || [], 'ej: Físico');
+      h += this._dbTA('Descripción del arquetipo', 'edit_txt', item.txt || '', 2);
+
+    /* ════ BACKGROUNDS ════ */
+    } else if (cat === 'backgrounds') {
+      h += this._dbRow(this._dbF('Nombre visible', 'edit_name', item.name || ''));
+      h += this._dbSec('Habilidades otorgadas');
+      h += this._dbHint('El jugador elige 2 de las habilidades listadas aquí. Añade cada una como chip individual.');
+      h += this._dbChips('edit_skills', item.skills || [], 'ej: Sigilo');
+      h += this._dbTA('Descripción / trasfondo narrativo', 'edit_txt', item.txt || '', 2);
+
+    /* ════ TALENTS ════ */
+    } else if (cat === 'talents') {
+      h += this._dbSel('Categoría de talento', 'edit_subcat', [
+        ['combate','Combate'], ['astucia','Astucia'], ['sobrenatural','Sobrenatural'], ['general','General']
+      ], isNew ? 'general' : key.split('|')[0]);
+      h += this._dbSec('Datos del talento');
+      h += this._dbRow(this._dbF('Nombre del talento', 'edit_name', item.name || ''));
+      h += this._dbF('ID especial de lógica interna', 'edit_special_id', item.id || '', 'alerta, atleta, despertar, def_nat — deja vacío si no aplica');
+      h += this._dbTA('Descripción (mostrada en la hoja)', 'edit_desc', item.desc || '', 3);
+      h += this._dbSec('Grados del talento');
+      h += `<div id="grades_container">
+        ${(item.grades || [{g:1,d:''}]).map(g => `
+          <div class="grade-entry" style="display:grid;grid-template-columns:90px 1fr 28px;gap:6px;align-items:center;margin-bottom:5px">
+            <span style="font-family:var(--font-display);font-size:.7rem;color:var(--blood);white-space:nowrap">Grado ${g.g}</span>
+            <input type="text" class="grade-desc" data-grade="${g.g}" value="${g.d}" placeholder="Efecto en grado ${g.g}" style="margin:0">
+            <button type="button" onclick="this.closest('.grade-entry').remove()"
+              style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:0">×</button>
+          </div>`).join('')}
+      </div>
+      <button class="btn-mini safe" style="margin-top:5px" onclick="app.addGradeField()">+ Grado</button>`;
+
+    /* ════ SPELLS ════ */
+    } else if (cat === 'spells') {
+      h += this._dbRow(this._dbF('Nombre del poder / hechizo', 'edit_name', item.name || ''));
+      h += this._dbTA('Descripción / efecto completo', 'edit_txt', item.txt || '', 4);
+
     } else {
-      html += `<label class="db-form-label">Clave / ID (único)</label><input type="text" id="edit_id" value="${key==='new'?'':key}" ${key!=='new'?'disabled':''}>
-               <label class="db-form-label">Nombre</label><input type="text" id="edit_name" value="${item.name||''}">
-               <label class="db-form-label">Texto / Descripción / Daño / CA</label><textarea id="edit_txt">${item.txt||item.dmg||item.ca||''}</textarea>`;
+      h += this._dbRow(this._dbF('Nombre', 'edit_name', item.name || ''));
+      h += this._dbTA('Descripción', 'edit_txt', item.txt || '', 3);
     }
-    html += `<div style="display:flex;gap:8px;margin-top:14px">
-               <button class="btn btn-primary" style="font-size:.78rem;padding:8px 14px" onclick="app.dbSaveEntry('${key}')">Guardar</button>
-               <button class="btn btn-ghost" style="font-size:.78rem;padding:8px 14px" onclick="document.getElementById('db_form_container').style.display='none'">Cancelar</button>
-             </div>`;
-    fc.innerHTML = html; fc.scrollIntoView({behavior:'smooth'});
+
+    h += saveBtn;
+    fc.innerHTML = h;
+    /* Deshabilitar ID en edición */
+    if (cat !== 'talents' && !isNew) {
+      const el = document.getElementById('edit_id');
+      if (el) { el.disabled = true; el.style.opacity = '.5'; el.style.cursor = 'not-allowed'; }
+    }
+    fc.scrollIntoView({ behavior: 'smooth' });
   },
 
   addGradeField() {
-    const c = document.getElementById('grades_container');
+    const c = document.getElementById('grades_container'); if (!c) return;
     const n = c.querySelectorAll('.grade-entry').length + 1;
     const d = document.createElement('div'); d.className = 'grade-entry';
-    d.innerHTML = `<b>Grado ${n}:</b><input type="text" class="grade-desc" data-grade="${n}" value="" style="display:inline-block;width:calc(100% - 70px)">`;
+    d.style.cssText = 'display:grid;grid-template-columns:90px 1fr 28px;gap:6px;align-items:center;margin-bottom:5px';
+    d.innerHTML = `
+      <span style="font-family:var(--font-display);font-size:.7rem;color:var(--blood);white-space:nowrap">Grado ${n}</span>
+      <input type="text" class="grade-desc" data-grade="${n}" value="" placeholder="Efecto en grado ${n}" style="margin:0">
+      <button type="button" onclick="this.closest('.grade-entry').remove()"
+        style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:0">×</button>`;
     c.appendChild(d);
   },
 
+  /* ── Guardado tipado completo ── */
   dbSaveEntry(key) {
     const cat = this.currentEditorCat;
-    const gv = id => { const el = document.getElementById(id); return el ? el.value : ''; };
-    const gi = id => parseInt(gv(id))||0;
-    const gArr = id => gv(id).split(',').map(s=>s.trim()).filter(Boolean);
-    const gJSON = (id, fallback={}) => { try { return JSON.parse(gv(id))||fallback } catch { return fallback } };
+    const gv  = id => document.getElementById(id)?.value?.trim() ?? '';
+    const gi  = id => parseInt(document.getElementById(id)?.value) || 0;
 
     if (cat === 'talents') {
-      const sub = gv('edit_subcat').toLowerCase().trim();
-      const grades = Array.from(document.querySelectorAll('.grade-desc')).map(el=>({g:parseInt(el.dataset.grade),d:el.value}));
-      const t = {name:gv('edit_name'), desc:gv('edit_desc'), grades};
-      const sid = gv('edit_special_id'); if(sid) t.id = sid;
+      const name = gv('edit_name');
+      if (!name) { this.toast('El nombre no puede estar vacío', 'Error'); return; }
+      const sub  = gv('edit_subcat').toLowerCase();
+      const grades = Array.from(document.querySelectorAll('.grade-desc')).map(el => ({g: parseInt(el.dataset.grade), d: el.value.trim()}));
+      const t = { name, desc: gv('edit_desc'), grades };
+      const sid = gv('edit_special_id'); if (sid) t.id = sid;
       if (!this.DB.talents[sub]) this.DB.talents[sub] = [];
-      if (key !== 'new' && key.includes('|')) { const [os,oi] = key.split('|'); this.DB.talents[os].splice(parseInt(oi),1) }
+      if (key !== 'new' && key.includes('|')) {
+        const [os, oi] = key.split('|'); this.DB.talents[os].splice(parseInt(oi), 1);
+      }
       this.DB.talents[sub].push(t);
 
     } else {
-      const id = gv('edit_id').trim();
-      if (!id) { this.toast('Ingresa una Clave / ID', 'Error'); return; }
+      const id = gv('edit_id');
+      if (!id)   { this.toast('La Clave / ID no puede estar vacía', 'Error'); return; }
+      const name = gv('edit_name');
+      if (!name && cat !== 'spells') { this.toast('El nombre no puede estar vacío', 'Error'); return; }
       if (!this.DB[cat]) this.DB[cat] = {};
 
       if (cat === 'weapons') {
-        this.DB[cat][id] = {name:gv('edit_name'), dmg:gv('edit_dmg')||'1d6', slots:gi('edit_slots')||1, cat:gv('edit_cat'), stat:gv('edit_stat'), req:gi('edit_req')};
+        this.DB[cat][id] = { name, dmg: gv('edit_dmg') || '1d6',
+          slots: gi('edit_slots') || 1, cat: gv('edit_cat'),
+          stat:  gv('edit_stat'), req: gi('edit_req') };
+
       } else if (cat === 'armors') {
-        this.DB[cat][id] = {name:gv('edit_name'), ca:gi('edit_ca')||10, type:gv('edit_type'), slots:gi('edit_slots')||1, txt:gv('edit_txt')};
+        this.DB[cat][id] = { name, ca: gi('edit_ca') || 10,
+          type:  gv('edit_type'), slots: gi('edit_slots') || 1,
+          txt:   gv('edit_txt') };
+
       } else if (cat === 'shields') {
-        this.DB[cat][id] = {name:gv('edit_name'), bonus:gi('edit_bonus')||1, slots:gi('edit_slots')||1};
+        this.DB[cat][id] = { name,
+          bonus: gi('edit_bonus') || 1, slots: gi('edit_slots') || 1 };
+
       } else if (cat === 'descriptors') {
-        this.DB[cat][id] = {name:gv('edit_name'), bonus:gv('edit_bonus'), mods:gJSON('edit_mods'), grant:gArr('edit_grant'), txt:gv('edit_txt')};
+        this.DB[cat][id] = { name,
+          mods:  this._dbReadAttrMods(),
+          grant: this._dbReadChips('edit_grant'),
+          bonus: gv('edit_bonus'),
+          txt:   gv('edit_txt') };
+
       } else if (cat === 'archetypes') {
-        this.DB[cat][id] = {name:gv('edit_name'), pv:gi('edit_pv'), adr:gi('edit_adr'), ing:gi('edit_ing'), ca:gi('edit_ca'), limit:gi('edit_limit'), skills:gArr('edit_skills'), edges:gArr('edit_edges'), txt:gv('edit_txt')};
+        this.DB[cat][id] = { name,
+          pv:     gi('edit_pv'),  adr: gi('edit_adr'), ing: gi('edit_ing'),
+          ca:     gi('edit_ca'),  limit: gi('edit_limit'),
+          skills: this._dbReadChips('edit_skills'),
+          edges:  this._dbReadChips('edit_edges'),
+          txt:    gv('edit_txt') };
+
       } else if (cat === 'backgrounds') {
-        this.DB[cat][id] = {name:gv('edit_name'), skills:gArr('edit_skills')};
+        this.DB[cat][id] = { name,
+          skills: this._dbReadChips('edit_skills'),
+          txt:    gv('edit_txt') };
+
       } else if (cat === 'spells') {
-        this.DB[cat][id] = {name:gv('edit_name'), txt:gv('edit_txt')};
+        this.DB[cat][id] = { name, txt: gv('edit_txt') };
+
       } else {
-        this.DB[cat][id] = {name:gv('edit_name'), txt:gv('edit_txt')};
+        this.DB[cat][id] = { name, txt: gv('edit_txt') };
       }
     }
-    this.saveRulesToLocal(); this.unlockApp(); this.dbEditCategory(cat); this.toast('Guardado correctamente', 'DB');
+
+    this.saveRulesToLocal();
+    this.unlockApp();
+    this.dbEditCategory(cat);
+    this.toast('Guardado correctamente', 'Base de Datos');
   },
 
   dbDeleteEntry(key) {
     if (!confirm('¿Eliminar esta entrada permanentemente?')) return;
     const cat = this.currentEditorCat;
-    if (key.includes('|')) { const [s,i] = key.split('|'); this.DB[cat][s].splice(i,1) }
+    if (key.includes('|')) { const [s,i] = key.split('|'); this.DB[cat][s].splice(parseInt(i), 1); }
     else delete this.DB[cat][key];
     this.saveRulesToLocal(); this.unlockApp(); this.dbEditCategory(cat);
+    this.toast('Entrada eliminada', 'Base de Datos');
   },
 
   exportRulesDB() {
