@@ -7,6 +7,13 @@
 <title>S&amp;S Companion</title>
 <link rel="icon" type="image/webp" href="Bind_Pact_Weapon.webp">
 <link rel="apple-touch-icon" href="Bind_Pact_Weapon.webp">
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="S&amp;S Companion">
+<meta name="application-name" content="S&amp;S Companion">
+<meta name="msapplication-TileColor" content="#07060a">
 <style>html,body{background:#07060a!important;color:#d8cce8}
 #ss-loader{position:fixed;inset:0;z-index:9999;background:var(--void);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .5s ease;background-image:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(125,28,42,.18) 0%,transparent 70%)}
 #ss-loader.fade-out{opacity:0;pointer-events:none}
@@ -44,13 +51,13 @@
   --gb:0 0 16px rgba(176,48,64,.3);
   --sm:0 1px 4px rgba(0,0,0,.4);--md:0 4px 16px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.3);--lg:0 8px 32px rgba(0,0,0,.65),0 2px 8px rgba(0,0,0,.4);
   --si:inset 0 1px 0 rgba(255,255,255,.04);
-  --r:4px;--rl:8px;--nav:52px;--ph:228px;--safe-b:env(safe-area-inset-bottom,0px);--fs-base:15px;
+  --r:4px;--rl:8px;--nav:52px;--safe-b:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
 ::selection{background:rgba(200,169,110,.2);color:var(--bright)}
 ::-webkit-scrollbar{display:none}*{scrollbar-width:none;-ms-overflow-style:none}
 html{scroll-behavior:smooth}
-body{font-family:var(--fb);background:var(--void);color:var(--text);height:100dvh;font-size:var(--fs-base,15px);line-height:1.4;overflow:hidden;
+body{font-family:var(--fb);background:var(--void);color:var(--text);height:100dvh;line-height:1.4;overflow:hidden;
   background-image:radial-gradient(ellipse 100% 50% at 10% 0%,rgba(125,28,42,.10) 0%,transparent 55%),radial-gradient(ellipse 70% 70% at 90% 100%,rgba(29,78,143,.07) 0%,transparent 55%);}
 .screen{position:fixed;inset:0;display:flex;flex-direction:column;transition:opacity .28s,transform .28s;overflow:hidden;-webkit-backface-visibility:hidden;backface-visibility:hidden}
 .screen.hidden{opacity:0;pointer-events:none;transform:translateY(14px)}
@@ -101,8 +108,8 @@ body{font-family:var(--fb);background:var(--void);color:var(--text);height:100dv
 
 /* ══ PAGES ══ */
 .pages-wrapper{flex:1;overflow:hidden;position:relative;min-height:0;touch-action:pan-y}
-.pages-track{display:flex;height:100%;transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform}
-.page{min-width:100%;width:100%;flex-shrink:0;height:100%;overflow-y:auto;overflow-x:hidden;padding:8px 12px 16px;display:flex;flex-direction:column;gap:10px}
+.pages-track{display:flex;height:100%;will-change:transform}
+.page{min-width:100%;width:100%;flex-shrink:0;height:100%;min-height:100%;overflow-y:auto;overflow-x:hidden;padding:8px 12px 16px;display:flex;flex-direction:column;gap:10px}
 /* ══ BOTTOM NAV ══ */
 .bnav{height:calc(var(--nav) + var(--safe-b));padding-bottom:var(--safe-b);background:var(--deep);border-top:1px solid var(--rim);display:flex;flex-shrink:0;z-index:10}
 .nbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:transparent;border:none;cursor:pointer;color:var(--muted);transition:color .2s;padding:4px 2px;position:relative;font-family:var(--fd)}
@@ -270,6 +277,8 @@ input[type=radio]:checked::after{transform:scale(1)}
 /* ══ MODALS ══ */
 dialog.modal{background:var(--deep);color:var(--text);border:1px solid var(--border);border-radius:var(--rl);width:min(96vw,920px);padding:0;box-shadow:0 24px 80px rgba(0,0,0,.85);position:fixed;inset:0;margin:auto;max-height:90svh;display:none;flex-direction:column;z-index:200;overflow:hidden}
 dialog.modal[open]{display:flex;animation:popIn .22s cubic-bezier(.18,.89,.32,1.28) forwards}
+/* crop_modal overrides the global max-height */
+#crop_modal{max-height:none}
 dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(8px)}
 @keyframes popIn{from{opacity:0;transform:scale(.95) translateY(16px)}to{opacity:1;transform:none}}
 .mhd{background:var(--surface);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);flex-shrink:0}
@@ -292,17 +301,144 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(8px)}
 .dbitem:hover{border-color:var(--border)}
 .dfl{font-family:var(--fd);font-size:.63rem;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;display:block;margin:6px 0 2px}
 /* ══ CROP ══ */
-.crl{display:flex;height:100%}
-.crws{flex:1;background:#090909;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
-.crfr{width:171px;height:228px;flex-shrink:0;border:2px solid var(--blood);box-shadow:0 0 0 1000px rgba(0,0,0,.88);position:relative;overflow:hidden;touch-action:none;z-index:10;cursor:grab}
-.crfr:active{cursor:grabbing}
-.crimg{position:absolute;top:0;left:0;transform-origin:top left;pointer-events:none}
-.crsd{width:185px;flex-shrink:0;background:var(--deep);border-left:1px solid var(--border);padding:12px;display:flex;flex-direction:column;gap:10px}
-.crsd p{font-size:.74rem;color:var(--muted);line-height:1.4}
-.crsd label{font-size:.63rem;color:var(--dim);font-family:var(--fd);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:3px}
-input[type=range]{width:100%;accent-color:var(--gold)}
-.bsave{background:linear-gradient(135deg,var(--crimson),var(--blood));color:#fff;border:none;padding:10px;cursor:pointer;border-radius:var(--r);font-family:var(--fd);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;transition:all .18s}
+/* Override base dialog constraints — crop needs full viewport on mobile */
+#crop_modal{
+  max-width:min(520px,100vw);
+  width:100%;
+  /* Full screen on mobile */
+  height:100dvh;
+  max-height:100dvh;
+  border-radius:0;
+  border:none;
+  inset:0;
+  margin:0;
+}
+@media(min-width:480px){
+  #crop_modal{
+    height:min(640px,92dvh);
+    max-height:min(640px,92dvh);
+    border-radius:var(--rl);
+    border:1px solid var(--border);
+    inset:0;
+    margin:auto;
+  }
+}
+/* The flex column that fills the dialog — must match dialog height exactly */
+#crop_modal .crl{
+  display:flex;
+  flex-direction:column;
+  height:100%;
+  min-height:0;
+  overflow:hidden;
+}
+/* Workspace: takes ALL remaining space after header + controls */
+.crws{
+  flex:1 1 0;
+  min-height:0;
+  background:#08080b;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;
+  touch-action:none;cursor:grab;
+  user-select:none;-webkit-user-select:none;
+}
+.crws:active{cursor:grabbing}
+
+/* Frame overlay — sized & centered by JS */
+.crfr{
+  position:absolute;
+  border:2px solid rgba(200,169,110,.95);
+  box-shadow:0 0 0 2000px rgba(0,0,0,.68),
+             inset 0 0 0 1px rgba(200,169,110,.12);
+  border-radius:3px;
+  pointer-events:none;
+  z-index:10;
+}
+.crfr::before,.crfr::after{
+  content:'';position:absolute;
+  width:18px;height:18px;
+  border-color:var(--gold);border-style:solid;
+}
+.crfr::before{top:-2px;left:-2px;border-width:3px 0 0 3px}
+.crfr::after{bottom:-2px;right:-2px;border-width:0 3px 3px 0}
+
+/* Image */
+.crimg{
+  position:absolute;
+  transform-origin:center center;
+  pointer-events:none;
+  will-change:transform;
+  max-width:none;max-height:none;
+}
+
+/* Rule-of-thirds grid */
+.cr-grid{
+  position:absolute;
+  pointer-events:none;
+  opacity:0;transition:opacity .18s;
+  z-index:11;
+}
+.crws.dragging .cr-grid{opacity:1}
+
+/* Controls bar — fixed height, never scrolls, safe-area aware */
+.crsd{
+  flex:0 0 auto;
+  background:var(--deep);
+  border-top:1px solid var(--border);
+  padding:10px 14px;
+  padding-bottom:max(10px, env(safe-area-inset-bottom, 10px));
+  display:flex;flex-direction:column;gap:8px;
+  overflow:visible;
+}
+.cr-ctrl-row{display:flex;align-items:center;gap:6px}
+.cr-zoom-btn{
+  width:40px;height:40px;border-radius:8px;
+  background:var(--raised);border:1px solid var(--rim);
+  color:var(--dim);font-size:1.3rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .15s;line-height:1;
+  -webkit-user-select:none;user-select:none;touch-action:manipulation;
+}
+.cr-zoom-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(200,169,110,.08)}
+.cr-zoom-btn:active{transform:scale(.88)}
+input[type=range]{flex:1;accent-color:var(--gold);cursor:pointer;min-width:0;height:22px}
+.cr-zoom-lbl{font-family:var(--fm);font-size:.62rem;color:var(--muted);min-width:38px;text-align:right;flex-shrink:0}
+.cr-actions{display:flex;gap:6px;justify-content:center;width:100%}
+.cr-rot-btn{
+  flex:1;max-width:110px;height:40px;padding:0 8px;border-radius:8px;
+  background:var(--raised);border:1px solid var(--rim);
+  color:var(--dim);font-size:.72rem;font-family:var(--fd);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px;
+  white-space:nowrap;transition:all .15s;
+  touch-action:manipulation;
+}
+.cr-rot-btn:hover{border-color:rgba(74,158,202,.5);color:var(--ice);background:rgba(74,158,202,.08)}
+.cr-rot-btn:active{transform:scale(.94)}
+.cr-fit-btn{
+  flex:1;max-width:110px;height:40px;padding:0 8px;border-radius:8px;
+  background:var(--raised);border:1px solid var(--rim);
+  color:var(--dim);font-size:.72rem;font-family:var(--fd);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px;
+  white-space:nowrap;transition:all .15s;
+  touch-action:manipulation;
+}
+.cr-fit-btn:hover{border-color:var(--border);color:var(--text);background:var(--panel)}
+.cr-fit-btn:active{transform:scale(.94)}
+/* Apply row — full width, prominent */
+.cr-apply-row{display:flex}
+.bsave{
+  flex:1;
+  background:linear-gradient(135deg,var(--crimson),var(--blood));
+  color:#fff;border:none;
+  height:48px;
+  cursor:pointer;border-radius:var(--r);
+  font-family:var(--fd);font-size:.82rem;
+  letter-spacing:.09em;text-transform:uppercase;
+  transition:all .18s;white-space:nowrap;
+  touch-action:manipulation;
+  box-shadow:0 2px 12px rgba(125,28,42,.4);
+}
 .bsave:hover{box-shadow:var(--gb)}
+.bsave:active{transform:scale(.98);opacity:.9}
 /* ══ TOAST ══ */
 #toast-ct{position:fixed;bottom:calc(var(--nav) + 12px);left:50%;transform:translateX(-50%);z-index:998;display:flex;flex-direction:column;gap:5px;pointer-events:none;align-items:center}
 .toast{background:var(--panel);color:var(--bright);padding:7px 14px;border-radius:var(--rl);border:1px solid var(--border);font-family:var(--fm);font-size:.74rem;box-shadow:var(--lg);display:flex;align-items:center;gap:7px;animation:slideUp .2s ease forwards;min-width:170px;max-width:320px;justify-content:center}
@@ -375,11 +511,9 @@ details>summary::before{content:'▸';color:var(--gold);font-size:.56rem;transit
   .tml{grid-template-columns:1fr;grid-template-rows:auto 1fr}
   .tms{border-right:none;border-bottom:1px solid var(--border);flex-direction:row;flex-wrap:wrap;gap:4px;padding:6px}
   .catbtn{width:auto;padding:4px 8px;font-size:.7rem}
-  dialog.modal{width:100vw;height:100dvh;max-height:100dvh;border-radius:0;border:none;inset:0;margin:0}
+  dialog.modal:not(#crop_modal){width:100vw;height:100dvh;max-height:100dvh;border-radius:0;border:none;inset:0;margin:0}
   .dbl{grid-template-columns:1fr;grid-template-rows:auto 1fr}
   .dbs{border-right:none;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:4px}
-  .crl{flex-direction:column}
-  .crsd{width:100%;flex-direction:row;align-items:center;justify-content:space-between;padding:8px 10px;border-left:none;border-top:1px solid var(--border);gap:8px}
 }
 @media(max-width:400px){.g6{grid-template-columns:repeat(2,1fr)}.saves-grid{grid-template-columns:repeat(3,1fr)}}
 </style>
@@ -499,7 +633,7 @@ details>summary::before{content:'▸';color:var(--gold);font-size:.56rem;transit
                 <div style="margin-bottom:6px"><span class="fl">Nombre</span><input type="text" id="char_name" placeholder="ej. Valerius el Audaz" style="font-family:var(--fd);font-size:.92rem;font-weight:600"></div>
                 <div class="g2" style="gap:5px;margin-bottom:6px">
                   <div><span class="fl">Nivel</span><input type="number" id="char_lvl" value="1" min="1" max="10" onchange="app.calc()"></div>
-                  <div><span class="fl">XP</span><input type="number" id="char_xp" value="0" min="0"></div>
+                  <div><span class="fl">XP <span id="xp_next_lbl" style="font-size:.58rem;color:var(--muted);font-style:normal;letter-spacing:0;text-transform:none"></span></span><input type="number" id="char_xp" value="0" min="0" oninput="app.updateXpHint()"></div>
                 </div>
                 <div style="margin-bottom:6px"><span class="fl">Alineamiento</span><div class="asel" id="align_sel"></div></div>
                 <div style="margin-bottom:4px"><span class="fl">Biografía</span><textarea id="char_concept" placeholder="Bio del personaje…" style="min-height:44px;font-size:.8rem"></textarea></div>
@@ -587,7 +721,7 @@ details>summary::before{content:'▸';color:var(--gold);font-size:.56rem;transit
                 <div style="font-family:var(--fd);font-size:.95rem;color:var(--gold);font-weight:700"><span id="res_ca">10</span></div>
                 <div style="font-family:var(--fm);font-size:.42rem;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="res_ca_armor">—</div>
               </div>
-              <div class="sc-clickable" onclick="app.rollCheck('Iniciativa',parseInt(document.getElementById('res_ini').innerText))">
+              <div class="sc-clickable" onclick="app.rollCheck('Iniciativa', parseInt(document.getElementById('res_ini').innerText) || 0)">
                 <div class="sc-lbl" style="color:var(--muted)">Ini</div>
                 <div style="font-family:var(--fd);font-size:.95rem;color:var(--bright);font-weight:700"><span id="res_ini">+0</span></div>
               </div>
@@ -957,19 +1091,37 @@ details>summary::before{content:'▸';color:var(--gold);font-size:.56rem;transit
 </dialog>
 
 <!-- ══ CROP MODAL ══ -->
-<dialog id="crop_modal" class="modal" style="max-width:min(700px,96vw);height:min(520px,90svh)">
-  <div class="mhd"><span class="mttl">Ajustar Retrato</span><button class="bcls" onclick="document.getElementById('crop_modal').close()">✕</button></div>
-  <div class="mbd crl" style="padding:0">
-    <div class="crws">
-      <div class="crfr" id="crop_frame"
-        onmousedown="app.startDrag(event)" ontouchstart="app.startDrag(event)">
-        <img class="crimg" id="crop_preview" src="" alt="">
-      </div>
+<dialog id="crop_modal" class="modal">
+  <div class="crl">
+    <div class="mhd">
+      <span class="mttl">✦ Ajustar Retrato</span>
+      <button class="bcls" onclick="app.cancelCrop()">✕</button>
+    </div>
+    <div class="crws" id="crop_ws"
+      onmousedown="app.cropDragStart(event)"
+      ontouchstart="app.cropDragStart(event)">
+      <img class="crimg" id="crop_preview" src="" alt="" draggable="false">
+      <div class="crfr" id="crop_frame"></div>
+      <div class="cr-grid" id="cr_grid"><svg id="cr_grid_svg" overflow="visible"></svg></div>
     </div>
     <div class="crsd">
-      <p>Arrastra la imagen para posicionarla. Usa el deslizador para ajustar el zoom.</p>
-      <div><label>Zoom</label><input type="range" id="crop_zoom" min="0.1" max="3" step="0.01" value="1" oninput="app.updateCropView()"></div>
-      <button class="bsave" onclick="app.applyCrop()">✓ Aplicar Retrato</button>
+      <div class="cr-ctrl-row">
+        <button class="cr-zoom-btn" onclick="app.cropZoomStep(-0.1)">−</button>
+        <input type="range" id="crop_zoom" min="0.05" max="8" step="0.005" value="1"
+          oninput="app.cropZoomSlider(this.value)">
+        <button class="cr-zoom-btn" onclick="app.cropZoomStep(0.1)">+</button>
+        <span class="cr-zoom-lbl" id="cr_zoom_lbl">100%</span>
+      </div>
+      <div class="cr-ctrl-row">
+        <div class="cr-actions">
+          <button class="cr-rot-btn" onclick="app.cropRotate(-90)">↺ −90°</button>
+          <button class="cr-rot-btn" onclick="app.cropRotate(90)">↻ +90°</button>
+          <button class="cr-fit-btn" onclick="app.cropFit()">⊡ Fit</button>
+        </div>
+      </div>
+      <div class="cr-apply-row">
+        <button class="bsave" onclick="app.applyCrop()">✓ Aplicar Retrato</button>
+      </div>
     </div>
   </div>
 </dialog>
@@ -1344,10 +1496,17 @@ const app = {
   totalPages: 5,
   activeTalentCat: null,
   currentEditorCat: '',
-  cropState: {img:null,x:0,y:0,zoom:1,isDragging:false,lastX:0,lastY:0},
+  _uidCounter: Date.now(),
+  cropState: {img:null, x:0, y:0, zoom:1, rot:0, minZoom:.05, isDragging:false, lastX:0, lastY:0, pinch:null, velX:0, velY:0},
   _weaponDmgData: [{formula:'1',name:'Desarmado'},{formula:'1',name:'Desarmado'}],
   _swipe: {startX:0,startY:0,startT:0,active:false},
   _editingCustomItem: null,
+  _aptSel: { tricks: new Set(), spells: new Set() },
+  _aptMode: 'tricks',
+  _savedName: null,
+
+  /* ── UID GENERATOR ── */
+  _nextUid() { return ++this._uidCounter; },
 
   /* ── INIT ── */
   init() {
@@ -1360,11 +1519,11 @@ const app = {
     this.buildAlignmentPicker();
     this.setupSwipe();
     this._initDiceSwipe();
-    // Setup crop drag listeners
-    window.addEventListener('mouseup', () => this.endDrag());
-    window.addEventListener('touchend', () => this.endDrag());
-    window.addEventListener('mousemove', e => this.doDrag(e));
-    window.addEventListener('touchmove', e => this.doDrag(e), {passive:false});
+    this._setupEscapeKey();
+    // Crop wheel zoom (registered once, guarded inside handler)
+    const ws = document.getElementById('crop_ws');
+    if (ws) ws.addEventListener('wheel', e => this._cropWheel(e), {passive:false});
+    this._restoreFontSize();
   },
 
   /* ── SCREENS ── */
@@ -1374,6 +1533,23 @@ const app = {
   },
 
   goHome() {
+    const name = document.getElementById('char_name')?.value?.trim();
+    const hasData = name || this.inventory.length > 0 ||
+      ['base_FUE','base_DES','base_CON','base_INT','base_SAB','base_CAR'].some(id=>{
+        const el = document.getElementById(id); return el && parseInt(el.value) !== 8;
+      });
+    if (hasData) {
+      // Warn if: never saved, OR name changed since last save
+      const unsaved = !this._savedName || (name && name !== this._savedName);
+      if (unsaved) {
+        const label = name ? `"${this._esc(name)}"` : 'Este personaje';
+        this._confirm('¿Salir sin guardar?', `${label} tiene cambios sin guardar. Se perderán los datos.`, '✓ Salir', () => {
+          this.renderHome();
+          this.showScreen('home');
+        });
+        return;
+      }
+    }
     this.renderHome();
     this.showScreen('home');
   },
@@ -1383,7 +1559,7 @@ const app = {
     this.showScreen('app');
     this.unlockApp();
     this.goToPage(0);
-    // Open all sections in edit mode
+    // Abrir todas las secciones en edición para flujo de creación
     this.editSection('personal');
     this.editSection('identity');
     this.editSection('stats');
@@ -1391,6 +1567,11 @@ const app = {
     this.editSection('skills');
     this.editSection('combat');
     this.editSection('equipment');
+    // Enfocar el campo nombre automáticamente
+    requestAnimationFrame(() => {
+      const nameInput = document.getElementById('char_name');
+      if (nameInput) nameInput.focus();
+    });
   },
 
   loadCharToApp(name) {
@@ -1398,14 +1579,19 @@ const app = {
     const data = roster[name];
     if (!data) return;
     this.clearCharData();
+    this._savedName = name;
     this.showScreen('app');
     this.unlockApp();
     this.applyCharData(data);
     this.goToPage(0);
-    this.toast(`Cargado: ${name}`);
+    this.toast(`Cargado: ${this._esc(name)}`);
   },
 
   /* ── HOME ROSTER ── */
+  _esc(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  },
+
   renderHome() {
     const el = document.getElementById('home-roster');
     const roster = JSON.parse(localStorage.getItem('sands_roster') || '{}');
@@ -1439,9 +1625,9 @@ const app = {
       card.innerHTML = `
         ${portHtml}
         <div class="char-ci">
-          <div class="char-cn">${name}</div>
-          <div class="char-cs">${desc||'—'} · ${arq}${bg ? ' · '+bg : ''}</div>
-          <div style="margin-top:3px"><span class="char-lvl-badge">Nivel ${lvl}</span></div>
+          <div class="char-cn">${this._esc(name)}</div>
+          <div class="char-cs">${this._esc(desc||'—')} · ${this._esc(arq)}${bg ? ' · '+this._esc(bg) : ''}</div>
+          <div style="margin-top:3px"><span class="char-lvl-badge">Nivel ${this._esc(lvl)}</span></div>
         </div>`;
       card.onclick = () => { if (!card._swiped) this.loadCharToApp(name); };
 
@@ -1495,42 +1681,66 @@ const app = {
       card.addEventListener('touchmove', e => { onMove(e.touches[0].clientX, e.touches[0].clientY); if(locked) e.preventDefault(); }, {passive:false});
       card.addEventListener('touchend', onEnd, {passive:true});
 
-      // Close swipe if user taps elsewhere
-      document.addEventListener('touchstart', (e) => {
-        if (revealed && !wrap.contains(e.target)) {
-          card.style.transition = 'transform .25s ease';
-          delBtn.style.transition = 'transform .25s ease';
-          card.style.transform = 'translateX(0)';
-          delBtn.style.transform = 'translateX(100%)';
-          revealed = false;
-          setTimeout(() => { card._swiped = false; }, 260);
-        }
-      }, {passive:true});
-
       wrap.appendChild(delBtn);
       wrap.appendChild(card);
       el.appendChild(wrap);
     });
+
+    // Single delegated listener to close any open swipe when tapping outside.
+    // Remove any previously registered handler first (stable ref on app object).
+    if (app._rosterSwipeHandler) {
+      document.removeEventListener('touchstart', app._rosterSwipeHandler);
+    }
+    app._rosterSwipeHandler = (e) => {
+      // Guard: if the roster element is no longer in the DOM, clean up and bail
+      if (!document.body.contains(el)) {
+        document.removeEventListener('touchstart', app._rosterSwipeHandler);
+        app._rosterSwipeHandler = null;
+        return;
+      }
+      el.querySelectorAll('.char-card').forEach(c => {
+        if (c._swiped && !c.closest('.char-card-wrap').contains(e.target)) {
+          const w = c.closest('.char-card-wrap');
+          const db = w?.querySelector('.char-card-delete');
+          c.style.transition = 'transform .25s ease';
+          if (db) db.style.transition = 'transform .25s ease';
+          c.style.transform = 'translateX(0)';
+          if (db) db.style.transform = 'translateX(100%)';
+          setTimeout(() => { c._swiped = false; }, 260);
+        }
+      });
+    };
+    document.addEventListener('touchstart', app._rosterSwipeHandler, {passive:true});
   },
 
   /* ── CONFIRM HELPER ── */
   _confirm(title, body, confirmLabel, onConfirm) {
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
-    overlay.innerHTML = `<div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--rl);padding:20px;max-width:300px;width:100%;text-align:center">
-      <div style="font-family:var(--fd);color:var(--gold);font-size:.9rem;letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px">${title}</div>
-      <div style="font-size:.82rem;color:var(--muted);margin-bottom:16px">${body}</div>
-      <div style="display:flex;gap:8px">
-        <button id="_conf_cancel" class="btn btn-g" style="flex:1">Cancelar</button>
-        <button id="_conf_ok" class="btn btn-p" style="flex:1">${confirmLabel}</button>
-      </div></div>`;
+    const box = document.createElement('div');
+    box.style.cssText = 'background:var(--panel);border:1px solid var(--border);border-radius:var(--rl);padding:20px;max-width:300px;width:100%;text-align:center';
+    const ttl = document.createElement('div');
+    ttl.style.cssText = 'font-family:var(--fd);color:var(--gold);font-size:.9rem;letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px';
+    ttl.textContent = title;
+    const bdy = document.createElement('div');
+    bdy.style.cssText = 'font-size:.82rem;color:var(--muted);margin-bottom:16px';
+    bdy.textContent = body;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px';
+    const btnCancel = document.createElement('button');
+    btnCancel.className = 'btn btn-g'; btnCancel.style.flex = '1'; btnCancel.textContent = 'Cancelar';
+    const btnOk = document.createElement('button');
+    btnOk.className = 'btn btn-p'; btnOk.style.flex = '1'; btnOk.textContent = confirmLabel;
+    row.appendChild(btnCancel); row.appendChild(btnOk);
+    box.appendChild(ttl); box.appendChild(bdy); box.appendChild(row);
+    overlay.appendChild(box);
     document.body.appendChild(overlay);
-    overlay.querySelector('#_conf_cancel').onclick = () => overlay.remove();
-    overlay.querySelector('#_conf_ok').onclick = () => { overlay.remove(); onConfirm(); };
+    btnCancel.onclick = () => overlay.remove();
+    btnOk.onclick = () => { overlay.remove(); onConfirm(); };
   },
 
   deleteChar(name) {
-    this._confirm('¿Eliminar personaje?', `"${name}" será eliminado permanentemente.`, '✓ Eliminar', () => this._doDeleteChar(name));
+    this._confirm('¿Eliminar personaje?', `"${this._esc(name)}" será eliminado permanentemente.`, '✓ Eliminar', () => this._doDeleteChar(name));
   },
 
   _doDeleteChar(name) {
@@ -1538,7 +1748,7 @@ const app = {
     delete r[name];
     localStorage.setItem('sands_roster', JSON.stringify(r));
     this.renderHome();
-    this.toast(`"${name}" eliminado`);
+    this.toast(`"${this._esc(name)}" eliminado`);
   },
 
   /* ── UNLOCK / SETUP APP ── */
@@ -1556,69 +1766,132 @@ const app = {
   /* ── NAVIGATION ── */
   setupSwipe() {
     const w = document.getElementById('pages_wrapper');
-    let startX=0,startY=0,startT=0,active=false,locked=false;
+    const track = document.getElementById('pages_track');
+    let startX=0, startY=0, startT=0;
+    let lastX=0, lastT=0, vel=0;         // velocity tracking
+    let dragging=false, locked=false;
+
+    const pageW = () => w.clientWidth || window.innerWidth;
+
+    // Live position: follow finger with rubber-band at edges
+    const setLive = (rawDx) => {
+      const base = -this.currentPage * pageW();
+      let x = base + rawDx;
+      // Rubber-band resistance past edges
+      const atStart = this.currentPage === 0 && rawDx > 0;
+      const atEnd   = this.currentPage === this.totalPages - 1 && rawDx < 0;
+      if (atStart || atEnd) x = base + rawDx * 0.25;
+      track.style.transition = 'none';
+      track.style.transform = `translateX(${x}px)`;
+    };
 
     w.addEventListener('touchstart', e => {
       const t = e.touches[0];
-      startX=t.clientX; startY=t.clientY; startT=Date.now();
-      active=true; locked=false;
+      startX = lastX = t.clientX;
+      startY = t.clientY;
+      startT = lastT = Date.now();
+      dragging = false; locked = false; vel = 0;
+      track.style.transition = 'none';
     }, {passive:true});
 
     w.addEventListener('touchmove', e => {
-      if (!active) return;
       const t = e.touches[0];
-      const dx = Math.abs(t.clientX - startX);
-      const dy = Math.abs(t.clientY - startY);
-      if (!locked) {
-        if (dx > dy && dx > 8) { locked=true; }
-        else if (dy > dx && dy > 8) { active=false; return; }
-      }
-      if (locked) e.preventDefault();
-    }, {passive:false});
-
-    w.addEventListener('touchend', e => {
-      if (!active) return;
-      const t = e.changedTouches[0];
       const dx = t.clientX - startX;
       const dy = t.clientY - startY;
-      const dt = Date.now() - startT;
-      active=false; locked=false;
-      if (Math.abs(dx) > Math.abs(dy)*1.2 && Math.abs(dx) > 40 && dt < 450) {
-        if (dx < 0 && this.currentPage < this.totalPages-1) this.goToPage(this.currentPage+1);
-        else if (dx > 0 && this.currentPage > 0) this.goToPage(this.currentPage-1);
-      }
-    }, {passive:true});
 
-    // Desktop mouse drag
+      // Direction lock: require clear horizontal intent before hijacking scroll
+      // dx must be > 12px AND at least 1.5× the vertical movement
+      if (!locked) {
+        if (Math.abs(dx) > Math.abs(dy) * 1.5 && Math.abs(dx) > 12) {
+          locked = true; dragging = true;
+        } else if (Math.abs(dy) > Math.abs(dx) * 1.2 && Math.abs(dy) > 12) {
+          locked = true; // vertical scroll — release entirely
+        }
+      }
+
+      if (dragging) {
+        e.preventDefault();
+        const now = Date.now();
+        const dt = now - lastT || 1;
+        const instVel = (t.clientX - lastX) / dt;
+        vel = vel * 0.6 + instVel * 0.4;
+        lastX = t.clientX; lastT = now;
+
+        setLive(dx);
+      }
+    }, {passive:false});
+
+    const endSwipe = (clientX) => {
+      if (!dragging) { dragging=false; locked=false; vel=0; return; }
+      dragging = false; locked = false;
+
+      const dx    = clientX - startX;
+      const pW    = pageW();
+      const ratio = dx / pW;
+      const fast  = Math.abs(vel) > 0.5;   // raised: 0.3 → 0.5 px/ms
+
+      let target = this.currentPage;
+      if      (fast && vel < 0 && this.currentPage < this.totalPages-1) target = this.currentPage + 1;
+      else if (fast && vel > 0 && this.currentPage > 0)                 target = this.currentPage - 1;
+      else if (ratio < -0.42 && this.currentPage < this.totalPages-1)   target = this.currentPage + 1;  // raised: 0.35 → 0.42
+      else if (ratio >  0.42 && this.currentPage > 0)                   target = this.currentPage - 1;
+
+      this.goToPage(target);
+    };
+
+    w.addEventListener('touchend',    e => endSwipe(e.changedTouches[0].clientX), {passive:true});
+    w.addEventListener('touchcancel', e => this.goToPage(this.currentPage),        {passive:true});
+
+    // ── Desktop mouse drag ──
     let mStart = null;
     w.addEventListener('mousedown', e => {
       if (e.target.closest('input,select,textarea,button,label')) return;
-      mStart={x:e.clientX,t:Date.now()};
+      mStart = {x:e.clientX, t:Date.now(), lastX:e.clientX, lastT:Date.now(), vel:0, dragging:false};
+      track.style.transition = 'none';
     });
     w.addEventListener('mousemove', e => {
       if (!mStart) return;
-      if (Math.abs(e.clientX - mStart.x) > 5) mStart.dragging=true;
-    });
-    w.addEventListener('mouseup', e => {
-      if (!mStart) return;
-      const dx = e.clientX - mStart.x, dt = Date.now() - mStart.t;
-      const wasDragging = mStart.dragging;
-      mStart = null;
-      if (wasDragging && Math.abs(dx) > 55 && dt < 400) {
-        if (dx < 0 && this.currentPage < this.totalPages-1) this.goToPage(this.currentPage+1);
-        else if (dx > 0 && this.currentPage > 0) this.goToPage(this.currentPage-1);
+      if (!mStart.dragging && Math.abs(e.clientX - mStart.x) > 12) mStart.dragging = true;
+      if (mStart.dragging) {
+        const now = Date.now(), dt = now - mStart.lastT || 1;
+        mStart.vel = mStart.vel * 0.6 + ((e.clientX - mStart.lastX) / dt) * 0.4;
+        mStart.lastX = e.clientX; mStart.lastT = now;
+        setLive(e.clientX - mStart.x);
       }
     });
+    const endMouse = (clientX) => {
+      if (!mStart) return;
+      const {x, dragging: was, vel: v} = mStart;
+      mStart = null;
+      if (!was) return;
+      const dx = clientX - x, pW = pageW(), ratio = dx / pW;
+      const fast = Math.abs(v) > 0.5;
+      let target = this.currentPage;
+      if      (fast && v < 0 && this.currentPage < this.totalPages-1) target = this.currentPage + 1;
+      else if (fast && v > 0 && this.currentPage > 0)                 target = this.currentPage - 1;
+      else if (ratio < -0.42 && this.currentPage < this.totalPages-1) target = this.currentPage + 1;
+      else if (ratio >  0.42 && this.currentPage > 0)                 target = this.currentPage - 1;
+      this.goToPage(target);
+    };
+    w.addEventListener('mouseup',    e => endMouse(e.clientX));
+    w.addEventListener('mouseleave', e => endMouse(e.clientX));
   },
 
   goToPage(n) {
     this.currentPage = n;
     const w = document.getElementById('pages_wrapper');
+    const track = document.getElementById('pages_track');
     const pageW = w ? w.clientWidth : window.innerWidth;
-    document.getElementById('pages_track').style.transform = `translateX(-${n * pageW}px)`;
+    // Restore smooth spring transition for snap
+    track.style.transition = 'transform .32s cubic-bezier(.25,.46,.45,.94)';
+    track.style.transform  = `translateX(-${n * pageW}px)`;
     document.querySelectorAll('.nbtn').forEach((b,i) => b.classList.toggle('active', i===n));
     if (n === 4) this.buildDetailPage();
     if (n === 2) this.buildAptitudesPage();
+    // Resetear scroll de la página destino para evitar fondo negro
+    // si en una visita anterior el usuario había scrolleado hacia abajo.
+    const destPage = document.getElementById('page_' + n);
+    if (destPage) destPage.scrollTop = 0;
   },
 
   /* ── SECTION TOGGLES ── */
@@ -1632,6 +1905,13 @@ const app = {
       if (ev) ev.style.display = 'block';
       if (sv) sv.style.display = 'none';
       if (sec === 'equipment') { this.updateDbSelect(); this.renderInventory(); }
+      // Scroll al panel en page_3 para que sea visible al expandirse
+      if (sec === 'combat' || sec === 'equipment') {
+        requestAnimationFrame(() => {
+          const panel = ev?.closest('.panel');
+          if (panel) panel.scrollIntoView({behavior:'smooth', block:'start'});
+        });
+      }
     }
   },
 
@@ -1672,6 +1952,19 @@ const app = {
     const sv = document.getElementById(`${sec}_summary_view`);
     if (ev) ev.style.display = 'none';
     if (sv) sv.style.display = 'block';
+
+    // combat y equipment viven en page_3. Al colapsar el edit_view, el scrollTop
+    // puede quedar apuntando a zona vacía, dejando pantalla negra.
+    if (sec === 'combat' || sec === 'equipment') {
+      requestAnimationFrame(() => {
+        const page = document.getElementById('page_3');
+        if (!page) return;
+        // Si el scroll superó el alto real del contenido, volver al top
+        if (page.scrollTop > page.scrollHeight - page.clientHeight + 1) {
+          page.scrollTop = 0;
+        }
+      });
+    }
   },
 
   _buildStatsSummary() {
@@ -1688,9 +1981,21 @@ const app = {
       box.innerHTML = `<div class="lbl">${s}</div><div class="mod">${modStr}</div><div class="val">${raw}</div>`;
       c.appendChild(box);
     });
-    // Also update the live display in edit view
+    // Also update the live display in edit view (rebuilt independently to avoid stale onclick handlers)
     const live = document.getElementById('stats_boxes_display');
-    if (live) live.innerHTML = c.innerHTML;
+    if (live) {
+      live.innerHTML = '';
+      STATS.forEach(s => {
+        const raw2 = parseInt(document.getElementById('base_'+s).value)||8;
+        const mod2 = this.getMod(raw2);
+        const modStr2 = (mod2>=0?'+':'')+mod2;
+        const box2 = document.createElement('div');
+        box2.className = 'sbox';
+        box2.onclick = () => this.rollCheck(s, mod2);
+        box2.innerHTML = `<div class="lbl">${s}</div><div class="mod">${modStr2}</div><div class="val">${raw2}</div>`;
+        live.appendChild(box2);
+      });
+    }
   },
 
   _buildSavesSummary() {
@@ -1738,7 +2043,7 @@ const app = {
     const armor = this._getInventoryItem(armorKey) || this.DB.armors?.[armorKey];
     const shield = this._getInventoryItem(shieldKey) || this.DB.shields?.[shieldKey];
     document.getElementById('sum_armor_name').innerText = armor?.name || 'Sin Armadura';
-    document.getElementById('sum_armor_type').innerText = armor?.type ? {none:'Normal',light:'Ligera',medium:'Media',heavy:'Pesada'}[armor.type]||armor.type : 'Normal';
+    document.getElementById('sum_armor_type').innerText = armor?.type ? ({none:'Sin armadura',light:'Ligera',medium:'Media',heavy:'Pesada'}[armor.type]||armor.type) : 'Sin armadura';
     document.getElementById('sum_shield').innerText = shield?.name || 'Sin Escudo';
     // Weapon summaries
     const w1atk = document.getElementById('w1_atk_val')?.innerText || '—';
@@ -1774,12 +2079,33 @@ const app = {
   },
 
   getMod(val) {
-    if (val<=3) return -3; if (val<=6) return -2; if (val<=9) return -1;
-    if (val<=12) return 0; if (val<=14) return 1; if (val<=16) return 2; return 3;
+    // Fórmula estándar: floor((val - 10) / 2), con techo a la tabla S&S (−3 a +4)
+    const raw = Math.floor((val - 10) / 2);
+    return Math.max(-3, Math.min(4, raw));
   },
 
   getStatVal(stat) {
     return parseInt(document.getElementById('base_'+stat)?.value) || 8;
+  },
+
+  // Tabla de XP necesario para subir al siguiente nivel (acumulativo)
+  _XP_TABLE: [0, 1000, 3000, 6000, 10000, 15000, 21000, 28000, 36000, 45000],
+
+  updateXpHint() {
+    const lvl  = parseInt(document.getElementById('char_lvl')?.value) || 1;
+    const xp   = parseInt(document.getElementById('char_xp')?.value)  || 0;
+    const lbl  = document.getElementById('xp_next_lbl');
+    if (!lbl) return;
+    if (lvl >= 10) { lbl.innerText = '(máx nivel)'; lbl.style.color = 'var(--gold)'; return; }
+    const need = this._XP_TABLE[lvl] || 0;
+    const left = need - xp;
+    if (left <= 0) {
+      lbl.innerText = '¡Sube de nivel!';
+      lbl.style.color = 'var(--sage)';
+    } else {
+      lbl.innerText = `(faltan ${left.toLocaleString('es')})`;
+      lbl.style.color = 'var(--muted)';
+    }
   },
 
   buildAlignmentPicker() {
@@ -1857,9 +2183,17 @@ const app = {
   },
 
   checkLimit(name, limit) {
-    const checked = document.querySelectorAll(`input[name="${name}"]:checked`);
+    const checked = Array.from(document.querySelectorAll(`input[name="${name}"]:checked`));
     if (checked.length > limit) {
-      checked[checked.length-1].checked = false;
+      const removed = checked[checked.length-1];
+      removed.checked = false;
+      // Parpadeo visual en la label del checkbox removido
+      const lbl = removed.closest('label');
+      if (lbl) {
+        lbl.style.transition = 'background .1s';
+        lbl.style.background = 'rgba(176,48,64,.18)';
+        setTimeout(() => { lbl.style.background = ''; }, 400);
+      }
       this.toast(`Máximo ${limit} habilidades`, 'Límite');
     }
   },
@@ -1885,6 +2219,7 @@ const app = {
     const arqKey = $('sel_arq').value;
     const arq = this.DB.archetypes?.[arqKey];
     const lvl = parseInt($('char_lvl')?.value)||1;
+    this.updateXpHint();
     const prof = lvl >= 9 ? 5 : lvl >= 7 ? 4 : lvl >= 5 ? 3 : 2;
 
     // Resources — fórmulas según tabla de Arquetipos (Cap.II Paso 3)
@@ -2088,7 +2423,7 @@ const app = {
     const data = this.DB[cat]?.[key];
     if (!data) return;
     const item = {
-      uid: Date.now(),
+      uid: this._nextUid(),
       name: data.name,
       slots: data.slots || 1,
       type: cat === 'shields' ? 'shields' : cat,
@@ -2114,7 +2449,7 @@ const app = {
     overlay.innerHTML = `
       <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--rl);width:100%;max-width:340px;padding:16px">
         <div style="font-family:var(--fd);color:var(--gold);font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px">${idx!==null?'Editar':'Nuevo'} Objeto</div>
-        <div style="margin-bottom:8px"><span class="fl">Nombre</span><input type="text" id="ci_name" value="${existing?.name||''}" placeholder="Nombre del objeto"></div>
+        <div style="margin-bottom:8px"><span class="fl">Nombre</span><input type="text" id="ci_name" value="${this._esc(existing?.name||'')}" placeholder="Nombre del objeto"></div>
         <div class="g2" style="gap:6px;margin-bottom:8px">
           <div><span class="fl">Slots</span><input type="number" id="ci_slots" value="${existing?.slots||1}" min="0" max="20"></div>
           <div><span class="fl">Tipo</span><select id="ci_type">
@@ -2139,7 +2474,7 @@ const app = {
     const slots = parseInt(document.getElementById('ci_slots')?.value)||1;
     const type = document.getElementById('ci_type')?.value||'misc';
     const isEdit = this._editingCustomItem !== null;
-    const item = {uid: isEdit?this.inventory[this._editingCustomItem].uid:Date.now(), name, slots, type};
+    const item = {uid: isEdit?this.inventory[this._editingCustomItem].uid:this._nextUid(), name, slots, type};
     if (isEdit) this.inventory[this._editingCustomItem] = item;
     else this.inventory.push(item);
     document.getElementById('custom_item_overlay')?.remove();
@@ -2178,7 +2513,8 @@ const app = {
         typeOpts.forEach(o => sel += `<option value="${o.v}"${item.type===o.v?' selected':''}>${o.l}</option>`);
         sel += '</select>';
         const isFirst = i === 0, isLast = i === this.inventory.length - 1;
-        row.innerHTML = `${sel}<input type="text" class="inm" value="${item.name}" onchange="app.updateInvItem(${i},'name',this.value)"><input type="number" class="isl" value="${item.slots}" min="0" max="20" onchange="app.updateInvItem(${i},'slots',this.value)"><button class="idel" onclick="app.moveInvItem(${i},-1)" style="color:var(--muted);font-size:.7rem;opacity:${isFirst?'0.2':'1'}" ${isFirst?'disabled':''}>↑</button><button class="idel" onclick="app.moveInvItem(${i},1)" style="color:var(--muted);font-size:.7rem;opacity:${isLast?'0.2':'1'}" ${isLast?'disabled':''}>↓</button><button class="idel" onclick="app._openCustomItemForm(${i})" style="color:var(--dim);font-size:.78rem">✎</button><button class="idel" onclick="app.removeInvItem(${i})">×</button>`;
+        const safeItemName = this._esc(item.name);
+        row.innerHTML = `${sel}<input type="text" class="inm" value="${safeItemName}" onchange="app.updateInvItem(${i},'name',this.value)"><input type="number" class="isl" value="${item.slots}" min="0" max="20" onchange="app.updateInvItem(${i},'slots',this.value)"><button class="idel" onclick="app.moveInvItem(${i},-1)" style="color:var(--muted);font-size:.7rem;opacity:${isFirst?'0.2':'1'}" ${isFirst?'disabled':''}>↑</button><button class="idel" onclick="app.moveInvItem(${i},1)" style="color:var(--muted);font-size:.7rem;opacity:${isLast?'0.2':'1'}" ${isLast?'disabled':''}>↓</button><button class="idel" onclick="app._openCustomItemForm(${i})" style="color:var(--dim);font-size:.78rem">✎</button><button class="idel" onclick="app.removeInvItem(${i})">×</button>`;
         list.appendChild(row);
       });
     }
@@ -2187,7 +2523,9 @@ const app = {
       sumList.innerHTML = this.inventory.length ? '' : '<div style="font-style:italic;color:var(--muted);text-align:center;padding:8px">Mochila vacía.</div>';
       this.inventory.forEach(item => {
         const row = document.createElement('div'); row.className = 'irow';
-        row.innerHTML = `<span>${item.name}</span><span style="font-family:var(--fm);font-size:.82rem;color:var(--gold)">${item.slots}</span>`;
+        const ni = document.createElement('span'); ni.textContent = item.name;
+        const si2 = document.createElement('span'); si2.style.cssText="font-family:var(--fm);font-size:.82rem;color:var(--gold)"; si2.textContent = item.slots;
+        row.appendChild(ni); row.appendChild(si2);
         sumList.appendChild(row);
       });
     }
@@ -2243,7 +2581,6 @@ const app = {
     const isCrit = d20===20, isFail = d20===1;
     const modStr = (mod>=0?'+':'')+mod;
     const detailTxt = `d20: ${d20}  ${modStr !== '+0' ? `(${modStr})` : ''}`;
-    const totalTxt = `${total>=0?'+':''}${total}`;
     this.showDiceRoll({
       label,
       die: 20,
@@ -2256,13 +2593,19 @@ const app = {
   },
 
   rollDice(formula, label) {
+    // Handle plain static value (e.g. unarmed "1" with no modifier)
+    const staticMatch = formula.match(/^([+-]?\d+)$/);
+    if (staticMatch) {
+      const val = parseInt(staticMatch[1]);
+      this.showDiceRoll({ label, die: val||1, finalFace: val, isCrit:false, isFail:false, detail: String(val), total: val, totalLabel:'Daño' });
+      return;
+    }
     const match = formula.match(/(\d+)d(\d+)([+-]\d+)?/i);
     if (!match) { this.toast(`${label}: ${formula}`, 'Daño'); return; }
     const num=parseInt(match[1]),die=parseInt(match[2]),bonus=parseInt(match[3]||0);
     let rolls=[],total=0;
     for (let i=0;i<num;i++){const r=Math.floor(Math.random()*die)+1;rolls.push(r);total+=r}
     total += bonus;
-    const isMax = rolls.some(r=>r===die);
     const bonusStr = bonus>0?`+${bonus}`:bonus<0?String(bonus):'';
     const detailTxt = num > 1
       ? `[${rolls.join(' + ')}]${bonusStr}`
@@ -2271,7 +2614,7 @@ const app = {
       label,
       die,
       finalFace: rolls[rolls.length-1],
-      isCrit: isMax, isFail: false,
+      isCrit: false, isFail: false,
       detail: detailTxt,
       total,
       totalLabel: 'Daño'
@@ -2382,6 +2725,8 @@ const app = {
   toast(msg, lbl='Info') { this.toastHtml(`<div class="tinf"><span class="tlbl">${lbl}</span><span>${msg}</span></div>`); },
   toastHtml(html, cls='') {
     const c = document.getElementById('toast-ct');
+    // Cap at 3 simultaneous toasts to avoid stacking spam
+    while (c.children.length >= 3) c.removeChild(c.firstChild);
     const t = document.createElement('div'); t.className=`toast ${cls}`; t.innerHTML=html;
     c.appendChild(t);
     setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)';t.style.transition='.3s';setTimeout(()=>t.remove(),300)},3000);
@@ -2405,7 +2750,7 @@ const app = {
     document.getElementById('talent_modal').showModal();
     const firstKey = Object.keys(this.DB.talents)[0];
     if (this.activeTalentCat) {
-      const btn = Array.from(document.querySelectorAll('#tm_categories .catbtn')).find(b=>b.innerText.toLowerCase()===this.activeTalentCat);
+      const btn = document.querySelector(`#tm_categories .catbtn[data-cat="${this.activeTalentCat}"]`);
       this.showTalentCategory(this.activeTalentCat, btn);
     } else if (firstKey) {
       this.showTalentCategory(firstKey, document.querySelector('#tm_categories .catbtn'));
@@ -2429,7 +2774,23 @@ const app = {
     talents.forEach(t => {
       const sel = !!document.querySelector(`input[name="chk_talents_hidden"][value="${t.name}"]`);
       const card = document.createElement('div'); card.className=`tc${sel?' sel':''}`;
-      card.innerHTML = `<input type="checkbox" value="${t.name}" ${t.id?`data-id="${t.id}"`:''}  data-desc="${t.desc||''}" ${sel?'checked':''} onchange="app.toggleTalent(this,'${t.name}','${t.id||''}')"><div><h4>${t.name}</h4><p>${t.desc||''}</p>${t.grades?.map(g=>`<span style="font-family:var(--fm);font-size:.63rem;color:var(--blood);display:block;margin-top:3px">G${g.g}: ${g.d}</span>`).join('')||''}</div>`;
+      // Build talent card via DOM to avoid XSS from DB content
+      const chkEl = document.createElement('input');
+      chkEl.type = 'checkbox'; chkEl.value = t.name;
+      if (t.id) chkEl.setAttribute('data-id', t.id);
+      chkEl.setAttribute('data-desc', t.desc||'');
+      if (sel) chkEl.checked = true;
+      chkEl.addEventListener('change', () => app.toggleTalent(chkEl, t.name, t.id||''));
+      const infoDiv = document.createElement('div');
+      const h4 = document.createElement('h4'); h4.textContent = t.name; infoDiv.appendChild(h4);
+      const p = document.createElement('p'); p.textContent = t.desc||''; infoDiv.appendChild(p);
+      (t.grades||[]).forEach(g => {
+        const sp = document.createElement('span');
+        sp.style.cssText = 'font-family:var(--fm);font-size:.63rem;color:var(--blood);display:block;margin-top:3px';
+        sp.textContent = `G${g.g}: ${g.d}`;
+        infoDiv.appendChild(sp);
+      });
+      card.appendChild(chkEl); card.appendChild(infoDiv);
       card.onclick = e => { if(e.target.type==='checkbox')return; const chk=card.querySelector('input');chk.checked=!chk.checked;this.toggleTalent(chk,t.name,t.id||''); };
       list.appendChild(card);
     });
@@ -2440,7 +2801,7 @@ const app = {
     const card = chk.closest('.tc');
     if (chk.checked) {
       const count = document.querySelectorAll('input[name="chk_talents_hidden"]').length;
-      if (count >= 3) { alert('Solo puedes elegir 3 talentos.'); chk.checked=false; return; }
+      if (count >= 3) { this.toast('Solo puedes elegir 3 talentos.', '⚠'); chk.checked=false; return; }
       if (!hidden) {
         hidden = document.createElement('input'); hidden.type='hidden'; hidden.name='chk_talents_hidden';
         hidden.value=name; hidden.setAttribute('data-desc',chk.getAttribute('data-desc'));
@@ -2453,7 +2814,40 @@ const app = {
   },
 
   clearTalents() {
-    this._confirm('¿Limpiar talentos?', 'Se eliminarán todos los talentos seleccionados.', '✓ Limpiar', () => this._doCleanTalents());
+    // El <dialog> talent_modal se renderiza en el top layer del navegador,
+    // por lo que cualquier overlay creado en document.body queda por debajo.
+    // La solución es inyectar el overlay de confirmación dentro del propio dialog.
+    const dialog = document.getElementById('talent_modal');
+    const container = (dialog && dialog.open) ? dialog : document.body;
+    this._confirmInContainer(container, '¿Limpiar talentos?', 'Se eliminarán todos los talentos seleccionados.', '✓ Limpiar', () => this._doCleanTalents());
+  },
+
+  _confirmInContainer(container, title, body, confirmLabel, onConfirm) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;border-radius:inherit';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:var(--panel);border:1px solid var(--border);border-radius:var(--rl);padding:20px;max-width:300px;width:100%;text-align:center;position:relative;z-index:10000';
+    const ttl = document.createElement('div');
+    ttl.style.cssText = 'font-family:var(--fd);color:var(--gold);font-size:.9rem;letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px';
+    ttl.textContent = title;
+    const bdy = document.createElement('div');
+    bdy.style.cssText = 'font-size:.82rem;color:var(--muted);margin-bottom:16px';
+    bdy.textContent = body;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px';
+    const btnCancel = document.createElement('button');
+    btnCancel.className = 'btn btn-g'; btnCancel.style.flex = '1'; btnCancel.textContent = 'Cancelar';
+    const btnOk = document.createElement('button');
+    btnOk.className = 'btn btn-p'; btnOk.style.flex = '1'; btnOk.textContent = confirmLabel;
+    row.appendChild(btnCancel); row.appendChild(btnOk);
+    box.appendChild(ttl); box.appendChild(bdy); box.appendChild(row);
+    overlay.appendChild(box);
+    // El container (dialog) necesita position:relative para que el overlay absoluto lo cubra
+    const prevPosition = container.style.position;
+    if (getComputedStyle(container).position === 'static') container.style.position = 'relative';
+    container.appendChild(overlay);
+    btnCancel.onclick = () => { overlay.remove(); container.style.position = prevPosition; };
+    btnOk.onclick = () => { overlay.remove(); container.style.position = prevPosition; onConfirm(); };
   },
 
   _doCleanTalents() {
@@ -2488,7 +2882,13 @@ const app = {
       items.forEach(h => {
         const d = document.createElement('div');
         d.style.cssText='background:var(--raised);border:1px solid var(--rim);border-radius:var(--r);padding:6px 10px';
-        d.innerHTML=`<div style="font-family:var(--fd);font-size:.8rem;color:var(--gold);margin-bottom:2px">${h.value}</div><div style="font-size:.75rem;color:var(--text)">${h.getAttribute('data-desc')}</div>`;
+        const tn = document.createElement('div');
+        tn.style.cssText='font-family:var(--fd);font-size:.8rem;color:var(--gold);margin-bottom:2px';
+        tn.textContent = h.value;
+        const td = document.createElement('div');
+        td.style.cssText='font-size:.75rem;color:var(--text)';
+        td.textContent = h.getAttribute('data-desc')||'';
+        d.appendChild(tn); d.appendChild(td);
         list.appendChild(d);
       });
     } else view.style.display='none';
@@ -2507,11 +2907,37 @@ const app = {
     const db = document.getElementById('detail_desc_body');
     if (desc) {
       dt.innerText = 'Linaje: '+desc.name;
-      let h = `<p style="font-size:.82rem;color:var(--text);line-height:1.6;margin-bottom:8px">${desc.txt||''}</p>`;
-      if (desc.bonus) h += `<div style="margin-bottom:8px"><span style="font-family:var(--fm);font-size:.72rem;color:var(--gold);background:rgba(200,169,110,.1);border:1px solid rgba(200,169,110,.3);border-radius:20px;padding:2px 10px">📈 ${desc.bonus}</span></div>`;
-      if (desc.grant?.length) h += `<div style="font-family:var(--fd);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px">Rasgos</div><div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">${desc.grant.map(g=>`<span class="tbadge">✦ ${g}</span>`).join('')}</div>`;
-      if (desc.mods && Object.keys(desc.mods).length) h += `<div style="font-family:var(--fd);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px">Modificadores</div><div style="display:flex;flex-wrap:wrap;gap:4px">${Object.entries(desc.mods).map(([k,v])=>`<span style="font-family:var(--fm);font-size:.8rem;color:${v>0?'var(--sage)':'var(--blood)'};background:var(--raised);border:1px solid var(--rim);border-radius:var(--r);padding:3px 8px">${k} ${v>0?'+':''}${v}</span>`).join('')}</div>`;
-      db.innerHTML = h;
+      db.innerHTML = '';
+      const dtxt = document.createElement('p');
+      dtxt.style.cssText='font-size:.82rem;color:var(--text);line-height:1.6;margin-bottom:8px';
+      dtxt.textContent = desc.txt||'';
+      db.appendChild(dtxt);
+      if (desc.bonus) {
+        const bw = document.createElement('div'); bw.style.marginBottom='8px';
+        const bs = document.createElement('span');
+        bs.style.cssText='font-family:var(--fm);font-size:.72rem;color:var(--gold);background:rgba(200,169,110,.1);border:1px solid rgba(200,169,110,.3);border-radius:20px;padding:2px 10px';
+        bs.textContent = '📈 '+desc.bonus; bw.appendChild(bs); db.appendChild(bw);
+      }
+      if (desc.grant?.length) {
+        const gl = document.createElement('div');
+        gl.style.cssText='font-family:var(--fd);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px';
+        gl.textContent='Rasgos'; db.appendChild(gl);
+        const gw = document.createElement('div'); gw.style.cssText='display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px';
+        desc.grant.forEach(g => { const sp=document.createElement('span'); sp.className='tbadge'; sp.textContent='✦ '+g; gw.appendChild(sp); });
+        db.appendChild(gw);
+      }
+      if (desc.mods && Object.keys(desc.mods).length) {
+        const ml = document.createElement('div');
+        ml.style.cssText='font-family:var(--fd);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px';
+        ml.textContent='Modificadores'; db.appendChild(ml);
+        const mw = document.createElement('div'); mw.style.cssText='display:flex;flex-wrap:wrap;gap:4px';
+        Object.entries(desc.mods).forEach(([k,v]) => {
+          const sp=document.createElement('span');
+          sp.style.cssText=`font-family:var(--fm);font-size:.8rem;color:${v>0?'var(--sage)':'var(--blood)'};background:var(--raised);border:1px solid var(--rim);border-radius:var(--r);padding:3px 8px`;
+          sp.textContent=`${k} ${v>0?'+':''}${v}`; mw.appendChild(sp);
+        });
+        db.appendChild(mw);
+      }
     } else { dt.innerText='Linaje: —'; db.innerHTML='<p style="color:var(--muted);font-size:.8rem;font-style:italic">Selecciona un Linaje.</p>'; }
 
     // Archetype
@@ -2519,19 +2945,47 @@ const app = {
     const ab = document.getElementById('detail_arq_body');
     if (arq) {
       at.innerText = 'Arquetipo: '+arq.name;
-      let h = `<p style="font-size:.82rem;color:var(--text);line-height:1.6;margin-bottom:8px">${arq.txt||''}</p>`;
-      h += `<div class="g3" style="margin-bottom:8px">`;
-      const pvFormula = `${arq.pv} + CON`;
-      const adrFormula = `FUE/DES + Niv + ${arq.adr_bonus||0}`;
-      const ingFormula = `INT/SAB/CAR + Niv + ${arq.ing_bonus||0}`;
-      h += `<div style="text-align:center;background:rgba(176,48,64,.12);border:1px solid rgba(176,48,64,.3);border-radius:var(--r);padding:6px"><div style="font-family:var(--fm);font-size:.56rem;color:var(--blood);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">PV Base</div><div style="font-family:var(--fd);font-size:.82rem;color:var(--bright);font-weight:700">${pvFormula}</div></div>`;
-      h += `<div style="text-align:center;background:rgba(76,175,125,.1);border:1px solid rgba(76,175,125,.3);border-radius:var(--r);padding:6px"><div style="font-family:var(--fm);font-size:.56rem;color:var(--sage);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Adrenalina</div><div style="font-family:var(--fd);font-size:.72rem;color:var(--bright);font-weight:700">${adrFormula}</div></div>`;
-      h += `<div style="text-align:center;background:rgba(74,158,202,.1);border:1px solid rgba(74,158,202,.3);border-radius:var(--r);padding:6px"><div style="font-family:var(--fm);font-size:.56rem;color:var(--ice);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Ingenio</div><div style="font-family:var(--fd);font-size:.72rem;color:var(--bright);font-weight:700">${ingFormula}</div></div>`;
-      h += '</div>';
-      if (filoVal) h += `<div style="font-family:var(--fd);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px">Filo Seleccionado</div><div style="margin-bottom:8px"><span class="tbadge">⚔ ${filoVal}</span></div>`;
+      ab.innerHTML = '';
+      const atxt = document.createElement('p');
+      atxt.style.cssText='font-size:.82rem;color:var(--text);line-height:1.6;margin-bottom:8px';
+      atxt.textContent = arq.txt||''; ab.appendChild(atxt);
+      // Stat formulas grid
+      const statGrid = document.createElement('div'); statGrid.className='g3'; statGrid.style.marginBottom='8px';
+      const mkStatBox = (bg, bc, lc, lbl, formula) => {
+        const box = document.createElement('div');
+        box.style.cssText=`text-align:center;background:${bg};border:1px solid ${bc};border-radius:var(--r);padding:6px`;
+        const l = document.createElement('div');
+        l.style.cssText=`font-family:var(--fm);font-size:.56rem;color:${lc};text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px`;
+        l.textContent=lbl;
+        const v = document.createElement('div');
+        v.style.cssText='font-family:var(--fd);font-size:.72rem;color:var(--bright);font-weight:700';
+        v.textContent=formula; box.appendChild(l); box.appendChild(v); return box;
+      };
+      statGrid.appendChild(mkStatBox('rgba(176,48,64,.12)','rgba(176,48,64,.3)','var(--blood)','PV Base',`${arq.pv} + CON`));
+      statGrid.appendChild(mkStatBox('rgba(76,175,125,.1)','rgba(76,175,125,.3)','var(--sage)','Adrenalina',`FUE/DES+Niv+${arq.adr_bonus||0}`));
+      statGrid.appendChild(mkStatBox('rgba(74,158,202,.1)','rgba(74,158,202,.3)','var(--ice)','Ingenio',`INT/SAB/CAR+Niv+${arq.ing_bonus||0}`));
+      ab.appendChild(statGrid);
+      if (filoVal) {
+        const fl = document.createElement('div');
+        fl.style.cssText='font-family:var(--fd);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px';
+        fl.textContent='Filo Seleccionado'; ab.appendChild(fl);
+        const fw = document.createElement('div'); fw.style.marginBottom='8px';
+        const fb = document.createElement('span'); fb.className='tbadge'; fb.textContent='⚔ '+filoVal;
+        fw.appendChild(fb); ab.appendChild(fw);
+      }
       const selSkills = [...new Set([...Array.from(document.querySelectorAll('input[name="chk_arq"]:checked')).map(e=>e.value),...Array.from(document.querySelectorAll('input[name="chk_bg"]:checked')).map(e=>e.value)])];
-      if (selSkills.length) h += `<div style="font-family:var(--fd);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px">Habilidades Seleccionadas</div><div style="display:flex;flex-wrap:wrap;gap:4px">${selSkills.map(s=>`<span style="font-family:var(--fm);font-size:.7rem;background:var(--raised);border:1px solid var(--border);border-radius:20px;padding:2px 8px;color:var(--text)">${s}</span>`).join('')}</div>`;
-      ab.innerHTML = h;
+      if (selSkills.length) {
+        const skl = document.createElement('div');
+        skl.style.cssText='font-family:var(--fd);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px';
+        skl.textContent='Habilidades Seleccionadas'; ab.appendChild(skl);
+        const skw = document.createElement('div'); skw.style.cssText='display:flex;flex-wrap:wrap;gap:4px';
+        selSkills.forEach(sk => {
+          const sp=document.createElement('span');
+          sp.style.cssText='font-family:var(--fm);font-size:.7rem;background:var(--raised);border:1px solid var(--border);border-radius:20px;padding:2px 8px;color:var(--text)';
+          sp.textContent=sk; skw.appendChild(sp);
+        });
+        ab.appendChild(skw);
+      }
     } else { at.innerText='Arquetipo: —'; ab.innerHTML='<p style="color:var(--muted);font-size:.8rem;font-style:italic">Selecciona un Arquetipo.</p>'; }
 
     // Talents
@@ -2542,17 +2996,26 @@ const app = {
     talents.forEach(h => {
       let grades = [];
       if (this.DB.talents) Object.values(this.DB.talents).forEach(arr=>{const f=arr.find(t=>t.name===h.value);if(f?.grades)grades=f.grades});
-      const gradesHTML = grades.map(g=>`<div style="font-family:var(--fm);font-size:.66rem;color:var(--blood);margin-top:4px;padding:3px 6px;background:rgba(125,28,42,.15);border-radius:3px">G${g.g}: ${g.d}</div>`).join('');
       const card = document.createElement('div'); card.className='dc';
-      card.innerHTML = `<div class="dch" onclick="this.closest('.dc').classList.toggle('open')"><span class="dct">✦ ${h.value}</span><span class="dca">▾</span></div><div class="dcb">${h.getAttribute('data-desc')||'Sin descripción.'}${gradesHTML}</div>`;
+      const dch = document.createElement('div'); dch.className='dch';
+      dch.onclick = () => card.classList.toggle('open');
+      const dct = document.createElement('span'); dct.className='dct'; dct.textContent='✦ '+h.value;
+      const dca = document.createElement('span'); dca.className='dca'; dca.textContent='▾';
+      dch.appendChild(dct); dch.appendChild(dca);
+      const dcb = document.createElement('div'); dcb.className='dcb';
+      dcb.textContent = h.getAttribute('data-desc')||'Sin descripción.';
+      grades.forEach(g => {
+        const gs = document.createElement('div');
+        gs.style.cssText='font-family:var(--fm);font-size:.66rem;color:var(--blood);margin-top:4px;padding:3px 6px;background:rgba(125,28,42,.15);border-radius:3px';
+        gs.textContent = `G${g.g}: ${g.d}`;
+        dcb.appendChild(gs);
+      });
+      card.appendChild(dch); card.appendChild(dcb);
       tl.appendChild(card);
     });
   },
 
   /* ── APTITUDES PAGE ── */
-  // selectedApt stores { tricks: Set of keys, spells: Set of keys }
-  _aptSel: { tricks: new Set(), spells: new Set() },
-  _aptMode: 'tricks',
 
   buildAptitudesPage() {
     this._renderAptSummary('tricks');
@@ -2582,7 +3045,12 @@ const app = {
     items.forEach(k => {
       const s = this.DB.spells[k];
       const card = document.createElement('div'); card.className='pc';
-      card.innerHTML = `<div class="pch"><span class="pcn">${s.name||k}</span><span style="font-size:.62rem;font-family:var(--fm);color:var(--muted)">▾</span></div><div class="pcb">${s.txt||'Sin descripción.'}</div>`;
+      const pch = document.createElement('div'); pch.className='pch';
+      const pcn = document.createElement('span'); pcn.className='pcn'; pcn.textContent=s.name||k;
+      const arr = document.createElement('span'); arr.style.cssText='font-size:.62rem;font-family:var(--fm);color:var(--muted)'; arr.textContent='▾';
+      pch.appendChild(pcn); pch.appendChild(arr);
+      const pcb = document.createElement('div'); pcb.className='pcb'; pcb.textContent=s.txt||'Sin descripción.';
+      card.appendChild(pch); card.appendChild(pcb);
       card.onclick = () => card.classList.toggle('open');
       sumList.appendChild(card);
     });
@@ -2690,7 +3158,14 @@ const app = {
 
   _dbListItem(container, name, key) {
     const row = document.createElement('div'); row.className='dbitem';
-    row.innerHTML = `<span style="font-size:.82rem">${name}</span><div style="display:flex;gap:4px"><button class="bmini bl" onclick="app.dbEditEntry('${key}')">Editar</button><button class="bmini br" onclick="app.dbDeleteEntry('${key}')">×</button></div>`;
+    const ns = document.createElement('span'); ns.style.fontSize='.82rem'; ns.textContent = name;
+    const bd = document.createElement('div'); bd.style.cssText='display:flex;gap:4px';
+    const eb = document.createElement('button'); eb.className='bmini bl'; eb.textContent='Editar';
+    eb.onclick = () => app.dbEditEntry(key);
+    const db2 = document.createElement('button'); db2.className='bmini br'; db2.textContent='×';
+    db2.onclick = () => app.dbDeleteEntry(key);
+    bd.appendChild(eb); bd.appendChild(db2);
+    row.appendChild(ns); row.appendChild(bd);
     container.appendChild(row);
   },
 
@@ -2708,82 +3183,130 @@ const app = {
       existing = this.DB[cat]?.[key];
     }
 
-    let formHtml = `<h3 style="font-family:var(--fd);font-size:.78rem;color:var(--gold);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">${key==='new'?'Nuevo':'Editar'} Entrada</h3>`;
+    // ── Helpers to build fields safely via DOM (no innerHTML with user data) ──
+    const mb6 = 'margin-bottom:6px';
+    const mkField = (labelTxt, inputEl) => {
+      const wrap = document.createElement('div'); wrap.style.cssText = mb6;
+      const lbl = document.createElement('span'); lbl.className = 'dfl'; lbl.textContent = labelTxt;
+      wrap.appendChild(lbl); wrap.appendChild(inputEl); return wrap;
+    };
+    const mkText = (id, val, placeholder='') => {
+      const el = document.createElement('input'); el.type='text'; el.id=id; el.value=val||'';
+      if (placeholder) el.placeholder=placeholder; return el;
+    };
+    const mkNum = (id, val, min, max, extraStyle='') => {
+      const el = document.createElement('input'); el.type='number'; el.id=id; el.value=val??0;
+      if (min!==undefined) el.min=min; if (max!==undefined) el.max=max;
+      if (extraStyle) el.style.cssText=extraStyle; return el;
+    };
+    const mkTA = (id, val, minH='52px') => {
+      const el = document.createElement('textarea'); el.id=id; el.style.minHeight=minH;
+      el.value=val||''; return el;
+    };
+    const mkSel = (id, options, selected) => {
+      const el = document.createElement('select'); el.id=id;
+      options.forEach(([v,t])=>{ const o=document.createElement('option'); o.value=v; o.textContent=t; if(v===selected)o.selected=true; el.appendChild(o); });
+      return el;
+    };
+    const mkGrid = (cls, style='') => { const d=document.createElement('div'); d.className=cls; if(style)d.style.cssText=style; return d; };
+    const mkWrap = (style) => { const d=document.createElement('div'); d.style.cssText=style; return d; };
+
+    fc.innerHTML = '';
+
+    // Title
+    const h3 = document.createElement('h3');
+    h3.style.cssText = 'font-family:var(--fd);font-size:.78rem;color:var(--gold);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px';
+    h3.textContent = (key==='new' ? 'Nueva' : 'Editar') + ' Entrada';
+    fc.appendChild(h3);
 
     if (cat === 'descriptors') {
-      formHtml += `<div style="margin-bottom:6px"><span class="dfl">Clave (ID único)</span><input type="text" id="db_key" value="${key==='new'?'':key}" placeholder="ej: elfo_oscuro"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Descripción</span><textarea id="db_txt" style="min-height:56px">${existing?.txt||''}</textarea></div>
-      <div style="margin-bottom:6px"><span class="dfl">Bono</span><input type="text" id="db_bonus" value="${existing?.bonus||''}" placeholder="ej: +1 DES"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Rasgos (separados por coma)</span><input type="text" id="db_grant" value="${(existing?.grant||[]).join(', ')}" placeholder="ej: Visión en la oscuridad, Resistencia"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Modificadores de Atributo</span>
-        <div class="g6" style="gap:4px">
-          ${['FUE','DES','CON','INT','SAB','CAR'].map(s=>`<div><span class="dfl">${s}</span><input type="number" id="db_mod_${s}" value="${existing?.mods?.[s]||0}" min="-5" max="5" style="font-family:var(--fm);font-size:.8rem;text-align:center;padding:3px"></div>`).join('')}
-        </div>
-      </div>`;
+      fc.appendChild(mkField('Clave (ID único)', mkText('db_key', key==='new'?'':key, 'ej: elfo_oscuro')));
+      fc.appendChild(mkField('Nombre', mkText('db_name', existing?.name)));
+      fc.appendChild(mkField('Descripción', mkTA('db_txt', existing?.txt, '56px')));
+      fc.appendChild(mkField('Bono', mkText('db_bonus', existing?.bonus, 'ej: +1 DES')));
+      fc.appendChild(mkField('Rasgos (separados por coma)', mkText('db_grant', (existing?.grant||[]).join(', '), 'ej: Visión en la oscuridad')));
+      const modWrap = mkWrap(mb6);
+      const modLbl = document.createElement('span'); modLbl.className='dfl'; modLbl.textContent='Modificadores de Atributo';
+      modWrap.appendChild(modLbl);
+      const g6 = mkGrid('g6','gap:4px');
+      ['FUE','DES','CON','INT','SAB','CAR'].forEach(s=>{
+        const d=document.createElement('div');
+        const l=document.createElement('span'); l.className='dfl'; l.textContent=s;
+        d.appendChild(l); d.appendChild(mkNum('db_mod_'+s, existing?.mods?.[s]||0, -5, 5, 'font-family:var(--fm);font-size:.8rem;text-align:center;padding:3px'));
+        g6.appendChild(d);
+      });
+      modWrap.appendChild(g6); fc.appendChild(modWrap);
     } else if (cat === 'archetypes') {
-      formHtml += `<div style="margin-bottom:6px"><span class="dfl">Clave</span><input type="text" id="db_key" value="${key==='new'?'':key}" placeholder="ej: paladín"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Descripción</span><textarea id="db_txt" style="min-height:56px">${existing?.txt||''}</textarea></div>
-      <div class="g3" style="gap:6px;margin-bottom:6px">
-        <div><span class="dfl">PV Base</span><input type="number" id="db_pv" value="${existing?.pv||8}"></div>
-        <div><span class="dfl">Adrenalina</span><input type="number" id="db_adr" value="${existing?.adr||2}"></div>
-        <div><span class="dfl">Ingenio</span><input type="number" id="db_ing" value="${existing?.ing||0}"></div>
-      </div>
-      <div style="margin-bottom:6px"><span class="dfl">Filos (separados por coma)</span><input type="text" id="db_edges" value="${(existing?.edges||[]).join(', ')}"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Habilidades (separadas por coma)</span><input type="text" id="db_skills" value="${(existing?.skills||[]).join(', ')}"></div>`;
+      fc.appendChild(mkField('Clave', mkText('db_key', key==='new'?'':key, 'ej: paladín')));
+      fc.appendChild(mkField('Nombre', mkText('db_name', existing?.name)));
+      fc.appendChild(mkField('Descripción', mkTA('db_txt', existing?.txt, '56px')));
+      const g3 = mkGrid('g3','gap:6px;margin-bottom:6px');
+      const dPv=document.createElement('div'); const lPv=document.createElement('span'); lPv.className='dfl'; lPv.textContent='PV Base'; dPv.appendChild(lPv); dPv.appendChild(mkNum('db_pv',existing?.pv||8)); g3.appendChild(dPv);
+      const dAdr=document.createElement('div'); const lAdr=document.createElement('span'); lAdr.className='dfl'; lAdr.textContent='Adrenalina'; dAdr.appendChild(lAdr); dAdr.appendChild(mkNum('db_adr',existing?.adr_bonus??existing?.adr??2)); g3.appendChild(dAdr);
+      const dIng=document.createElement('div'); const lIng=document.createElement('span'); lIng.className='dfl'; lIng.textContent='Ingenio'; dIng.appendChild(lIng); dIng.appendChild(mkNum('db_ing',existing?.ing_bonus??existing?.ing??0)); g3.appendChild(dIng);
+      fc.appendChild(g3);
+      fc.appendChild(mkField('Filos (separados por coma)', mkText('db_edges', (existing?.edges||[]).join(', '))));
+      fc.appendChild(mkField('Habilidades (separadas por coma)', mkText('db_skills', (existing?.skills||[]).join(', '))));
     } else if (cat === 'backgrounds') {
-      formHtml += `<div style="margin-bottom:6px"><span class="dfl">Clave</span><input type="text" id="db_key" value="${key==='new'?'':key}"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Descripción</span><textarea id="db_txt" style="min-height:56px">${existing?.txt||''}</textarea></div>
-      <div style="margin-bottom:6px"><span class="dfl">Rasgos (coma)</span><input type="text" id="db_grant" value="${(existing?.grant||[]).join(', ')}"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Habilidades (coma)</span><input type="text" id="db_skills" value="${(existing?.skills||[]).join(', ')}"></div>`;
+      fc.appendChild(mkField('Clave', mkText('db_key', key==='new'?'':key)));
+      fc.appendChild(mkField('Nombre', mkText('db_name', existing?.name)));
+      fc.appendChild(mkField('Descripción', mkTA('db_txt', existing?.txt, '56px')));
+      fc.appendChild(mkField('Rasgos (coma)', mkText('db_grant', (existing?.grant||[]).join(', '))));
+      fc.appendChild(mkField('Habilidades (coma)', mkText('db_skills', (existing?.skills||[]).join(', '))));
     } else if (cat === 'weapons') {
-      formHtml += `<div style="margin-bottom:6px"><span class="dfl">Clave</span><input type="text" id="db_key" value="${key==='new'?'':key}"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
-      <div class="g2" style="gap:6px;margin-bottom:6px">
-        <div><span class="dfl">Daño (ej: 1d8)</span><input type="text" id="db_dmg" value="${existing?.dmg||'1d6'}"></div>
-        <div><span class="dfl">Tipo</span><select id="db_wtype"><option value="light"${existing?.type==='light'?' selected':''}>Ligera</option><option value="medium"${existing?.type==='medium'?' selected':''}>Media</option><option value="heavy"${existing?.type==='heavy'?' selected':''}>Pesada</option><option value="ranged"${existing?.type==='ranged'?' selected':''}>Distancia</option><option value="reach"${existing?.type==='reach'?' selected':''}>Alcance</option></select></div>
-      </div>
-      <div class="g3" style="gap:6px;margin-bottom:6px">
-        <div><span class="dfl">Slots</span><input type="number" id="db_slots" value="${existing?.slots||1}"></div>
-        <div><span class="dfl">Req. FUE</span><input type="number" id="db_req_fue" value="${existing?.req_FUE||0}"></div>
-        <div><span class="dfl">Req. DES</span><input type="number" id="db_req_des" value="${existing?.req_DES||0}"></div>
-      </div>`;
+      fc.appendChild(mkField('Clave', mkText('db_key', key==='new'?'':key)));
+      fc.appendChild(mkField('Nombre', mkText('db_name', existing?.name)));
+      const g2a = mkGrid('g2','gap:6px;margin-bottom:6px');
+      const dDmg=document.createElement('div'); const lDmg=document.createElement('span'); lDmg.className='dfl'; lDmg.textContent='Daño (ej: 1d8)'; dDmg.appendChild(lDmg); dDmg.appendChild(mkText('db_dmg',existing?.dmg||'1d6')); g2a.appendChild(dDmg);
+      const dWt=document.createElement('div'); const lWt=document.createElement('span'); lWt.className='dfl'; lWt.textContent='Tipo'; dWt.appendChild(lWt);
+      dWt.appendChild(mkSel('db_wtype',[['light','Ligera'],['medium','Media'],['heavy','Pesada'],['ranged','Distancia'],['reach','Alcance']],existing?.type));
+      g2a.appendChild(dWt); fc.appendChild(g2a);
+      const g3b = mkGrid('g3','gap:6px;margin-bottom:6px');
+      const dSl=document.createElement('div'); const lSl=document.createElement('span'); lSl.className='dfl'; lSl.textContent='Slots'; dSl.appendChild(lSl); dSl.appendChild(mkNum('db_slots',existing?.slots||1,0)); g3b.appendChild(dSl);
+      const dFue=document.createElement('div'); const lFue=document.createElement('span'); lFue.className='dfl'; lFue.textContent='Req. FUE'; dFue.appendChild(lFue); dFue.appendChild(mkNum('db_req_fue',existing?.req_FUE||0,0)); g3b.appendChild(dFue);
+      const dDes=document.createElement('div'); const lDes=document.createElement('span'); lDes.className='dfl'; lDes.textContent='Req. DES'; dDes.appendChild(lDes); dDes.appendChild(mkNum('db_req_des',existing?.req_DES||0,0)); g3b.appendChild(dDes);
+      fc.appendChild(g3b);
     } else if (cat === 'armors') {
-      formHtml += `<div style="margin-bottom:6px"><span class="dfl">Clave</span><input type="text" id="db_key" value="${key==='new'?'':key}"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
-      <div class="g3" style="gap:6px;margin-bottom:6px">
-        <div><span class="dfl">CA Base</span><input type="number" id="db_ca" value="${existing?.ca||10}"></div>
-        <div><span class="dfl">Tipo</span><select id="db_atype"><option value="none"${existing?.type==='none'?' selected':''}>Sin armadura</option><option value="light"${existing?.type==='light'?' selected':''}>Ligera</option><option value="medium"${existing?.type==='medium'?' selected':''}>Media</option><option value="heavy"${existing?.type==='heavy'?' selected':''}>Pesada</option></select></div>
-        <div><span class="dfl">Slots</span><input type="number" id="db_slots" value="${existing?.slots||1}"></div>
-      </div>`;
+      fc.appendChild(mkField('Clave', mkText('db_key', key==='new'?'':key)));
+      fc.appendChild(mkField('Nombre', mkText('db_name', existing?.name)));
+      const g3c = mkGrid('g3','gap:6px;margin-bottom:6px');
+      const dCa=document.createElement('div'); const lCa=document.createElement('span'); lCa.className='dfl'; lCa.textContent='CA Base'; dCa.appendChild(lCa); dCa.appendChild(mkNum('db_ca',existing?.ca||10)); g3c.appendChild(dCa);
+      const dAt=document.createElement('div'); const lAt=document.createElement('span'); lAt.className='dfl'; lAt.textContent='Tipo'; dAt.appendChild(lAt);
+      dAt.appendChild(mkSel('db_atype',[['none','Sin armadura'],['light','Ligera'],['medium','Media'],['heavy','Pesada']],existing?.type));
+      g3c.appendChild(dAt);
+      const dSla=document.createElement('div'); const lSla=document.createElement('span'); lSla.className='dfl'; lSla.textContent='Slots'; dSla.appendChild(lSla); dSla.appendChild(mkNum('db_slots',existing?.slots||1,0)); g3c.appendChild(dSla);
+      fc.appendChild(g3c);
     } else if (cat === 'shields') {
-      formHtml += `<div style="margin-bottom:6px"><span class="dfl">Clave</span><input type="text" id="db_key" value="${key==='new'?'':key}"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
-      <div class="g2" style="gap:6px;margin-bottom:6px">
-        <div><span class="dfl">Bono CA</span><input type="number" id="db_bonus_ca" value="${existing?.bonus||1}"></div>
-        <div><span class="dfl">Slots</span><input type="number" id="db_slots" value="${existing?.slots||1}"></div>
-      </div>`;
+      fc.appendChild(mkField('Clave', mkText('db_key', key==='new'?'':key)));
+      fc.appendChild(mkField('Nombre', mkText('db_name', existing?.name)));
+      const g2b = mkGrid('g2','gap:6px;margin-bottom:6px');
+      const dBo=document.createElement('div'); const lBo=document.createElement('span'); lBo.className='dfl'; lBo.textContent='Bono CA'; dBo.appendChild(lBo); dBo.appendChild(mkNum('db_bonus_ca',existing?.bonus||1)); g2b.appendChild(dBo);
+      const dSlb=document.createElement('div'); const lSlb=document.createElement('span'); lSlb.className='dfl'; lSlb.textContent='Slots'; dSlb.appendChild(lSlb); dSlb.appendChild(mkNum('db_slots',existing?.slots||1,0)); g2b.appendChild(dSlb);
+      fc.appendChild(g2b);
     } else if (cat === 'spells') {
-      formHtml += `<div style="margin-bottom:6px"><span class="dfl">Clave</span><input type="text" id="db_key" value="${key==='new'?'':key}"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Descripción</span><textarea id="db_txt" style="min-height:60px">${existing?.txt||''}</textarea></div>
-      <div class="g2" style="gap:6px;margin-bottom:6px">
-        <div><span class="dfl">Tipo</span><select id="db_stype"><option value="spell"${existing?.type==='spell'?' selected':''}>Conjuro</option><option value="trick"${(existing?.type==='trick'||existing?.type==='power')?'selected':''}>Truco</option></select></div>
-        <div><span class="dfl">Coste</span><input type="text" id="db_cost" value="${existing?.cost||''}" placeholder="ej: 2 Ing"></div>
-      </div>`;
+      fc.appendChild(mkField('Clave', mkText('db_key', key==='new'?'':key)));
+      fc.appendChild(mkField('Nombre', mkText('db_name', existing?.name)));
+      fc.appendChild(mkField('Descripción', mkTA('db_txt', existing?.txt, '60px')));
+      const g2c = mkGrid('g2','gap:6px;margin-bottom:6px');
+      const dSt=document.createElement('div'); const lSt=document.createElement('span'); lSt.className='dfl'; lSt.textContent='Tipo'; dSt.appendChild(lSt);
+      const stSel = mkSel('db_stype',[['spell','Conjuro'],['trick','Truco']], (existing?.type==='trick'||existing?.type==='power')?'trick':existing?.type||'spell');
+      dSt.appendChild(stSel); g2c.appendChild(dSt);
+      const dCo=document.createElement('div'); const lCo=document.createElement('span'); lCo.className='dfl'; lCo.textContent='Coste'; dCo.appendChild(lCo); dCo.appendChild(mkText('db_cost',existing?.cost,'ej: 2 Ing')); g2c.appendChild(dCo);
+      fc.appendChild(g2c);
     } else if (isTalent) {
-      formHtml += `<div style="margin-bottom:6px"><span class="dfl">Categoría (existente)</span><input type="text" id="db_tcat" value="${talentSub}" placeholder="ej: acero"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Descripción</span><textarea id="db_txt" style="min-height:56px">${existing?.desc||''}</textarea></div>`;
+      fc.appendChild(mkField('Categoría (existente)', mkText('db_tcat', talentSub, 'ej: acero')));
+      fc.appendChild(mkField('Nombre', mkText('db_name', existing?.name)));
+      fc.appendChild(mkField('Descripción', mkTA('db_txt', existing?.desc, '56px')));
     }
 
-    formHtml += `<div style="display:flex;gap:8px;margin-top:12px">
-      <button class="btn btn-g" style="flex:1" onclick="document.getElementById('db_form_container').style.display='none'">Cancelar</button>
-      <button class="btn btn-p" style="flex:1" onclick="app.dbSaveEntry('${key}')">✓ Guardar</button>
-    </div>`;
-    fc.innerHTML = formHtml;
+    // Action buttons
+    const btnRow = mkWrap('display:flex;gap:8px;margin-top:12px');
+    const btnCancel = document.createElement('button'); btnCancel.className='btn btn-g'; btnCancel.style.flex='1'; btnCancel.textContent='Cancelar';
+    btnCancel.onclick = () => { fc.style.display='none'; };
+    const btnSave = document.createElement('button'); btnSave.className='btn btn-p'; btnSave.style.flex='1'; btnSave.textContent='✓ Guardar';
+    btnSave.onclick = () => app.dbSaveEntry(key);
+    btnRow.appendChild(btnCancel); btnRow.appendChild(btnSave);
+    fc.appendChild(btnRow);
     fc.scrollIntoView({behavior:'smooth',block:'nearest'});
   },
 
@@ -2818,9 +3341,9 @@ const app = {
       } else if (cat==='archetypes') {
         entry.txt=document.getElementById('db_txt')?.value;
         entry.pv=parseInt(document.getElementById('db_pv')?.value)||8;
-        entry.adr=parseInt(document.getElementById('db_adr')?.value)||2;
-        entry.ing=parseInt(document.getElementById('db_ing')?.value)||0;
-        entry.speed=9;
+        entry.adr_bonus=parseInt(document.getElementById('db_adr')?.value)||2;
+        entry.ing_bonus=parseInt(document.getElementById('db_ing')?.value)||0;
+        entry.speed=30;
         entry.prof=2;
         entry.edges=(document.getElementById('db_edges')?.value||'').split(',').map(s=>s.trim()).filter(Boolean);
         entry.skills=(document.getElementById('db_skills')?.value||'').split(',').map(s=>s.trim()).filter(Boolean);
@@ -2861,18 +3384,22 @@ const app = {
   },
 
   dbDeleteEntry(key) {
-    if (!confirm(`¿Eliminar "${key}"?`)) return;
     const cat = this.currentEditorCat;
-    if (cat === 'talents' && key.includes('|')) {
-      const [sub,idx] = key.split('|');
-      this.DB.talents[sub]?.splice(parseInt(idx),1);
-    } else if (this.DB[cat]?.[key]) {
-      delete this.DB[cat][key];
-    }
-    this.saveRulesToLocal();
-    this.dbEditCategory(cat);
-    this.unlockApp();
-    this.toast('Eliminado','DB');
+    const label = key.includes('|') ? key.split('|')[0]+' (talento)' : key;
+    const dialog = document.getElementById('db_editor_modal');
+    const container = (dialog && dialog.open) ? dialog : document.body;
+    this._confirmInContainer(container, `¿Eliminar "${label}"?`, 'Esta entrada se eliminará de la base de datos.', '✓ Eliminar', () => {
+      if (cat === 'talents' && key.includes('|')) {
+        const [sub,idx] = key.split('|');
+        this.DB.talents[sub]?.splice(parseInt(idx),1);
+      } else if (this.DB[cat]?.[key]) {
+        delete this.DB[cat][key];
+      }
+      this.saveRulesToLocal();
+      this.dbEditCategory(cat);
+      this.unlockApp();
+      this.toast('Eliminado','DB');
+    });
   },
 
   saveRulesToLocal() { try{localStorage.setItem('sands_rules',JSON.stringify(this.DB))}catch{} },
@@ -2884,67 +3411,306 @@ const app = {
   },
 
   /* ── CROPPER ── */
+
+  // Returns the frame dimensions computed from the workspace size
+  _cropFrameSize() {
+    const ws = document.getElementById('crop_ws');
+    if (!ws) return {w:171, h:228};
+    const wsW = ws.clientWidth, wsH = ws.clientHeight;
+    // Fill 88% of the smaller dimension, keeping 3:4 ratio
+    const maxW = wsW * 0.88, maxH = wsH * 0.88;
+    let fw = maxW, fh = fw * (4/3);
+    if (fh > maxH) { fh = maxH; fw = fh * (3/4); }
+    return {w: Math.round(fw), h: Math.round(fh)};
+  },
+
+  // Position & size the frame element, and the grid overlay
+  _cropPositionFrame() {
+    const {w, h} = this._cropFrameSize();
+    const frame = document.getElementById('crop_frame');
+    if (frame) {
+      frame.style.width  = w + 'px';
+      frame.style.height = h + 'px';
+      frame.style.left   = '50%';
+      frame.style.top    = '50%';
+      frame.style.transform = 'translate(-50%,-50%)';
+    }
+    // Position the grid SVG over the frame
+    const grid = document.getElementById('cr_grid');
+    const svg  = document.getElementById('cr_grid_svg');
+    if (grid && svg) {
+      grid.style.cssText = `position:absolute;left:50%;top:50%;width:${w}px;height:${h}px;transform:translate(-50%,-50%);pointer-events:none;opacity:0;transition:opacity .18s;z-index:11`;
+      const t = (n) => `<line x1="${n}" y1="0" x2="${n}" y2="${h}" stroke="rgba(255,255,255,.2)" stroke-width="1"/>`;
+      const l = (n) => `<line x1="0" y1="${n}" x2="${w}" y2="${n}" stroke="rgba(255,255,255,.2)" stroke-width="1"/>`;
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+      svg.innerHTML = t(w/3) + t(w*2/3) + l(h/3) + l(h*2/3);
+    }
+  },
+
   startCrop(input) {
     if (!input.files?.[0]) return;
     const r = new FileReader();
     r.onload = e => {
-      app.cropState.img = new Image();
-      app.cropState.img.onload = function() {
-        const W=171,H=228;
-        const sc = Math.max(W/this.naturalWidth, H/this.naturalHeight);
-        app.cropState.zoom=sc; app.cropState.x=(W-this.naturalWidth*sc)/2; app.cropState.y=(H-this.naturalHeight*sc)/2;
-        const sl = document.getElementById('crop_zoom');
-        sl.min=sc*0.1; sl.max=sc*5; sl.step=0.01; sl.value=sc;
-        document.getElementById('crop_preview').src = app.cropState.img.src;
+      const img = new Image();
+      img.onerror = () => this.toast('Imagen inválida','Error');
+      img.onload = () => {
+        this.cropState.img = img;
+        this.cropState.rot = 0;
+        document.getElementById('crop_preview').src = img.src;
         document.getElementById('crop_modal').showModal();
-        app.updateCropView();
+        // Two frames: let modal render fully, then size frame & fit
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          this._cropPositionFrame();
+          this.cropFit();
+        }));
       };
-      app.cropState.img.onerror = () => app.toast('Imagen inválida','Error');
-      app.cropState.img.src = e.target.result;
+      img.src = e.target.result;
     };
-    r.readAsDataURL(input.files[0]); input.value='';
+    r.readAsDataURL(input.files[0]);
+    input.value = '';
   },
 
-  updateCropView() {
-    app.cropState.zoom = parseFloat(document.getElementById('crop_zoom').value);
+  // Fit image to fill the frame, centered
+  cropFit() {
+    const cs = this.cropState;
+    if (!cs.img) return;
+    this._cropPositionFrame();
+    const {w: FW, h: FH} = this._cropFrameSize();
+    const isRot90 = cs.rot % 180 !== 0;
+    const natW = isRot90 ? cs.img.naturalHeight : cs.img.naturalWidth;
+    const natH = isRot90 ? cs.img.naturalWidth  : cs.img.naturalHeight;
+    cs.zoom = Math.max(FW / natW, FH / natH);
+    cs.minZoom = cs.zoom * 0.25;
+    cs.x = 0; cs.y = 0;
+    this._cropApply();
+    this._cropUpdateSlider();
+  },
+
+  cropZoomStep(delta) {
+    const cs = this.cropState;
+    const prev = cs.zoom;
+    cs.zoom = Math.max(cs.minZoom || 0.05, Math.min(8, cs.zoom + delta));
+    const ratio = cs.zoom / prev;
+    cs.x *= ratio; cs.y *= ratio;
+    this._cropApply();
+    this._cropUpdateSlider();
+  },
+
+  cropZoomSlider(val) {
+    const cs = this.cropState;
+    const prev = cs.zoom;
+    cs.zoom = parseFloat(val);
+    const ratio = cs.zoom / prev;
+    cs.x *= ratio; cs.y *= ratio;
+    this._cropApply();
+    this._cropUpdateSlider();
+  },
+
+  cropRotate(deg) {
+    const cs = this.cropState;
+    cs.rot = (cs.rot + deg + 360) % 360;
+    cs.x = 0; cs.y = 0;
+    this.cropFit();
+  },
+
+  cancelCrop() {
+    document.getElementById('crop_modal').close();
+    this.cropState = {img:null, x:0, y:0, zoom:1, rot:0, minZoom:.05,
+      isDragging:false, lastX:0, lastY:0, pinch:null, velX:0, velY:0};
+  },
+
+  // ── Internal: apply transform ──
+  _cropApply() {
+    const cs = this.cropState;
+    if (!cs.img) return;
+    cs.x = this._cropClamp('x');
+    cs.y = this._cropClamp('y');
     const img = document.getElementById('crop_preview');
-    img.style.transform = `translate3d(${app.cropState.x}px,${app.cropState.y}px,0) scale(${app.cropState.zoom})`;
-    img.style.transformOrigin = '0 0';
+    img.style.transform = `translate(${cs.x}px,${cs.y}px) rotate(${cs.rot}deg) scale(${cs.zoom})`;
   },
 
-  startDrag(e) {
-    if (!document.getElementById('crop_modal').open) return;
-    app.cropState.isDragging=true;
-    const p = e.touches?.[0]||e;
-    app.cropState.lastX=p.clientX; app.cropState.lastY=p.clientY;
-    if (e.touches) e.preventDefault();
+  _cropClamp(axis) {
+    const cs = this.cropState;
+    const {w: FW, h: FH} = this._cropFrameSize();
+    const isRot90 = cs.rot % 180 !== 0;
+    const scaledW = (isRot90 ? cs.img.naturalHeight : cs.img.naturalWidth)  * cs.zoom;
+    const scaledH = (isRot90 ? cs.img.naturalWidth  : cs.img.naturalHeight) * cs.zoom;
+    if (axis === 'x') {
+      const half = Math.max(0, scaledW/2 - FW/2);
+      return Math.min(half, Math.max(-half, cs.x));
+    } else {
+      const half = Math.max(0, scaledH/2 - FH/2);
+      return Math.min(half, Math.max(-half, cs.y));
+    }
   },
-  doDrag(e) {
-    if (!app.cropState.isDragging) return;
-    const p = e.touches?.[0]||e;
-    app.cropState.x += p.clientX-app.cropState.lastX;
-    app.cropState.y += p.clientY-app.cropState.lastY;
-    app.cropState.lastX=p.clientX; app.cropState.lastY=p.clientY;
-    app.updateCropView();
-    if (e.touches) e.preventDefault();
+
+  _cropUpdateSlider() {
+    const cs = this.cropState;
+    const sl = document.getElementById('crop_zoom');
+    if (sl) { sl.min = cs.minZoom || 0.05; sl.value = cs.zoom; }
+    const lbl = document.getElementById('cr_zoom_lbl');
+    if (lbl) lbl.innerText = Math.round(cs.zoom * 100) + '%';
   },
-  endDrag() { app.cropState.isDragging=false; },
+
+  // ── Drag ──
+  cropDragStart(e) {
+    const cs = this.cropState;
+    if (!cs.img) return;
+    e.preventDefault();
+    const ws = document.getElementById('crop_ws');
+    ws.classList.add('dragging');
+
+    // ── unified pointer state ──
+    let rafPending = false;
+    const scheduleApply = () => {
+      if (rafPending) return;
+      rafPending = true;
+      requestAnimationFrame(() => { rafPending = false; this._cropApply(); });
+    };
+
+    const getTouches = (ev) => ev.touches ? Array.from(ev.touches) : null;
+    const pinchDist  = (t) => Math.hypot(t[1].clientX-t[0].clientX, t[1].clientY-t[0].clientY);
+    const pinchMid   = (t) => ({ x:(t[0].clientX+t[1].clientX)/2, y:(t[0].clientY+t[1].clientY)/2 });
+
+    // State
+    let mode      = 'idle'; // 'drag' | 'pinch'
+    let lastX     = 0, lastY = 0;
+    let pinchRef  = null;   // {dist, zoom, midX, midY, imgX, imgY}
+    cs.velX = 0; cs.velY = 0; cs._lastTime = Date.now();
+
+    // Init from first event
+    const touches = getTouches(e);
+    if (touches?.length >= 2) {
+      mode = 'pinch';
+      pinchRef = { dist: pinchDist(touches), zoom: cs.zoom, midX: pinchMid(touches).x, midY: pinchMid(touches).y, imgX: cs.x, imgY: cs.y };
+    } else {
+      mode = 'drag';
+      const p = touches?.[0] || e;
+      lastX = p.clientX; lastY = p.clientY;
+    }
+
+    const onMove = (ev) => {
+      ev.preventDefault();
+      const ts = getTouches(ev);
+
+      // Transition drag→pinch when second finger lands
+      if (ts?.length >= 2 && mode === 'drag') {
+        mode = 'pinch';
+        pinchRef = { dist: pinchDist(ts), zoom: cs.zoom, midX: pinchMid(ts).x, midY: pinchMid(ts).y, imgX: cs.x, imgY: cs.y };
+        cs.velX = 0; cs.velY = 0;
+        return;
+      }
+
+      // Transition pinch→drag when one finger lifts
+      if (ts?.length === 1 && mode === 'pinch') {
+        mode = 'drag';
+        pinchRef = null;
+        lastX = ts[0].clientX; lastY = ts[0].clientY;
+        cs.velX = 0; cs.velY = 0;
+        return;
+      }
+
+      if (mode === 'pinch' && ts?.length >= 2) {
+        const dist  = pinchDist(ts);
+        const ratio = dist / pinchRef.dist;
+        const newZoom = Math.max(cs.minZoom||.05, Math.min(8, pinchRef.zoom * ratio));
+
+        // Zoom towards pinch midpoint
+        const mid = pinchMid(ts);
+        const dMidX = mid.x - pinchRef.midX;
+        const dMidY = mid.y - pinchRef.midY;
+        cs.zoom = newZoom;
+        // Re-anchor position so pinch center stays fixed
+        cs.x = pinchRef.imgX * ratio + dMidX;
+        cs.y = pinchRef.imgY * ratio + dMidY;
+        scheduleApply();
+        this._cropUpdateSlider();
+
+      } else if (mode === 'drag') {
+        const pt = ts?.[0] || ev;
+        const now = Date.now(), dt = Math.max(now - (cs._lastTime||now), 1);
+        const ddx = pt.clientX - lastX, ddy = pt.clientY - lastY;
+        cs.velX = cs.velX * 0.55 + (ddx / dt) * 0.45;
+        cs.velY = cs.velY * 0.55 + (ddy / dt) * 0.45;
+        lastX = pt.clientX; lastY = pt.clientY; cs._lastTime = now;
+        cs.x += ddx; cs.y += ddy;
+        scheduleApply();
+      }
+    };
+
+    const onEnd = (ev) => {
+      const ts = getTouches(ev);
+      // Still have one finger — back to drag
+      if (ts?.length === 1 && mode === 'pinch') {
+        mode = 'drag';
+        pinchRef = null;
+        lastX = ts[0].clientX; lastY = ts[0].clientY;
+        cs.velX = 0; cs.velY = 0;
+        return;
+      }
+      // All fingers up
+      if (!ts?.length || ts.length === 0) {
+        mode = 'idle';
+        ws.classList.remove('dragging');
+        this._cropInertia();
+        window.removeEventListener('mousemove',  onMove);
+        window.removeEventListener('touchmove',  onMove);
+        window.removeEventListener('mouseup',    onEnd);
+        window.removeEventListener('touchend',   onEnd);
+      }
+    };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('touchmove', onMove, {passive:false});
+    window.addEventListener('mouseup',   onEnd);
+    window.addEventListener('touchend',  onEnd);
+  },
+
+  _cropInertia() {
+    const cs = this.cropState;
+    let vx = cs.velX * 80, vy = cs.velY * 80;
+    const step = () => {
+      if (!cs.img) return; // guard: crop cancelled mid-inertia
+      if (Math.abs(vx) < 0.3 && Math.abs(vy) < 0.3) return;
+      cs.x += vx; cs.y += vy;
+      vx *= 0.88; vy *= 0.88;
+      this._cropApply();
+      requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  },
+
+  _cropWheel(e) {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.07 : 0.07;
+    this.cropZoomStep(delta);
+  },
 
   applyCrop() {
-    if (!app.cropState.img) return;
+    const cs = this.cropState;
+    if (!cs.img) return;
+    const {w: FW, h: FH} = this._cropFrameSize();
+    // Cap at 600×800px max to keep portrait size reasonable in localStorage
+    const MAX_W = 600;
+    const SC = Math.min(2, MAX_W / FW);
     const canvas = document.createElement('canvas');
-    canvas.width=342; canvas.height=456;
+    canvas.width = Math.round(FW * SC); canvas.height = Math.round(FH * SC);
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle='#111'; ctx.fillRect(0,0,342,456);
-    ctx.translate(app.cropState.x*2, app.cropState.y*2);
-    ctx.scale(app.cropState.zoom*2, app.cropState.zoom*2);
-    ctx.drawImage(app.cropState.img,0,0);
-    const src = canvas.toDataURL('image/jpeg',.92);
-    // Set BOTH images immediately
+    ctx.fillStyle = '#111';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.translate(canvas.width/2, canvas.height/2);
+    ctx.rotate(cs.rot * Math.PI / 180);
+    ctx.scale(cs.zoom * SC, cs.zoom * SC);
+    ctx.translate(cs.x / cs.zoom, cs.y / cs.zoom);
+    ctx.drawImage(cs.img, -cs.img.naturalWidth/2, -cs.img.naturalHeight/2);
+    const src = canvas.toDataURL('image/jpeg', .92);
     document.getElementById('char_img').src = src;
     document.getElementById('char_img_summary').src = src;
     document.getElementById('crop_modal').close();
-    this.toast('Retrato actualizado');
+    // Reset crop state so next image starts clean
+    this.cropState = {img:null, x:0, y:0, zoom:1, rot:0, minZoom:.05,
+      isDragging:false, lastX:0, lastY:0, pinch:null, velX:0, velY:0};
+    this.toast('Retrato actualizado', '✦');
   },
 
   /* ── RULES IMPORT ── */
@@ -3022,10 +3788,23 @@ const app = {
     const name = document.getElementById('char_name').value.trim();
     if (!name) { this.toast('¡Se requiere nombre!','Error'); return; }
     const roster = JSON.parse(localStorage.getItem('sands_roster')||'{}');
-    if (roster[name] && !confirm(`¿Sobreescribir "${name}"?`)) return;
+    if (roster[name]) {
+      this._confirm('¿Sobreescribir personaje?', `El personaje "${this._esc(name)}" ya existe y será reemplazado.`, '✓ Sobreescribir', () => this._doSaveChar(name));
+    } else {
+      this._doSaveChar(name);
+    }
+  },
+
+  _doSaveChar(name) {
+    const roster = JSON.parse(localStorage.getItem('sands_roster')||'{}');
+    // If the character was previously saved under a different name, remove the old entry
+    if (this._savedName && this._savedName !== name && roster[this._savedName]) {
+      delete roster[this._savedName];
+    }
     roster[name] = this.gatherCharData();
     try {
       localStorage.setItem('sands_roster', JSON.stringify(roster));
+      this._savedName = name;
       const now = new Date();
       const ts = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
       const lbl = document.getElementById('last_saved_lbl');
@@ -3050,13 +3829,15 @@ const app = {
     r.onload = e => {
       try {
         const data = JSON.parse(e.target.result);
+        if (typeof data !== 'object' || !data.inputs) throw new Error('Formato inválido');
         this.clearCharData();
         this.showScreen('app');
         this.unlockApp();
         this.applyCharData(data);
+        this._savedName = null; // imported but not yet saved to roster
         this.goToPage(0);
         this.toast('Personaje importado');
-      } catch { this.toast('JSON inválido','Error'); }
+      } catch(err) { this.toast(err.message || 'JSON inválido','Error'); }
     };
     r.readAsText(input.files[0]); input.value='';
   },
@@ -3065,6 +3846,7 @@ const app = {
 
   /* ── CLEAR ── */
   clearCharData() {
+    this._savedName = null;
     ['base_FUE','base_DES','base_CON','base_INT','base_SAB','base_CAR'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=8});
     ['char_name','char_concept','char_notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     const lvlEl=document.getElementById('char_lvl');if(lvlEl)lvlEl.value=1;
@@ -3084,19 +3866,27 @@ const app = {
     const wd2 = document.getElementById('w2_dmg_attr'); if(wd2)wd2.value='FUE';
     this.showTalentSummary(); this.updateTalentCount();
     this.renderInventory();
+    // Reset lethality to default
+    this.setLethality(1);
+    // Reset active talent category so next open starts fresh
+    this.activeTalentCat = null;
   },
 
 
-  /* ── FONT SIZE ── */
+  /* ── FONT SIZE ══
+     Todos los tamaños del CSS usan rem, que escalan desde el font-size de <html>.
+     Cambiando document.documentElement.style.fontSize toda la interfaz responde. */
   setFontSize(size) {
-    const map = {small:'13px', normal:'15px', large:'17px', xlarge:'19px'};
-    const px = map[size]||'15px';
-    document.documentElement.style.setProperty('--fs-base', px);
-    document.body.style.fontSize = px;
+    // Normal = 16px (1rem base estándar del navegador).
+    // Las opciones desplazan ±2px desde esa base.
+    const map = {small:'13px', normal:'16px', large:'18px', xlarge:'20px'};
+    const px = map[size] || '16px';
+    // Cambiar el font-size del <html> escala todos los rem de la UI de golpe
+    document.documentElement.style.fontSize = px;
     localStorage.setItem('ss_font_size', size);
     ['small','normal','large','xlarge'].forEach(s=>{
-      const el=document.getElementById('fs_'+s);
-      if(el) el.classList.toggle('active', s===size);
+      const el = document.getElementById('fs_'+s);
+      if (el) el.classList.toggle('active', s===size);
     });
   },
 
@@ -3131,6 +3921,21 @@ const app = {
     document.getElementById('campana_edit').style.display = 'none';
     document.getElementById('campana_summary').style.display = 'block';
     document.getElementById('campana_edit_btn').style.display = '';
+  },
+
+  _setupEscapeKey() {
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      // Close sdial menu (and fire the same close path toggleDial uses)
+      const menu = document.getElementById('sdial_menu');
+      const btn  = document.querySelector('.sdial-btn');
+      if (menu?.classList.contains('open')) {
+        menu.classList.remove('open');
+        btn?.classList.remove('open');
+        // Dispatch a synthetic click outside sdial so the _close listener self-removes
+        document.dispatchEvent(new MouseEvent('click', {bubbles:true}));
+      }
+    });
   },
 
   toggleDial() {
@@ -3170,7 +3975,7 @@ const app = {
     // 1. Stats (3d6 cada uno)
     const STATS = ['FUE','DES','CON','INT','SAB','CAR'];
     STATS.forEach(s => {
-      const roll = [0,1,2].reduce(sum => sum + Math.floor(Math.random()*6)+1, 0);
+      const roll = [0,1,2].reduce((sum, _) => sum + Math.floor(Math.random()*6)+1, 0);
       const el = document.getElementById('base_'+s); if(el) el.value = roll;
     });
 
@@ -3217,7 +4022,8 @@ const app = {
       const boxes = Array.from(document.querySelectorAll(`input[name="${name}"]`));
       boxes.sort(()=>Math.random()-.5).slice(0,lim).forEach(b=>b.checked=true);
     };
-    randCheck('chk_arq', 2);
+    const arqLimitRand = this.DB.archetypes?.[document.getElementById('sel_arq').value]?.skills_count || 2;
+    randCheck('chk_arq', arqLimitRand);
     randCheck('chk_bg', 2);
 
     // 10. Talentos aleatorios (3)
@@ -3234,10 +4040,10 @@ const app = {
     // 11. Inventario básico
     const weapons = Object.entries(this.DB.weapons||{});
     const armors = Object.entries(this.DB.armors||{}).filter(([k])=>k!=='laminar');
-    if (armors.length) { const [k,v]=armors[Math.floor(Math.random()*armors.length)]; this.inventory.push({uid:Date.now()+1,name:v.name,slots:v.slots||1,type:'armors',dbKey:k,dbData:v}); }
-    if (weapons.length) { const [k,v]=weapons[Math.floor(Math.random()*weapons.length)]; this.inventory.push({uid:Date.now()+2,name:v.name,slots:v.slots||1,type:'weapons',dbKey:k,dbData:v}); }
-    this.inventory.push({uid:Date.now()+3,name:'Raciones (3)',slots:1,type:'misc'});
-    this.inventory.push({uid:Date.now()+4,name:'Antorchas (5)',slots:1,type:'misc'});
+    if (armors.length) { const [k,v]=armors[Math.floor(Math.random()*armors.length)]; this.inventory.push({uid:this._nextUid(),name:v.name,slots:v.slots||1,type:'armors',dbKey:k,dbData:v}); }
+    if (weapons.length) { const [k,v]=weapons[Math.floor(Math.random()*weapons.length)]; this.inventory.push({uid:this._nextUid(),name:v.name,slots:v.slots||1,type:'weapons',dbKey:k,dbData:v}); }
+    this.inventory.push({uid:this._nextUid(),name:'Raciones (3)',slots:1,type:'misc'});
+    this.inventory.push({uid:this._nextUid(),name:'Antorchas (5)',slots:1,type:'misc'});
     this.gold = Math.floor(Math.random()*20)+10;
     this.syncCombatOptions();
 
@@ -3263,7 +4069,14 @@ const app = {
   }
 };
 
-window.onload = () => app.init();
+window.addEventListener('load', () => app.init());
+
+  // ── Service Worker (PWA offline support)
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+  }
 
   // ── Loader dismiss
   (function(){
