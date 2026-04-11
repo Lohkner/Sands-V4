@@ -73,6 +73,8 @@
   --nav-h:     52px;
   --safe-b:    env(safe-area-inset-bottom, 0px);
   --font-base: 15px;
+  /* Real usable height — overwritten by JS on load/resize/orientationchange */
+  --app-h:     100vh;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -90,13 +92,14 @@ html {
   background: var(--void);
   color-scheme: dark;
   font-size: var(--font-base);
+  height: 100%;
 }
 
 body {
   font-family: var(--fb);
   background: var(--void);
   color: var(--text);
-  height: 100dvh;
+  height: var(--app-h);
   line-height: 1.4;
   overflow: hidden;
   background-image:
@@ -114,6 +117,7 @@ body {
 .screen {
   position: fixed;
   inset: 0;
+  height: var(--app-h);
   display: flex;
   flex-direction: column;
   transition: opacity .28s ease, transform .28s ease;
@@ -365,7 +369,7 @@ body {
 .app-shell {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
+  height: var(--app-h);
   max-width: 720px;
   margin: 0 auto;
   width: 100%;
@@ -1498,8 +1502,8 @@ dialog::backdrop           { background: rgba(0,0,0,.72); backdrop-filter: blur(
 #crop-modal {
   max-width: min(520px, 100vw);
   width: 100%;
-  height: 100dvh;
-  max-height: 100dvh;
+  height: var(--app-h);
+  max-height: var(--app-h);
   border-radius: 0;
   border: none;
   inset: 0;
@@ -1888,7 +1892,7 @@ details[open] > summary::before      { content: '▾'; }
   .talent-modal-layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
   .talent-modal-sidebar { border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; flex-wrap: wrap; gap: 4px; padding: 6px; }
   .category-btn { width: auto; padding: 4px 8px; font-size: .7rem; }
-  dialog.modal:not(#crop-modal) { width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; border: none; inset: 0; margin: 0; }
+  dialog.modal:not(#crop-modal) { width: 100vw; height: var(--app-h); max-height: var(--app-h); border-radius: 0; border: none; inset: 0; margin: 0; }
   .db-editor-layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
   .db-editor-sidebar { border-right: none; border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 4px; }
 }
@@ -4818,6 +4822,21 @@ const App = {
    BOOT
 ═══════════════════════════════════════════════════════════ */
 window.addEventListener('load', () => {
+  // ── PWA / viewport height fix ──
+  // window.innerHeight gives the real usable pixels in standalone mode,
+  // where dvh/vh can include phantom browser-chrome space.
+  (function fixAppHeight() {
+    const set = () => {
+      document.documentElement.style.setProperty('--app-h', window.innerHeight + 'px');
+    };
+    set();
+    window.addEventListener('resize',            set, { passive: true });
+    window.addEventListener('orientationchange', set, { passive: true });
+    // iOS Safari fires a second resize after the keyboard fully dismisses;
+    // a short rAF ensures we capture the settled value.
+    window.addEventListener('focusout', () => requestAnimationFrame(set), { passive: true });
+  })();
+
   App.init();
 
   // Service Worker (PWA)
