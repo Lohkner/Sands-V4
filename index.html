@@ -18,29 +18,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
-<!-- ═══════════════════════════════════════════════════════════
-     PWA VIEWPORT FIX — must run before first CSS paint
-     Sets --app-h = real usable pixels (window.innerHeight).
-     Fixes the "black bar" in standalone/PWA mode on iOS/Android
-     where vh/dvh/svh include phantom browser-chrome space.
-═══════════════════════════════════════════════════════════ -->
-<script>
-(function(){
-  function setH(){
-    document.documentElement.style.setProperty('--app-h', window.innerHeight+'px');
-  }
-  setH();
-  // Re-measure on every resize and orientation flip
-  window.addEventListener('resize',            setH, {passive:true});
-  window.addEventListener('orientationchange', setH, {passive:true});
-  // iOS Safari: keyboard-dismiss fires focusout then a delayed resize.
-  // Two rAFs guarantee we read the settled value after layout completes.
-  window.addEventListener('focusout', function(){
-    requestAnimationFrame(function(){ requestAnimationFrame(setH); });
-  }, {passive:true});
-})();
-</script>
-
 <style>
 /* ═══════════════════════════════════════════════════════════
    DESIGN TOKENS
@@ -96,8 +73,7 @@
   --nav-h:     52px;
   --safe-b:    env(safe-area-inset-bottom, 0px);
   --font-base: 15px;
-  /* Real usable height — set by inline JS in <head> before first paint.
-     Fallback chain: fill-available (old iOS) → dvh → vh             */
+  /* Real usable height — overwritten by JS on load/resize/orientationchange */
   --app-h:     100dvh;
 }
 
@@ -116,22 +92,17 @@ html {
   background: var(--void);
   color-scheme: dark;
   font-size: var(--font-base);
-  /* Prevent rubber-band overscroll pushing layout on iOS */
   height: 100%;
-  overflow: hidden;
 }
 
 body {
   font-family: var(--fb);
   background: var(--void);
   color: var(--text);
-  /* Layered fallback: JS var → dvh → -webkit-fill-available → vh */
-  height: var(--app-h);
+  height: 100dvh;
   line-height: 1.4;
   overflow: hidden;
-  /* Prevent iOS bounce from displacing fixed elements */
   overscroll-behavior: none;
-  position: fixed;
   width: 100%;
   background-image:
     radial-gradient(ellipse 100% 50% at 10% 0%, rgba(125,28,42,.10) 0%, transparent 55%),
@@ -147,11 +118,7 @@ body {
 ═══════════════════════════════════════════════════════════ */
 .screen {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  height: var(--app-h);
+  inset: 0;
   display: flex;
   flex-direction: column;
   transition: opacity .28s ease, transform .28s ease;
@@ -403,8 +370,8 @@ body {
 .app-shell {
   display: flex;
   flex-direction: column;
-  height: var(--app-h);
-  max-height: var(--app-h);
+  height: 100dvh;
+  max-height: 100dvh;
   max-width: 720px;
   margin: 0 auto;
   width: 100%;
@@ -416,6 +383,7 @@ body {
   flex-shrink: 0;
   background: linear-gradient(180deg, rgba(7,6,10,1) 0%, rgba(7,6,10,.88) 100%);
   padding: 8px 14px 6px;
+  padding-top: max(8px, env(safe-area-inset-top, 8px));
   display: flex;
   align-items: center;
   gap: 8px;
@@ -538,10 +506,10 @@ body {
 
 /* ── Pages ── */
 .pages-wrapper {
-  flex: 1 1 0;
+  flex: 1;
   overflow: hidden;
   position: relative;
-  min-height: 0;          /* critical: allows flex child to shrink below content size */
+  min-height: 0;
   touch-action: pan-y;
 }
 
@@ -558,13 +526,11 @@ body {
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  /* Extra bottom padding absorbs safe-area so last card isn't hidden */
-  padding: 8px 12px calc(16px + env(safe-area-inset-bottom, 0px));
+  padding: 8px 12px 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
 }
 
 /* ── Bottom Navigation ── */
@@ -1464,7 +1430,7 @@ dialog.modal {
   position: fixed;
   inset: 0;
   margin: auto;
-  max-height: calc(var(--app-h) * 0.90);
+  max-height: 90svh;
   display: none;
   flex-direction: column;
   z-index: 200;
@@ -1540,8 +1506,8 @@ dialog::backdrop           { background: rgba(0,0,0,.72); backdrop-filter: blur(
 #crop-modal {
   max-width: min(520px, 100vw);
   width: 100%;
-  height: var(--app-h);
-  max-height: var(--app-h);
+  height: 100dvh;
+  max-height: 100dvh;
   border-radius: 0;
   border: none;
   inset: 0;
@@ -1550,8 +1516,8 @@ dialog::backdrop           { background: rgba(0,0,0,.72); backdrop-filter: blur(
 
 @media (min-width: 480px) {
   #crop-modal {
-    height: min(640px, calc(var(--app-h) * 0.92));
-    max-height: min(640px, calc(var(--app-h) * 0.92));
+    height: min(640px, 92dvh);
+    max-height: min(640px, 92dvh);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
     inset: 0;
@@ -1930,7 +1896,7 @@ details[open] > summary::before      { content: '▾'; }
   .talent-modal-layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
   .talent-modal-sidebar { border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; flex-wrap: wrap; gap: 4px; padding: 6px; }
   .category-btn { width: auto; padding: 4px 8px; font-size: .7rem; }
-  dialog.modal:not(#crop-modal) { width: 100vw; height: var(--app-h); max-height: var(--app-h); border-radius: 0; border: none; inset: 0; margin: 0; }
+  dialog.modal:not(#crop-modal) { width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; border: none; inset: 0; margin: 0; }
   .db-editor-layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
   .db-editor-sidebar { border-right: none; border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 4px; }
 }
@@ -1989,7 +1955,7 @@ details[open] > summary::before      { content: '▾'; }
 <!-- ══════════════════════════════════════════
      APTITUDE MANAGER MODAL
 ══════════════════════════════════════════ -->
-<dialog id="apt-manager-modal" class="modal" style="max-width:min(960px,96vw);height:min(calc(var(--app-h)*0.85),calc(var(--app-h)*0.90))">
+<dialog id="apt-manager-modal" class="modal" style="max-width:min(960px,96vw);height:min(85dvh,90svh)">
   <div class="modal-header">
     <span class="modal-title" id="apt-manager-title">Gestor de Trucos</span>
     <button class="btn--close" id="apt-manager-close">✕</button>
@@ -2727,7 +2693,7 @@ details[open] > summary::before      { content: '▾'; }
 <!-- ══════════════════════════════════════════
      DB EDITOR MODAL
 ══════════════════════════════════════════ -->
-<dialog id="db-editor-modal" class="modal" style="max-width:min(1000px,96vw);height:min(calc(var(--app-h)*0.88),calc(var(--app-h)*0.90))">
+<dialog id="db-editor-modal" class="modal" style="max-width:min(1000px,96vw);height:min(88dvh,90svh)">
   <div class="modal-header" style="background:var(--panel)">
     <span class="modal-title" style="color:var(--ice)">Editor de Base de Datos</span>
     <button class="btn--close" id="db-editor-close">✕</button>
@@ -2755,7 +2721,7 @@ details[open] > summary::before      { content: '▾'; }
 <!-- ══════════════════════════════════════════
      TALENT MODAL
 ══════════════════════════════════════════ -->
-<dialog id="talent-modal" class="modal" style="max-width:min(960px,96vw);height:min(calc(var(--app-h)*0.85),calc(var(--app-h)*0.90))">
+<dialog id="talent-modal" class="modal" style="max-width:min(960px,96vw);height:min(85dvh,90svh)">
   <div class="modal-header">
     <span class="modal-title">Gestor de Talentos</span>
     <button class="btn--close" id="talent-modal-close">✕</button>
