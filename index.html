@@ -15,6 +15,7 @@
 <meta name="application-name" content="S&amp;S Companion">
 <meta name="msapplication-TileColor" content="#07060a">
 <style>html,body{background:#07060a!important;color:#d8cce8}
+html{padding-top:env(safe-area-inset-top,0px);box-sizing:border-box}
 #ss-loader{position:fixed;inset:0;z-index:9999;background:var(--void);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .5s ease;background-image:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(125,28,42,.18) 0%,transparent 70%)}
 #ss-loader.fade-out{opacity:0;pointer-events:none}
 .loader-title{font-family:var(--ft);font-size:clamp(1.3rem,6vw,2.2rem);color:var(--gold);letter-spacing:.12em;text-shadow:0 0 40px rgba(200,169,110,.5),0 2px 8px rgba(0,0,0,.9);text-align:center;line-height:1.3}
@@ -61,18 +62,18 @@
   --gb:0 0 16px rgba(176,48,64,.3);
   --sm:0 1px 4px rgba(0,0,0,.4);--md:0 4px 16px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.3);--lg:0 8px 32px rgba(0,0,0,.65),0 2px 8px rgba(0,0,0,.4);
   --si:inset 0 1px 0 rgba(255,255,255,.04);
-  --r:4px;--rl:8px;--nav:52px;--ph:228px;--safe-b:env(safe-area-inset-bottom,0px);--fs-base:15px;
+  --r:4px;--rl:8px;--nav:52px;--ph:228px;--safe-b:env(safe-area-inset-bottom,0px);--safe-t:env(safe-area-inset-top,0px);--fs-base:15px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
 ::selection{background:rgba(200,169,110,.2);color:var(--bright)}
 ::-webkit-scrollbar{display:none}*{scrollbar-width:none;-ms-overflow-style:none}
 html{scroll-behavior:smooth}
-body{font-family:var(--fb);background:var(--void);color:var(--text);height:100dvh;font-size:var(--fs-base,15px);line-height:1.4;overflow:hidden;
+body{font-family:var(--fb);background:var(--void);color:var(--text);min-height:-webkit-fill-available;height:100dvh;font-size:var(--fs-base,15px);line-height:1.4;overflow:hidden;
   background-image:radial-gradient(ellipse 100% 50% at 10% 0%,rgba(125,28,42,.10) 0%,transparent 55%),radial-gradient(ellipse 70% 70% at 90% 100%,rgba(29,78,143,.07) 0%,transparent 55%);}
 .screen{position:fixed;inset:0;display:flex;flex-direction:column;transition:opacity .28s,transform .28s;overflow:hidden;-webkit-backface-visibility:hidden;backface-visibility:hidden}
 .screen.hidden{opacity:0;pointer-events:none;transform:translateY(14px)}
 /* ══ HOME ══ */
-#home-screen{overflow-y:auto;overflow-x:hidden;padding:0 0 60px;-webkit-overflow-scrolling:touch}
+#home-screen{overflow-y:auto;overflow-x:hidden;padding:env(safe-area-inset-top,0px) 0 60px;-webkit-overflow-scrolling:touch}
 .home-hdr{text-align:center;padding:42px 20px 22px}
 .home-title{font-family:var(--ft);font-size:clamp(1.4rem,5vw,2.4rem);color:var(--gold);letter-spacing:.1em;text-shadow:0 0 40px rgba(200,169,110,.45),0 2px 8px rgba(0,0,0,.9);line-height:1.2}
 .home-sub{font-family:var(--fd);font-size:.68rem;color:var(--muted);letter-spacing:.32em;text-transform:uppercase;margin-top:5px}
@@ -96,8 +97,8 @@ body{font-family:var(--fb);background:var(--void);color:var(--text);height:100dv
 .char-card:hover{border-color:rgba(200,169,110,.4);box-shadow:0 0 0 1px var(--glow-g)}.char-card:hover::before{opacity:1}
 /* ══ APP SHELL ══ */
 
-.app-shell{display:flex;flex-direction:column;height:100dvh;max-width:720px;margin:0 auto;width:100%}
-.app-hdr{flex-shrink:0;background:linear-gradient(180deg,rgba(7,6,10,1) 0%,rgba(7,6,10,.88) 100%);padding:8px 14px 6px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--rim);z-index:10}
+.app-shell{display:flex;flex-direction:column;min-height:-webkit-fill-available;height:100dvh;max-width:720px;margin:0 auto;width:100%}
+.app-hdr{flex-shrink:0;background:linear-gradient(180deg,rgba(7,6,10,1) 0%,rgba(7,6,10,.88) 100%);padding:calc(8px + env(safe-area-inset-top,0px)) 14px 6px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--rim);z-index:10}
 .app-hdr-back{background:linear-gradient(135deg,rgba(200,169,110,.06),transparent);border:1px solid rgba(200,169,110,.3);color:var(--dim);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:.88rem;display:flex;align-items:center;justify-content:center;transition:all .18s;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.04);letter-spacing:-.02em;font-weight:700}
 .app-hdr-back:hover{border-color:var(--gold);color:var(--gold);background:rgba(200,169,110,.1);box-shadow:0 0 0 1px rgba(200,169,110,.2),0 2px 8px rgba(0,0,0,.4)}
 .app-hdr-back:active{transform:scale(.92)}
@@ -528,11 +529,7 @@ details>summary::before{content:'▸';color:var(--gold);font-size:.56rem;transit
 @media(max-width:400px){.g6{grid-template-columns:repeat(2,1fr)}.saves-grid{grid-template-columns:repeat(3,1fr)}}
 
 /* ══ PWA UPDATE TOAST ══ */
-#pwa-update-toast{position:fixed;bottom:calc(var(--nav) + var(--safe-b) + 10px);left:50%;transform:translateX(-50%) translateY(80px);background:var(--panel);border:1px solid rgba(200,169,110,.5);border-radius:var(--rl);padding:10px 16px;display:flex;align-items:center;gap:10px;z-index:9998;box-shadow:var(--lg);transition:transform .3s cubic-bezier(.18,.89,.32,1.28);white-space:nowrap}
-#pwa-update-toast.show{transform:translateX(-50%) translateY(0)}
-#pwa-update-toast span{font-family:var(--fm);font-size:.7rem;color:var(--dim)}
-#pwa-update-toast button{font-family:var(--fd);font-size:.65rem;padding:4px 10px;background:rgba(200,169,110,.15);border:1px solid rgba(200,169,110,.5);color:var(--gold);border-radius:var(--r);cursor:pointer;letter-spacing:.06em;text-transform:uppercase;transition:all .15s}
-#pwa-update-toast button:hover{background:rgba(200,169,110,.3);border-color:var(--gold)}
+
 </style>
 </head>
 <body>
@@ -543,7 +540,6 @@ details>summary::before{content:'▸';color:var(--gold);font-size:.56rem;transit
   <div class="loader-orb"></div>
 </div>
 <div id="toast-ct"></div>
-<div id="pwa-update-toast" role="status" aria-live="polite"><span>✦ Actualización disponible</span><button onclick="app.applySwUpdate()" aria-label="Recargar con la nueva versión">Recargar</button></div>
 <div id="dice-overlay">
   <div class="dice-backdrop" id="dice-backdrop" onclick="app.closeDiceOverlay()"></div>
   <div class="dice-card" id="dice-card">
@@ -4114,19 +4110,6 @@ const app = {
     this.toast('Personaje aleatorio listo','⚄');
   },
 
-  /* ── PWA UPDATE ── */
-  _swReg: null,
-  _showUpdateToast() {
-    const t = document.getElementById('pwa-update-toast');
-    if (t) t.classList.add('show');
-  },
-  applySwUpdate() {
-    const t = document.getElementById('pwa-update-toast');
-    if (t) t.classList.remove('show');
-    const sw = this._swReg?.waiting;
-    if (sw) sw.postMessage({ type: 'SKIP_WAITING' });
-    else window.location.reload();
-  },
 
   /* ── DEBOUNCE HELPER ── */
   _debounce(fn, ms) {
@@ -4138,28 +4121,10 @@ const app = {
 
 window.onload = () => app.init();
 
-  // ── Service Worker (PWA + update flow)
+  // ── Service Worker (PWA offline support)
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js').then(reg => {
-        // Check for waiting worker on page load
-        if (reg.waiting) { app._swReg = reg; app._showUpdateToast(); }
-        // Detect new workers installing
-        reg.addEventListener('updatefound', () => {
-          const nw = reg.installing;
-          if (!nw) return;
-          nw.addEventListener('statechange', () => {
-            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-              app._swReg = reg; app._showUpdateToast();
-            }
-          });
-        });
-      }).catch(() => {});
-      // Reload page when SW controller changes (after skipWaiting)
-      let reloading = false;
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (reloading) return; reloading = true; window.location.reload();
-      });
+      navigator.serviceWorker.register('sw.js').catch(() => {});
     });
   }
 
