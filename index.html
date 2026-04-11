@@ -89,10 +89,6 @@
 
 html {
   scroll-behavior: smooth;
-  background: var(--void);
-  color-scheme: dark;
-  font-size: var(--font-base);
-  height: 100%;
 }
 
 body {
@@ -102,8 +98,6 @@ body {
   height: 100dvh;
   line-height: 1.4;
   overflow: hidden;
-  overscroll-behavior: none;
-  width: 100%;
   background-image:
     radial-gradient(ellipse 100% 50% at 10% 0%, rgba(125,28,42,.10) 0%, transparent 55%),
     radial-gradient(ellipse 70% 70% at 90% 100%, rgba(29,78,143,.07) 0%, transparent 55%);
@@ -371,11 +365,9 @@ body {
   display: flex;
   flex-direction: column;
   height: 100dvh;
-  max-height: 100dvh;
   max-width: 720px;
   margin: 0 auto;
   width: 100%;
-  overflow: hidden;
 }
 
 /* ── App Header ── */
@@ -383,7 +375,6 @@ body {
   flex-shrink: 0;
   background: linear-gradient(180deg, rgba(7,6,10,1) 0%, rgba(7,6,10,.88) 100%);
   padding: 8px 14px 6px;
-  padding-top: max(8px, env(safe-area-inset-top, 8px));
   display: flex;
   align-items: center;
   gap: 8px;
