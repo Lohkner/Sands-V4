@@ -1874,6 +1874,15 @@ details[open] > summary::before      { content: '▾'; }
 /* ═══════════════════════════════════════════════════════════
    RESPONSIVE
 ═══════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
 @media (max-width: 480px) {
   .grid-6 { grid-template-columns: repeat(3, 1fr); }
   .talent-modal-layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
@@ -1910,7 +1919,7 @@ details[open] > summary::before      { content: '▾'; }
 <!-- ══════════════════════════════════════════
      DICE OVERLAY
 ══════════════════════════════════════════ -->
-<div id="dice-overlay" role="dialog" aria-modal="true" aria-label="Resultado de Tirada">
+<div id="dice-overlay" role="dialog" aria-modal="true" aria-labelledby="dice-label">
   <div class="dice-backdrop" id="dice-backdrop"></div>
   <div class="dice-card" id="dice-card">
     <div class="dice-label"  id="dice-label">Tirada</div>
@@ -2874,6 +2883,8 @@ const STORAGE_KEYS = { rules:'sands_rules', roster:'sands_roster', fontSize:'ss_
 /* ═══════════════════════════════════════════════════════════
    UTILITY
 ═══════════════════════════════════════════════════════════ */
+let _uidCounter = Date.now();
+const nextUid = () => ++_uidCounter;
 const esc = str => String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 const $   = id  => document.getElementById(id);
 const $$  = sel => document.querySelectorAll(sel);
@@ -3006,7 +3017,7 @@ const Inventory = {
   addFromDB(){
     const cat=$('inv-db-category')?.value,key=$('inv-db-item')?.value;
     if(!key)return;const data=State.DB[cat]?.[key];if(!data)return;
-    State.inventory.push({uid:Date.now(),name:data.name,slots:data.slots||1,type:cat==='shields'?'shields':cat,dbKey:key,dbData:data});
+    State.inventory.push({uid:nextUid(),name:data.name,slots:data.slots||1,type:cat==='shields'?'shields':cat,dbKey:key,dbData:data});
     this.render();Combat.syncEquipDropdowns();Toast.show(`${data.name} añadido`,'Inventario');
   },
   openCustomForm(idx=null){
@@ -3038,7 +3049,7 @@ const Inventory = {
     const name=$('ci-name')?.value?.trim();if(!name){Toast.show('Se requiere nombre','Error');return;}
     const slots=parseInt($('ci-slots')?.value)||1,type=$('ci-type')?.value||'misc';
     const isEdit=State.editingCustomItem!==null;
-    const item={uid:isEdit?State.inventory[State.editingCustomItem].uid:Date.now(),name,slots,type};
+    const item={uid:isEdit?State.inventory[State.editingCustomItem].uid:nextUid(),name,slots,type};
     if(isEdit)State.inventory[State.editingCustomItem]=item;else State.inventory.push(item);
     $('custom-item-overlay')?.remove();State.editingCustomItem=null;
     this.render();Combat.syncEquipDropdowns();Toast.show(isEdit?'Actualizado':'Añadido','Inventario');
@@ -3050,7 +3061,7 @@ const Inventory = {
   render(){
     const list=$('inv-backpack-list');
     if(list){
-      list.innerHTML='';
+      const frag=document.createDocumentFragment();
       State.inventory.forEach((item,i)=>{
         const isF=i===0,isL=i===State.inventory.length-1;
         const row=document.createElement('div');row.className='inv-item';
@@ -3058,13 +3069,18 @@ const Inventory = {
         let ts=`<select class="inv-type-select" data-inv-type="${i}">`;
         typeOpts.forEach(o=>ts+=`<option value="${o.v}"${item.type===o.v?' selected':''}>${o.l}</option>`);ts+='</select>';
         row.innerHTML=`${ts}<input type="text" class="inv-name-input" value="${esc(item.name)}" data-inv-name="${i}"><input type="number" class="inv-slots-input" value="${item.slots}" min="0" max="20" data-inv-slots="${i}"><button class="inv-action-btn inv-action-btn--mute" data-inv-up="${i}" ${isF?'disabled style="opacity:.2"':''}>↑</button><button class="inv-action-btn inv-action-btn--mute" data-inv-down="${i}" ${isL?'disabled style="opacity:.2"':''}>↓</button><button class="inv-action-btn inv-action-btn--edit" data-inv-edit="${i}">✎</button><button class="inv-action-btn" data-inv-del="${i}">×</button>`;
-        list.appendChild(row);
+        frag.appendChild(row);
       });
+      list.innerHTML='';list.appendChild(frag);
     }
     const sl=$('inv-summary-list');
     if(sl){
       if(!State.inventory.length){sl.innerHTML='<div style="font-style:italic;color:var(--muted);text-align:center;padding:8px">Mochila vacía.</div>';}
-      else{sl.innerHTML='';State.inventory.forEach(item=>{const r=document.createElement('div');r.className='inv-summary-row';r.innerHTML=`<span>${esc(item.name)}</span><span style="font-family:var(--fm);font-size:.82rem;color:var(--gold)">${item.slots}</span>`;sl.appendChild(r);});}
+      else{
+        const frag=document.createDocumentFragment();
+        State.inventory.forEach(item=>{const r=document.createElement('div');r.className='inv-summary-row';r.innerHTML=`<span>${esc(item.name)}</span><span style="font-family:var(--fm);font-size:.82rem;color:var(--gold)">${item.slots}</span>`;frag.appendChild(r);});
+        sl.innerHTML='';sl.appendChild(frag);
+      }
     }
     if($('gold-coins-display'))$('gold-coins-display').innerText=State.gold;
     const ge=$('gold-coins-edit');if(ge&&document.activeElement!==ge)ge.value=State.gold;
@@ -3108,7 +3124,11 @@ const Calc = {
     STATS.forEach(s=>final[s]=raw[s]+(desc?.mods?.[s]||0));
     const mods={};STATS.forEach(s=>mods[s]=getMod(final[s]));
     const arqKey=$('sel-archetype').value,arq=State.DB.archetypes?.[arqKey];
-    const lvl=parseInt($('char-level')?.value)||1;
+    const lvlRaw=parseInt($('char-level')?.value)||1;
+    const lvl=Math.max(1,Math.min(10,lvlRaw));
+    if($('char-level')&&lvlRaw!==lvl)$('char-level').value=lvl;
+    const xpRaw=parseInt($('char-xp')?.value)||0;
+    if($('char-xp')&&xpRaw<0)$('char-xp').value=0;
     this._updateXpHint(lvl);
     const prof=lvl>=9?5:lvl>=7?4:lvl>=5?3:2;
     const pvBase=(arq?.pv||6)+final.CON;
@@ -3173,11 +3193,17 @@ const Calc = {
     const bd=wd.dmg||'1d4';if(de)de.innerText=bd+ds;
     State.weaponDmgData[n-1]={formula:dm!==0?`${bd}${dm>=0?'+':''}${dm}`:bd,name:wd.name};
     let alert='';
-    if(wd.req_FUE>0&&(parseInt($('base-FUE')?.value)||8)<wd.req_FUE)alert=`⚠ Requiere FUE ${wd.req_FUE}`;
-    if(wd.req_DES>0&&(parseInt($('base-DES')?.value)||8)<wd.req_DES)alert+=`${alert?' · ':''}⚠ Requiere DES ${wd.req_DES}`;
+    if(wd.req_FUE>0&&(mods.FUE!==undefined?(((parseInt($('base-FUE')?.value)||8)+(State.DB.descriptors?.[$('sel-descriptor')?.value]?.mods?.FUE||0))):8)<wd.req_FUE)alert=`⚠ Requiere FUE ${wd.req_FUE}`;
+    if(wd.req_DES>0&&(mods.DES!==undefined?(((parseInt($('base-DES')?.value)||8)+(State.DB.descriptors?.[$('sel-descriptor')?.value]?.mods?.DES||0))):8)<wd.req_DES)alert+=`${alert?' · ':''}⚠ Requiere DES ${wd.req_DES}`;
     if(al)al.innerText=alert;
   },
-  _calcLoad:()=>({current:State.inventory.reduce((s,i)=>s+(i.slots||0),0),max:(parseInt($('base-FUE')?.value)||8)+4})
+  _calcLoad(){
+    const rawFUE = parseInt($('base-FUE')?.value)||8;
+    const descKey = $('sel-descriptor')?.value;
+    const desc = State.DB.descriptors?.[descKey];
+    const finalFUE = rawFUE + (desc?.mods?.FUE || 0);
+    return {current:State.inventory.reduce((s,i)=>s+(i.slots||0),0), max: finalFUE + 4};
+  }
 };
 
 /* ═══════════════════════════════════════════════════════════
@@ -3189,23 +3215,25 @@ const UI = {
   setAlignment(a){State.alignment=a;$$('.align-option').forEach(b=>b.classList.toggle('active',b.dataset.align===a));},
   buildStatBoxes(){
     [['stats-live-display'],['stats-summary-boxes']].forEach(([id])=>{
-      const c=$(id);if(!c)return;c.innerHTML='';
+      const c=$(id);if(!c)return;
+      const frag=document.createDocumentFragment();
       STATS.forEach(s=>{const raw=parseInt($(`base-${s}`)?.value)||8,mod=getMod(raw),box=document.createElement('div');
         box.className='stat-box';box.innerHTML=`<div class="stat-box__lbl">${s}</div><div class="stat-box__mod">${modStr(mod)}</div><div class="stat-box__val">${raw}</div>`;
-        box.addEventListener('click',()=>Dice.rollCheck(s,mod));c.appendChild(box);});
-    });
+        box.addEventListener('click',()=>Dice.rollCheck(s,mod));frag.appendChild(box);});
+      c.innerHTML='';c.appendChild(frag);});
   },
   buildSaveBoxes(){
     const common=document.querySelector('input[name="save-common"]:checked')?.value;
     const uncommon=document.querySelector('input[name="save-uncommon"]:checked')?.value;
     const prof=parseInt($('res-proficiency')?.innerText)||2;
     ['saves-live-display','saves-summary-boxes'].forEach(id=>{
-      const c=$(id);if(!c)return;c.innerHTML='';
+      const c=$(id);if(!c)return;
+      const frag=document.createDocumentFragment();
       STATS.forEach(s=>{const raw=parseInt($(`base-${s}`)?.value)||8,base=getMod(raw),ip=s===common||s===uncommon,total=base+(ip?prof:0);
         const box=document.createElement('div');box.className=`save-box${ip?' save-box--prof':''}`;
         box.innerHTML=`<span class="save-box__label">${s}</span>${modStr(total)}`;
-        box.addEventListener('click',()=>Dice.rollCheck(`Salvación ${s}`,total));c.appendChild(box);});
-    });
+        box.addEventListener('click',()=>Dice.rollCheck(`Salvación ${s}`,total));frag.appendChild(box);});
+      c.innerHTML='';c.appendChild(frag);});
   },
   buildTraitsList(){
     const tl=$('traits-list');if(!tl)return;tl.innerHTML='';
@@ -3321,12 +3349,15 @@ const TalentManager = {
 
   open() {
     if (!State.DB.talents) return;
-    $('talent-modal').showModal();
+    State._talentOpener = document.activeElement;
+    const dlg = $('talent-modal');
+    dlg.showModal();
     const keys = Object.keys(State.DB.talents);
     const activeKey = State.activeTalentCat || keys[0];
     if (activeKey) {
       const btn = document.querySelector(`#tm-categories .category-btn[data-cat="${activeKey}"]`);
       this.showCategory(activeKey, btn);
+      if (btn) btn.focus();
     }
     this.updateCount();
   },
@@ -3336,6 +3367,7 @@ const TalentManager = {
     this.buildSummary();
     this.updateCount();
     Calc.run();
+    State._talentOpener?.focus();
   },
 
   showCategory(key, btn) {
@@ -3443,14 +3475,19 @@ const TalentManager = {
 const AptManager = {
   open(sec) {
     State.aptMode = sec;
+    State._aptOpener = document.activeElement;
     $('apt-manager-title').innerText = sec === 'tricks' ? 'Gestor de Trucos' : 'Gestor de Conjuros';
     this._render();
-    $('apt-manager-modal').showModal();
+    const dlg = $('apt-manager-modal');
+    dlg.showModal();
+    const first = dlg.querySelector('button,input,select,textarea,[tabindex]:not([tabindex="-1"])');
+    if (first) first.focus();
   },
 
   close() {
     $('apt-manager-modal').close();
     this._renderSummary(State.aptMode);
+    State._aptOpener?.focus();
   },
 
   _isTrick: s => s.type === 'trick' || (s.cost && String(s.cost).toLowerCase().includes('adr')),
@@ -3551,9 +3588,13 @@ const AptManager = {
 ═══════════════════════════════════════════════════════════ */
 const DBEditor = {
   open() {
+    State._dbEditorOpener = document.activeElement;
     $('settings-modal')?.close();
-    $('db-editor-modal').showModal();
+    const dlg = $('db-editor-modal');
+    dlg.showModal();
     this.showCategory('descriptors');
+    const first = dlg.querySelector('button,[tabindex]:not([tabindex="-1"])');
+    if (first) first.focus();
   },
 
   showCategory(cat) {
@@ -4045,7 +4086,7 @@ const Persist = {
       const el = item.id ? $(item.id) : document.querySelector(`input[name="${item.name}"][value="${item.value}"]`);
       if (el) el.checked = true;
     });
-    data.hidden_talents?.forEach(t => {
+    data.hidden_talents?.slice(0, 3).forEach(t => {
       const h = document.createElement('input');
       h.type = 'hidden'; h.name = 'hidden-talents'; h.value = t.value;
       h.dataset.desc = t.desc || ''; if (t.id) h.dataset.id = t.id;
@@ -4100,14 +4141,23 @@ const Persist = {
     reader.onload = e => {
       try {
         const data = JSON.parse(e.target.result);
-        if (typeof data !== 'object' || !data.inputs) throw new Error('Formato inválido');
+        if (typeof data !== 'object' || data === null) throw new Error('El archivo no es un objeto JSON válido');
+        if (!data.inputs || typeof data.inputs !== 'object') throw new Error('Falta el campo "inputs" o es inválido');
+        // Normalize arrays defensively
+        if (!Array.isArray(data.inventory))     data.inventory = [];
+        if (!Array.isArray(data.checks))        data.checks = [];
+        if (!Array.isArray(data.hidden_talents))data.hidden_talents = [];
+        if (!Array.isArray(data.apt_tricks))    data.apt_tricks = [];
+        if (!Array.isArray(data.apt_spells))    data.apt_spells = [];
+        data.gold     = typeof data.gold     === 'number' ? data.gold     : 0;
+        data.lethality= [1,2,3].includes(data.lethality) ? data.lethality : 1;
         App.clearCharData();
         App.showScreen('app');
         App.unlockApp();
         this.applyCharData(data);
         App.goToPage(0);
         Toast.show('Personaje importado');
-      } catch (err) { Toast.show(err.message || 'JSON inválido', 'Error'); }
+      } catch (err) { Toast.show((err.message || 'JSON inválido') + '. Revisa el archivo.', 'Error'); }
     };
     reader.readAsText(input.files[0]); input.value = '';
   },
@@ -4118,10 +4168,15 @@ const Persist = {
     reader.onload = e => {
       try {
         const rules = JSON.parse(e.target.result);
-        if (!rules.descriptors && !rules.archetypes) throw new Error('Invalid format');
+        if (typeof rules !== 'object' || rules === null) throw new Error('No es un objeto JSON válido');
+        if (!rules.descriptors && !rules.archetypes) throw new Error('Faltan campos "descriptors" y "archetypes"');
+        // Ensure all expected keys exist
+        ['descriptors','archetypes','backgrounds','talents','weapons','armors','shields','spells','misc'].forEach(k => {
+          if (!rules[k]) rules[k] = (k === 'talents') ? {} : (k === 'spells' || k === 'misc') ? {} : {};
+        });
         State.DB = rules; this.saveRules();
         App.unlockApp(); Toast.show('Reglas cargadas', 'Sistema');
-      } catch { Toast.show('Formato JSON inválido', 'Error'); }
+      } catch(err) { Toast.show((err.message||'Formato JSON inválido') + '. Revisa el archivo.', 'Error'); }
     };
     reader.readAsText(input.files[0]); input.value = '';
   }
@@ -4493,10 +4548,10 @@ const App = {
 
     // Random inventory
     const wEntries = Object.entries(State.DB.weapons||{}), aEntries = Object.entries(State.DB.armors||{}).filter(([k]) => k !== 'ninguna');
-    if (aEntries.length) { const [k,v] = aEntries[Math.floor(Math.random()*aEntries.length)]; State.inventory.push({uid:Date.now()+1,name:v.name,slots:v.slots||1,type:'armors',dbKey:k,dbData:v}); }
-    if (wEntries.length) { const [k,v] = wEntries[Math.floor(Math.random()*wEntries.length)]; State.inventory.push({uid:Date.now()+2,name:v.name,slots:v.slots||1,type:'weapons',dbKey:k,dbData:v}); }
-    State.inventory.push({uid:Date.now()+3,name:'Raciones (3)',slots:1,type:'misc'});
-    State.inventory.push({uid:Date.now()+4,name:'Antorchas (5)',slots:1,type:'misc'});
+    if (aEntries.length) { const [k,v] = aEntries[Math.floor(Math.random()*aEntries.length)]; State.inventory.push({uid:nextUid(),name:v.name,slots:v.slots||1,type:'armors',dbKey:k,dbData:v}); }
+    if (wEntries.length) { const [k,v] = wEntries[Math.floor(Math.random()*wEntries.length)]; State.inventory.push({uid:nextUid(),name:v.name,slots:v.slots||1,type:'weapons',dbKey:k,dbData:v}); }
+    State.inventory.push({uid:nextUid(),name:'Raciones (3)',slots:1,type:'misc'});
+    State.inventory.push({uid:nextUid(),name:'Antorchas (5)',slots:1,type:'misc'});
     State.gold = Math.floor(Math.random()*20)+10;
     Combat.syncEquipDropdowns();
 
@@ -4666,9 +4721,13 @@ const App = {
       if (t.id === 'inv-db-category') { Inventory.updateDbCategorySelect(); return; }
     });
 
-    // ── Input events (live calc) ──
+    // ── Input events (live calc, debounced) ──
+    let _calcDebounce = null;
     document.addEventListener('input', e => {
-      if (e.target.matches('[id^="base-"]')) Calc.run();
+      if (e.target.matches('[id^="base-"]')) {
+        clearTimeout(_calcDebounce);
+        _calcDebounce = setTimeout(() => Calc.run(), 80);
+      }
     });
 
     // ── Inventory button delegates ──
@@ -4705,7 +4764,7 @@ const App = {
     $('settings-open-db')?.addEventListener('click',  () => DBEditor.open());
     $('settings-save')?.addEventListener('click',     () => { Persist.saveChar(); $('settings-modal').close(); });
     $('settings-export')?.addEventListener('click',   () => Persist.exportJSON());
-    $('db-editor-close')?.addEventListener('click',   () => $('db-editor-modal').close());
+    $('db-editor-close')?.addEventListener('click',   () => { $('db-editor-modal').close(); State._dbEditorOpener?.focus(); });
     $('btn-export-rules')?.addEventListener('click',  () => DBEditor.exportRules());
     $('btn-open-talent-manager')?.addEventListener('click', () => TalentManager.open());
     $('talent-modal-close')?.addEventListener('click',() => TalentManager.close());
@@ -4742,12 +4801,16 @@ const App = {
     $('crop-workspace')?.addEventListener('touchstart', e => Crop.onDragStart(e), { passive: false });
     $('crop-workspace')?.addEventListener('wheel', e => Crop.onWheel(e), { passive: false });
 
-    // ── Escape key to close speed dial ──
+    // ── Escape key to close speed dial + restore focus on dialog cancel ──
     document.addEventListener('keydown', e => {
       if (e.key !== 'Escape') return;
       const menu = $('speed-dial-menu'), trigger = $('speed-dial-trigger');
       if (menu?.classList.contains('open')) { menu.classList.remove('open'); trigger?.classList.remove('open'); App._dialOpen = false; }
     });
+    // Restore focus when dialogs are closed via Escape
+    $('talent-modal')?.addEventListener('cancel', () => { State._talentOpener?.focus(); });
+    $('apt-manager-modal')?.addEventListener('cancel', () => { State._aptOpener?.focus(); });
+    $('db-editor-modal')?.addEventListener('cancel', () => { State._dbEditorOpener?.focus(); });
   }
 };
 
