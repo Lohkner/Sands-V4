@@ -1607,8 +1607,12 @@ const app = {
 
   /* ── INIT ── */
   init() {
-    // Load rules via STORAGE module — deep clone to avoid mutation of DEFAULT_DB
-    this.DB = STORAGE.loadRules();
+    // Load rules — fallback to DEFAULT_DB if storage is corrupt
+    try {
+      this.DB = STORAGE.loadRules();
+    } catch(e) {
+      this.DB = JSON.parse(JSON.stringify(DEFAULT_DB));
+    }
     // Build home screen
     this.renderHome();
     // Setup alignment for app
@@ -4209,25 +4213,43 @@ return function(…args) { clearTimeout(timer); timer = setTimeout(() => fn.appl
 
 };
 
-window.onload = () => app.init();
-
-// ── Service Worker (PWA offline support)
-if (‘serviceWorker’ in navigator) {
-window.addEventListener(‘load’, () => {
-navigator.serviceWorker.register(‘sw.js’).catch(() => {});
-});
-}
-
-// ── Loader dismiss
-(function(){
-function dismiss(){
-const l=document.getElementById(‘ss-loader’);
-if(!l)return;
+// ── Boot sequence ──────────────────────────────────────────
+// Single entry point. Uses addEventListener (not assignment) so it
+// never conflicts with other listeners and never misses an already-
+// fired ‘load’ event (readyState guard handles that case).
+(function boot() {
+function dismissLoader() {
+const l = document.getElementById(‘ss-loader’);
+if (!l) return;
 l.classList.add(‘fade-out’);
-setTimeout(()=>{if(l.parentNode)l.parentNode.removeChild(l);},520);
+setTimeout(() => { if (l.parentNode) l.parentNode.removeChild(l); }, 520);
 }
-if(document.readyState===‘complete’){setTimeout(dismiss,500);}
-else{window.addEventListener(‘load’,()=>setTimeout(dismiss,400));}
+
+function startApp() {
+try {
+app.init();
+} catch(err) {
+console.error(‘S&S init error:’, err);
+}
+// Dismiss loader after init — short delay so first paint is ready
+setTimeout(dismissLoader, 300);
+}
+
+// Register SW independently (non-blocking, no relation to app init)
+if (‘serviceWorker’ in navigator) {
+navigator.serviceWorker.register(‘sw.js’).catch(() => {});
+}
+
+// Fire startApp as soon as DOM + resources are ready
+if (document.readyState === ‘complete’) {
+// Already loaded (e.g. script at bottom of body, cached page)
+setTimeout(startApp, 0);
+} else {
+window.addEventListener(‘load’, startApp, { once: true });
+}
+
+// Safety net: if something hangs, dismiss loader after 5s regardless
+setTimeout(dismissLoader, 5000);
 })();
 </script>
 
