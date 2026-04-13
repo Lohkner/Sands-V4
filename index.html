@@ -200,7 +200,7 @@ input[type=radio]:checked::after{transform:scale(1)}
 .res-box-ing{background:rgba(74,158,202,.08);border:1px solid rgba(74,158,202,.3)}
 .res-lbl{font-family:var(--fd);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;font-weight:700;opacity:.95}
 .res-lbl-pv{color:var(--blood)}.res-lbl-adr{color:var(--sage)}.res-lbl-ing{color:var(--ice)}
-.res-ctrl{display:flex;align-items:center;justify-content:center;gap:3px;font-weight:700;font-size:1rem}
+.res-ctrl{display:flex;align-items:center;justify-content:center;gap:4px;font-weight:700;font-size:1rem}
 .res-ctrl-pv{font-family:var(--fd);color:var(--blood)}.res-ctrl-adr,.res-ctrl-ing{font-family:var(--fm);font-weight:600;color:var(--sage)}
 .res-ctrl-ing{color:var(--ice)}
 .res-fin{color:var(--bright);width:5ch;max-width:5ch;text-align:center;font-size:.9rem;font-weight:600}
@@ -509,12 +509,12 @@ details>summary::before{content:'▸';color:var(--gold);font-size:.56rem;transit
 /* ══ RESPONSIVE ══ */
 .char-lvl-badge{display:inline-block;font-family:var(--fm);font-size:.58rem;color:var(--dim);background:var(--raised);border:1px solid var(--border);border-radius:10px;padding:1px 6px;letter-spacing:.06em}
 /* ══ RESOURCE CONTROLS ══ */
-.res-btn-carne{border-color:rgba(160,104,58,.55);color:#a0683a}.res-btn-carne:hover{background:rgba(160,104,58,.22);border-color:#a0683a}
-.res-btn{width:28px;height:28px;border-radius:50%;border:1px solid;background:transparent;cursor:pointer;font-size:1rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;transition:background .12s,border-color .12s,transform .08s;flex-shrink:0;line-height:1;padding:0;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-.res-btn:active{transform:scale(.78)}
-.res-btn-pv{border-color:rgba(176,48,64,.45);color:var(--blood)}.res-btn-pv:hover{background:rgba(176,48,64,.2);border-color:var(--blood)}
-.res-btn-adr{border-color:rgba(76,175,125,.45);color:var(--sage)}.res-btn-adr:hover{background:rgba(76,175,125,.2);border-color:var(--sage)}
-.res-btn-ing{border-color:rgba(74,158,202,.45);color:var(--ice)}.res-btn-ing:hover{background:rgba(74,158,202,.2);border-color:var(--ice)}
+.res-btn-carne{border-color:rgba(160,104,58,.35);color:rgba(160,104,58,.7)}.res-btn-carne:hover{background:rgba(160,104,58,.15);border-color:#a0683a;color:#a0683a;box-shadow:0 0 0 1px rgba(160,104,58,.2)}
+.res-btn{width:24px;height:32px;border-radius:6px;border:1px solid;background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:background .12s,border-color .12s,transform .08s,box-shadow .12s;flex-shrink:0;padding:0;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.res-btn:active{transform:scale(.82)}
+.res-btn-pv{border-color:rgba(176,48,64,.35);color:rgba(176,48,64,.7)}.res-btn-pv:hover{background:rgba(176,48,64,.15);border-color:var(--blood);color:var(--blood);box-shadow:0 0 0 1px rgba(176,48,64,.2)}
+.res-btn-adr{border-color:rgba(76,175,125,.35);color:rgba(76,175,125,.7)}.res-btn-adr:hover{background:rgba(76,175,125,.15);border-color:var(--sage);color:var(--sage);box-shadow:0 0 0 1px rgba(76,175,125,.2)}
+.res-btn-ing{border-color:rgba(74,158,202,.35);color:rgba(74,158,202,.7)}.res-btn-ing:hover{background:rgba(74,158,202,.15);border-color:var(--ice);color:var(--ice);box-shadow:0 0 0 1px rgba(74,158,202,.2)}
 /* ══ UTILITY BADGES ══ */
 .pill-badge{display:inline-flex;align-items:center;gap:3px;font-family:var(--fm);font-size:.66rem;color:var(--muted);margin-left:auto;background:var(--raised);border:1px solid var(--border);border-radius:20px;padding:2px 9px}
 .leth-sub{font-family:var(--fm);font-size:.58rem;color:var(--muted);margin-top:2px}
@@ -739,27 +739,27 @@ input:focus-visible,textarea:focus-visible{outline:none}
               <div class="res-box res-box-pv">
                 <div class="res-lbl res-lbl-pv">PV</div>
                 <div class="res-ctrl res-ctrl-pv">
-                  <button class="res-btn res-btn-pv" onclick="app.adjustRes('cur_pv','max_pv',-1)" aria-label="Reducir puntos de vida">−</button>
+                  <button class="res-btn res-btn-pv" onclick="app.adjustRes('cur_pv','max_pv',-1)" aria-label="Reducir puntos de vida"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
                   <input type="text" inputmode="numeric" id="cur_pv" value="0" class="fin res-fin">
-                  <button class="res-btn res-btn-pv" onclick="app.adjustRes('cur_pv','max_pv',1)" aria-label="Aumentar puntos de vida">+</button>
+                  <button class="res-btn res-btn-pv" onclick="app.adjustRes('cur_pv','max_pv',1)" aria-label="Aumentar puntos de vida"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="2" x2="5" y2="8"/><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
                 </div>
                 <div class="res-max res-max-pv">/ <span id="max_pv">0</span></div>
               </div>
               <div class="res-box res-box-adr">
                 <div class="res-lbl res-lbl-adr">Adrenalina</div>
                 <div class="res-ctrl res-ctrl-adr">
-                  <button class="res-btn res-btn-adr" onclick="app.adjustRes('cur_adr','max_adr',-1)" aria-label="Reducir adrenalina">−</button>
+                  <button class="res-btn res-btn-adr" onclick="app.adjustRes('cur_adr','max_adr',-1)" aria-label="Reducir adrenalina"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
                   <input type="text" inputmode="numeric" id="cur_adr" value="0" class="fin res-fin">
-                  <button class="res-btn res-btn-adr" onclick="app.adjustRes('cur_adr','max_adr',1)" aria-label="Aumentar adrenalina">+</button>
+                  <button class="res-btn res-btn-adr" onclick="app.adjustRes('cur_adr','max_adr',1)" aria-label="Aumentar adrenalina"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="2" x2="5" y2="8"/><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
                 </div>
                 <div class="res-max res-max-adr">/ <span id="max_adr">0</span></div>
               </div>
               <div class="res-box res-box-ing">
                 <div class="res-lbl res-lbl-ing">Ingenio</div>
                 <div class="res-ctrl res-ctrl-ing">
-                  <button class="res-btn res-btn-ing" onclick="app.adjustRes('cur_ing','max_ing',-1)" aria-label="Reducir ingenio">−</button>
+                  <button class="res-btn res-btn-ing" onclick="app.adjustRes('cur_ing','max_ing',-1)" aria-label="Reducir ingenio"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
                   <input type="text" inputmode="numeric" id="cur_ing" value="0" class="fin res-fin">
-                  <button class="res-btn res-btn-ing" onclick="app.adjustRes('cur_ing','max_ing',1)" aria-label="Aumentar ingenio">+</button>
+                  <button class="res-btn res-btn-ing" onclick="app.adjustRes('cur_ing','max_ing',1)" aria-label="Aumentar ingenio"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="2" x2="5" y2="8"/><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
                 </div>
                 <div class="res-max res-max-ing">/ <span id="max_ing">0</span></div>
               </div>
@@ -785,9 +785,9 @@ input:focus-visible,textarea:focus-visible{outline:none}
               <div class="sc" style="padding:4px 3px">
                 <div class="sc-lbl" style="color:#a0683a">Carne</div>
                 <div style="display:flex;align-items:center;justify-content:center;gap:3px;font-family:var(--fm);font-weight:600;font-size:.92rem;">
-                  <button class="res-btn res-btn-carne" onclick="app.adjustRes('cur_carne','res_carne',-1)" aria-label="Reducir daño de carne">−</button>
+                  <button class="res-btn res-btn-carne" onclick="app.adjustRes('cur_carne','res_carne',-1)" aria-label="Reducir daño de carne"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
                   <input type="text" inputmode="numeric" id="cur_carne" value="0" class="fin" style="color:var(--bright);width:5ch;max-width:5ch;text-align:center;font-size:.88rem">
-                  <button class="res-btn res-btn-carne" onclick="app.adjustRes('cur_carne','res_carne',1)" aria-label="Aumentar daño de carne">+</button>
+                  <button class="res-btn res-btn-carne" onclick="app.adjustRes('cur_carne','res_carne',1)" aria-label="Aumentar daño de carne"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="2" x2="5" y2="8"/><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
                 </div>
                 <div style="font-family:var(--fm);font-size:.58rem;color:rgba(160,104,58,.8);margin-top:1px">/ <span id="res_carne">0</span></div>
               </div>
