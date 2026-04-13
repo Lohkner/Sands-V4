@@ -205,8 +205,7 @@ input[type=radio]:checked::after{transform:scale(1)}
 .res-lbl{font-family:var(--fd);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;font-weight:700;opacity:.95}
 .res-lbl-pv{color:var(--blood)}.res-lbl-adr{color:var(--sage)}.res-lbl-ing{color:var(--ice)}
 .res-ctrl{display:flex;align-items:center;justify-content:center;gap:4px;font-weight:700;font-size:1rem}
-.res-ctrl-pv{font-family:var(--fd);color:var(--blood)}.res-ctrl-adr,.res-ctrl-ing{font-family:var(--fm);font-weight:600;color:var(--sage)}
-.res-ctrl-ing{color:var(--ice)}
+.res-ctrl-pv{font-family:var(--fd);color:var(--blood)}.res-ctrl-adr{font-family:var(--fm);font-weight:600;color:var(--sage)}.res-ctrl-ing{font-family:var(--fm);font-weight:600;color:var(--ice)}
 .res-fin{color:var(--bright);width:5ch;max-width:5ch;text-align:center;font-size:.9rem;font-weight:600}
 .res-max{font-family:var(--fm);font-size:.58rem;margin-top:1px}
 .res-max-pv{color:rgba(176,48,64,.7)}.res-max-adr{color:rgba(76,175,125,.6)}.res-max-ing{color:rgba(74,158,202,.6)}
@@ -264,7 +263,7 @@ input[type=radio]:checked::after{transform:scale(1)}
 .ibadge{display:inline-flex;align-items:center;gap:4px;font-family:var(--fd);font-size:.72rem;color:var(--gold);background:rgba(200,169,110,.07);border:1px solid rgba(200,169,110,.25);border-radius:20px;padding:3px 10px;margin:2px}
 .asel{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
 .aopt{padding:3px 8px;border:1px solid var(--border);border-radius:20px;font-family:var(--fm);font-size:.67rem;color:var(--dim);cursor:pointer;transition:all .15s;background:transparent}
-.aopt:hover,.aopt.active{border-color:var(--gold);color:var(--gold);background:rgba(200,169,110,.08)}.aopt.active{box-shadow:0 0 0 1px rgba(200,169,110,.2)}
+.aopt:hover,.aopt.active{border-color:var(--gold);color:var(--gold);background:rgba(200,169,110,.08)}.aopt.active{box-shadow:0 0 0 1px rgba(200,169,110,.2);background:rgba(200,169,110,.1)}
 .tbadge{font-family:var(--fm);font-size:.68rem;color:var(--ice);background:rgba(74,158,202,.1);border:1px solid rgba(74,158,202,.3);border-radius:20px;padding:2px 8px}
 /* ══ DETAIL CARDS ══ */
 .dc{background:var(--raised);border:1px solid var(--rim);border-radius:var(--r);margin-bottom:5px;overflow:hidden;transition:border-color .15s}
@@ -476,6 +475,7 @@ input[type=range]{flex:1;accent-color:var(--gold);cursor:pointer;min-width:0;hei
 .t-icon.gold{color:var(--gold)}
 .t-icon.err{color:var(--ember)}
 .t-icon.ok{color:var(--sage)}
+.t-icon.dim{color:var(--muted)}
 .t-msg{flex:1;line-height:1.35}
 @keyframes slideUp{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
 /* ══ DICE ROLL OVERLAY ══ */
@@ -672,7 +672,7 @@ input:focus-visible,textarea:focus-visible{outline:none}
         <span class="app-hdr-ttl">Stars &amp; Sorcery</span>
         <div class="last-saved" id="last_saved_lbl"></div>
       </div>
-      <button class="app-hdr-save" onclick="app.saveChar()" aria-label="Guardar personaje" title="Guardar (Ctrl+S)">💾 Guardar</button>
+      <button class="app-hdr-save" onclick="app.saveChar()" aria-label="Guardar personaje" title="Guardar">Guardar</button>
       <div class="sdial" id="sdial">
         <button class="sdial-btn" onclick="app.toggleDial()" title="Acciones" aria-label="Abrir menú de acciones" aria-expanded="false" id="sdial_btn">⚙</button>
         <div class="sdial-menu" id="sdial_menu">
@@ -760,7 +760,7 @@ input:focus-visible,textarea:focus-visible{outline:none}
                 <div class="res-lbl res-lbl-pv">PV</div>
                 <div class="res-ctrl res-ctrl-pv">
                   <button class="res-btn res-btn-pv" onclick="app.adjustRes('cur_pv','max_pv',-1)" aria-label="Reducir puntos de vida"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
-                  <input type="text" inputmode="numeric" id="cur_pv" value="0" class="fin res-fin">
+                  <input type="text" inputmode="numeric" id="cur_pv" value="0" class="fin res-fin" aria-label="Puntos de vida actuales" inputmode="numeric">
                   <button class="res-btn res-btn-pv" onclick="app.adjustRes('cur_pv','max_pv',1)" aria-label="Aumentar puntos de vida"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="2" x2="5" y2="8"/><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
                 </div>
                 <div class="res-max res-max-pv">/ <span id="max_pv">0</span></div>
@@ -769,7 +769,7 @@ input:focus-visible,textarea:focus-visible{outline:none}
                 <div class="res-lbl res-lbl-adr">Adrenalina</div>
                 <div class="res-ctrl res-ctrl-adr">
                   <button class="res-btn res-btn-adr" onclick="app.adjustRes('cur_adr','max_adr',-1)" aria-label="Reducir adrenalina"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
-                  <input type="text" inputmode="numeric" id="cur_adr" value="0" class="fin res-fin">
+                  <input type="text" inputmode="numeric" id="cur_adr" value="0" class="fin res-fin" aria-label="Adrenalina actual" inputmode="numeric">
                   <button class="res-btn res-btn-adr" onclick="app.adjustRes('cur_adr','max_adr',1)" aria-label="Aumentar adrenalina"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="2" x2="5" y2="8"/><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
                 </div>
                 <div class="res-max res-max-adr">/ <span id="max_adr">0</span></div>
@@ -778,7 +778,7 @@ input:focus-visible,textarea:focus-visible{outline:none}
                 <div class="res-lbl res-lbl-ing">Ingenio</div>
                 <div class="res-ctrl res-ctrl-ing">
                   <button class="res-btn res-btn-ing" onclick="app.adjustRes('cur_ing','max_ing',-1)" aria-label="Reducir ingenio"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
-                  <input type="text" inputmode="numeric" id="cur_ing" value="0" class="fin res-fin">
+                  <input type="text" inputmode="numeric" id="cur_ing" value="0" class="fin res-fin" aria-label="Ingenio actual" inputmode="numeric">
                   <button class="res-btn res-btn-ing" onclick="app.adjustRes('cur_ing','max_ing',1)" aria-label="Aumentar ingenio"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="2" x2="5" y2="8"/><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
                 </div>
                 <div class="res-max res-max-ing">/ <span id="max_ing">0</span></div>
@@ -791,7 +791,7 @@ input:focus-visible,textarea:focus-visible{outline:none}
                 <div style="font-family:var(--fd);font-size:.95rem;color:var(--gold);font-weight:700"><span id="res_ca">10</span></div>
                 <div style="font-family:var(--fm);font-size:.42rem;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="res_ca_armor">—</div>
               </div>
-              <div class="sc-clickable" onclick="app.rollCheck('Iniciativa', parseInt(document.getElementById('res_ini').innerText) || 0)">
+              <div class="sc-clickable" onclick="app.rollCheck('Iniciativa', parseInt(document.getElementById('res_ini').textContent) || 0)">
                 <div class="sc-lbl" style="color:var(--muted)">Ini</div>
                 <div style="font-family:var(--fd);font-size:.95rem;color:var(--bright);font-weight:700"><span id="res_ini">+0</span></div>
               </div>
@@ -1707,8 +1707,6 @@ const app = {
     const ws = document.getElementById('crop_ws');
     if (ws) ws.addEventListener('wheel', e => this._cropWheel(e), {passive:false});
     this._restoreFontSize();
-    // Debounce calc to avoid thrashing on rapid input changes
-    this._calcDebounced = this._debounce(this.calc.bind(this), 60);
     // Long-press repeat on resource +/- buttons
     this._initResLongPress();
   },
@@ -1721,23 +1719,14 @@ const app = {
 
   goHome() {
     const name = document.getElementById('char_name')?.value?.trim();
-    if (name) {
-      // Check if there is a saved version to compare against
-      const roster = STORAGE.loadRoster();
-      if (roster[name]) {
-        // Character exists — go home directly (already saved at some point)
-        this.renderHome();
-        this.showScreen('home');
-      } else {
-        // New unsaved character — warn
-        this._confirm('¿Salir sin guardar?', `"${this._esc(name)}" no ha sido guardado. Se perderán los datos.`, '✓ Salir', () => {
-          this.renderHome();
-          this.showScreen('home');
-        });
-      }
+    const lbl  = document.getElementById('last_saved_lbl');
+    const hasUnsaved = lbl?.classList.contains('unsaved');
+    if (name && hasUnsaved) {
+      this._confirm('¿Salir sin guardar?', `"${this._esc(name)}" tiene cambios sin guardar. Se perderán.`, '✓ Salir', () => {
+        this.renderHome(); this.showScreen('home');
+      });
     } else {
-      this.renderHome();
-      this.showScreen('home');
+      this.renderHome(); this.showScreen('home');
     }
   },
 
@@ -1935,16 +1924,27 @@ const app = {
   _confirm(title, body, confirmLabel, onConfirm) {
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
-    overlay.innerHTML = `<div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--rl);padding:20px;max-width:300px;width:100%;text-align:center">
-      <div style="font-family:var(--fd);color:var(--gold);font-size:.9rem;letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px">${title}</div>
-      <div style="font-size:.82rem;color:var(--muted);margin-bottom:16px">${body}</div>
-      <div style="display:flex;gap:8px">
-        <button id="_conf_cancel" class="btn btn-g" style="flex:1">Cancelar</button>
-        <button id="_conf_ok" class="btn btn-p" style="flex:1">${confirmLabel}</button>
-      </div></div>`;
+    // Build via DOM (no innerHTML) to prevent XSS from user-controlled title/body
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--panel);border:1px solid var(--border);border-radius:var(--rl);padding:20px;max-width:300px;width:100%;text-align:center';
+    const tEl = document.createElement('div');
+    tEl.style.cssText = 'font-family:var(--fd);color:var(--gold);font-size:.9rem;letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px';
+    tEl.textContent = title;
+    const bEl = document.createElement('div');
+    bEl.style.cssText = 'font-size:.82rem;color:var(--muted);margin-bottom:16px';
+    bEl.textContent = body;
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:8px';
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'btn btn-g'; cancelBtn.style.flex = '1'; cancelBtn.textContent = 'Cancelar';
+    const okBtn = document.createElement('button');
+    okBtn.className = 'btn btn-p'; okBtn.style.flex = '1'; okBtn.textContent = confirmLabel;
+    btnRow.appendChild(cancelBtn); btnRow.appendChild(okBtn);
+    card.appendChild(tEl); card.appendChild(bEl); card.appendChild(btnRow);
+    overlay.appendChild(card);
     document.body.appendChild(overlay);
-    overlay.querySelector('#_conf_cancel').onclick = () => overlay.remove();
-    overlay.querySelector('#_conf_ok').onclick = () => { overlay.remove(); onConfirm(); };
+    cancelBtn.onclick = () => overlay.remove();
+    okBtn.onclick = () => { overlay.remove(); onConfirm(); };
   },
 
   deleteChar(name) {
@@ -2276,7 +2276,7 @@ const app = {
     unique.forEach(sk => {
       const t = document.createElement('span');
       t.className = 'stag';
-      t.innerText = sk;
+      t.textContent = sk;
       c.appendChild(t);
     });
   },
@@ -2331,9 +2331,6 @@ const app = {
     return Math.max(-3, Math.min(4, raw));
   },
 
-  getStatVal(stat) {
-    return parseInt(document.getElementById('base_'+stat)?.value) || 8;
-  },
 
   // Tabla de XP necesario para subir al siguiente nivel (acumulativo)
   // XP_TABLE is defined as a top-level constant
@@ -2359,7 +2356,7 @@ const app = {
     const c = document.getElementById('align_sel');
     ALIGNMENTS.forEach(a => {
       const btn = document.createElement('button');
-      btn.type = 'button'; btn.className = 'aopt'; btn.innerText = a;
+      btn.type = 'button'; btn.className = 'aopt'; btn.textContent = a;
       btn.onclick = () => {
         this.alignment = a;
         document.querySelectorAll('.aopt').forEach(b => b.classList.remove('active'));
@@ -2381,9 +2378,9 @@ const app = {
     const bg = this.DB.backgrounds?.[bgKey];
 
     // Info boxes
-    document.getElementById('desc_info').innerText = desc ? (desc.bonus||'') + (desc.grant?.length?' · '+desc.grant.join(', '):'') : '';
-    document.getElementById('arq_info').innerText = arq ? `PV base: ${arq.pv}+CON · Adr: FUE/DES+Niv+${arq.adr_bonus||0} · Ing: INT/SAB/CAR+Niv+${arq.ing_bonus||0} · Skills: ${arq.skills_count||2}` : '';
-    document.getElementById('bg_info').innerText = bg ? `Habilidades: ${bg.skills?.join(', ')||'—'}${bg.defecto?' · '+bg.defecto:''}` : '';
+    document.getElementById('desc_info').textContent = desc ? (desc.bonus||'') + (desc.grant?.length?' · '+desc.grant.join(', '):'') : '';
+    document.getElementById('arq_info').textContent = arq ? `PV base: ${arq.pv}+CON · Adr: FUE/DES+Niv+${arq.adr_bonus||0} · Ing: INT/SAB/CAR+Niv+${arq.ing_bonus||0} · Skills: ${arq.skills_count||2}` : '';
+    document.getElementById('bg_info').textContent = bg ? `Habilidades: ${bg.skills?.join(', ')||'—'}${bg.defecto?' · '+bg.defecto:''}` : '';
 
     // Filo select
     const filoSel = document.getElementById('sel_filo');
@@ -2392,7 +2389,7 @@ const app = {
     if (arq?.edges) {
       arq.edges.forEach(e => {
         const o = document.createElement('option');
-        o.value = e; o.innerText = e;
+        o.value = e; o.textContent = e;
         filoSel.appendChild(o);
       });
       if (arq.edges.includes(curFilo)) filoSel.value = curFilo;
@@ -2423,7 +2420,7 @@ const app = {
     const grants = [...(desc?.grant||[]), ...(bg?.grant||[])];
     grants.forEach(g => {
       const b = document.createElement('span');
-      b.className = 'tbadge'; b.innerText = '✦ '+g;
+      b.className = 'tbadge'; b.textContent = '✦ '+g;
       tl.appendChild(b);
     });
 
@@ -2490,28 +2487,28 @@ const app = {
     const hasTalent = (id) => !!document.querySelector(`input[name="chk_talents_hidden"][data-id="${id}"]`);
     if (hasTalent('despertar')) maxIng += 6;
 
-    $('max_pv').innerText = maxPv;
-    $('max_adr').innerText = Math.max(0, maxAdr);
-    $('max_ing').innerText = Math.max(0, maxIng);
-    $('res_prof').innerText = '+'+prof;
+    $('max_pv').textContent = maxPv;
+    $('max_adr').textContent = Math.max(0, maxAdr);
+    $('max_ing').textContent = Math.max(0, maxIng);
+    $('res_prof').textContent = '+'+prof;
 
     // Filo
     const filoVal = $('sel_filo').value;
-    $('res_filo_val').innerText = filoVal || '—';
+    $('res_filo_val').textContent = filoVal || '—';
 
     // Iniciativa
     let ini = mods.DES;
     if (hasTalent('alerta')) ini += 5;
-    $('res_ini').innerText = (ini>=0?'+':'')+ini;
+    $('res_ini').textContent = (ini>=0?'+':'')+ini;
 
     // Velocidad
     const spd = arq?.speed || 30;
-    $('res_vel').innerText = spd+' pies';
+    $('res_vel').textContent = spd+' pies';
 
     // Flesh/Carne = puntuación de CON (el número, no el modificador)
     const conScore = parseInt($('base_CON')?.value)||8;
     const carneVal = conScore + (desc?.mods?.CON||0);
-    $('res_carne').innerText = carneVal;
+    $('res_carne').textContent = carneVal;
 
     // CA
     const armorUID = $('sel_armor').value;
@@ -2551,15 +2548,15 @@ const app = {
     if (hasTalent('def_nat') && (armorType === 'none')) {
       caFinal = Math.max(caFinal, 10 + (mods.DES||0) + (mods.CON||0));
     }
-    $('res_ca').innerText = caFinal;
-    $('armor_base_val').innerText = caBase;
-    $('sum_ac').innerText = caFinal;
+    $('res_ca').textContent = caFinal;
+    $('armor_base_val').textContent = caBase;
+    $('sum_ac').textContent = caFinal;
     const caArmorEl = $('res_ca_armor');
-    if (caArmorEl) caArmorEl.innerText = armorData?.name || 'Sin armadura';
+    if (caArmorEl) caArmorEl.textContent = armorData?.name || 'Sin armadura';
 
     // Armor desc
     const adesc = $('armor_desc');
-    if (adesc) adesc.innerText = armorData ? `${armorData.name} · CA ${caBase} · ${({none:'Sin restricción',light:'Ligera',medium:'Media',heavy:'Pesada'}[armorType]||armorType)}` : '';
+    if (adesc) adesc.textContent = armorData ? `${armorData.name} · CA ${caBase} · ${({none:'Sin restricción',light:'Ligera',medium:'Media',heavy:'Pesada'}[armorType]||armorType)}` : '';
 
     // Weapons
     this._calcWeapon('w1', $('sel_weapon').value, $('w1_attr').value, $('w1_dmg_attr')?.value||'FUE', mods, prof, arq);
@@ -2573,22 +2570,22 @@ const app = {
       const sumDmgEl  = document.getElementById(`sum_atk${n}_dmg`);
       const srcAtk    = document.getElementById(`w${n}_atk_val`);
       const srcDmg    = document.getElementById(`w${n}_dmg_val`);
-      if (atkEl    && srcAtk) atkEl.innerText     = srcAtk.innerText;
-      if (dmgEl    && srcDmg) dmgEl.innerText     = srcDmg.innerText;
-      if (sumBonusEl && srcAtk) sumBonusEl.innerText = srcAtk.innerText.replace(/[^+\-\d]/g,'')||'+0';
-      if (sumDmgEl && srcDmg) sumDmgEl.innerText  = srcDmg.innerText;
+      if (atkEl    && srcAtk) atkEl.textContent = srcAtk.innerText;
+      if (dmgEl    && srcDmg) dmgEl.textContent = srcDmg.textContent;
+      if (sumBonusEl && srcAtk) sumBonusEl.textContent = srcAtk.textContent.replace(/[^+\-\d]/g,'')||'+0';
+      if (sumDmgEl && srcDmg) sumDmgEl.textContent = srcDmg.innerText;
     });
 
     // Encumbrance
     const inv = this.calcInventory();
-    $('res_carga').innerText = `${inv.current}/${inv.max}`;
+    $('res_carga').textContent = `${inv.current}/${inv.max}`;
     const pct = inv.max > 0 ? Math.min(100, (inv.current/inv.max)*100) : 0;
     $('carga_bar').style.width = pct+'%';
     $('carga_bar').style.background = pct > 100 ? 'var(--blood)' : '';
     const warn = $('carga_warn');
     warn.style.display = inv.current > inv.max ? 'block' : 'none';
     if ($('load_summary_display'))
-      $('load_summary_display').innerText = `${inv.current}/${inv.max}`;
+      $('load_summary_display').textContent = `${inv.current}/${inv.max}`;
 
     // Saves display (live)
     this._buildSavesSummary();
@@ -2606,24 +2603,24 @@ const app = {
     const alertEl = document.getElementById(`${wid}_alert`);
 
     if (!wData || uid === 'unarmed') {
-      if (nameEl) nameEl.innerText = 'Desarmado';
-      if (atkEl)  atkEl.innerText  = (mods[attr]>=0?'+':'')+mods[attr];
-      if (dmgEl)  dmgEl.innerText  = '1d4';
-      if (alertEl) alertEl.innerText = '';
+      if (nameEl) nameEl.textContent = 'Desarmado';
+      if (atkEl)  atkEl.textContent = (mods[attr]>=0?'+':'')+mods[attr];
+      if (dmgEl)  dmgEl.textContent = '1d4';
+      if (alertEl) alertEl.textContent = '';
       this._weaponDmgData[n-1] = {formula:'1d4', name:'Desarmado', dmgMod:0, dmgModStr:''};
       return;
     }
 
-    if (nameEl) nameEl.innerText = wData.name;
+    if (nameEl) nameEl.textContent = wData.name;
     const attrMod = mods[attr] || 0;
     const atkBonus = attrMod + prof + (wData.atk_bonus||0);
-    if (atkEl) atkEl.innerText = (atkBonus>=0?'+':'')+atkBonus;
+    if (atkEl) atkEl.textContent = (atkBonus>=0?'+':'')+atkBonus;
 
     // Damage mod from chosen attribute (NONE = 0)
     const dmgMod = (dmgAttr && dmgAttr !== 'NONE') ? (mods[dmgAttr] || 0) : 0;
     const dmgModStr = dmgMod !== 0 ? (dmgMod > 0 ? `+${dmgMod}` : `${dmgMod}`) : '';
     const baseDmg = wData.dmg || '1d4';
-    if (dmgEl) dmgEl.innerText = baseDmg + dmgModStr;
+    if (dmgEl) dmgEl.textContent = baseDmg + dmgModStr;
 
     // Store for rollDice: formula includes modifier as static bonus
     const formulaWithMod = dmgMod !== 0
@@ -2635,7 +2632,7 @@ const app = {
     let alert = '';
     if (wData.req_FUE > 0 && (parseInt(document.getElementById('base_FUE')?.value)||8) < wData.req_FUE) alert = `⚠ Requiere FUE ${wData.req_FUE}`;
     if (wData.req_DES > 0 && (parseInt(document.getElementById('base_DES')?.value)||8) < wData.req_DES) alert += `${alert?' · ':''}⚠ Requiere DES ${wData.req_DES}`;
-    if (alertEl) alertEl.innerText = alert;
+    if (alertEl) alertEl.textContent = alert;
   },
 
   onWeaponChange(wid) {
@@ -2661,7 +2658,7 @@ const app = {
     const data = this.DB[cat] || {};
     Object.entries(data).forEach(([k,v]) => {
       const o = document.createElement('option');
-      o.value = k; o.innerText = v.name;
+      o.value = k; o.textContent = v.name;
       sel.appendChild(o);
     });
   },
@@ -2825,7 +2822,7 @@ const app = {
       const s = document.getElementById(id); if (!s) return;
       s.innerHTML = `<option value="${defVal}">${defTxt}</option>`;
       this.inventory.filter(i=>i.type===type).forEach(item => {
-        const o = document.createElement('option'); o.value = item.uid; o.innerText = item.name; s.appendChild(o);
+        const o = document.createElement('option'); o.value = item.uid; o.textContent = item.name; s.appendChild(o);
       });
     };
     fill('sel_armor','armors','none','Sin Armadura');
@@ -3022,7 +3019,7 @@ const app = {
     const max = document.getElementById(maxId);
     if (!cur) return;
     let val = parseInt(cur.value) || 0;
-    const maxVal = parseInt(max?.innerText ?? max?.textContent) || 999;
+    const maxVal = parseInt(max?.textContent) || 999;
     val = Math.max(0, Math.min(maxVal, val + delta));
     cur.value = val;
     // Flash feedback
@@ -3050,17 +3047,15 @@ const app = {
       const start = () => {
         fire();
         speed = 160;
-        timer = setTimeout(() => {
-          interval = setInterval(() => {
-            speed = Math.max(50, speed - 15);
-            fire();
-            clearInterval(interval);
-            interval = setInterval(fire, speed);
-          }, speed);
+        // After hold delay, fire repeatedly with accelerating interval
+        timer = setTimeout(function tick() {
+          fire();
+          speed = Math.max(50, speed - 18);
+          interval = setTimeout(tick, speed);
         }, 380);
       };
       const stop = () => {
-        clearTimeout(timer); clearInterval(interval);
+        clearTimeout(timer); clearTimeout(interval);
         timer = null; interval = null; speed = 120;
       };
       btn.addEventListener('mousedown', e => { e.preventDefault(); start(); });
@@ -3091,7 +3086,7 @@ const app = {
 
     if (t === 'ok')       { icon.textContent = '✦'; icon.classList.add('gold'); }
     else if (t === 'err') { icon.textContent = '✕'; icon.classList.add('err'); }
-    else                  { icon.textContent = '✦'; icon.classList.add('gold'); }
+    else                  { icon.textContent = '·'; icon.classList.add('dim'); }
 
     const m = document.createElement('span');
     m.className = 't-msg'; m.textContent = String(msg);
@@ -3100,13 +3095,6 @@ const app = {
     wrap.style.display = 'flex'; wrap.style.alignItems = 'center'; wrap.style.gap = '9px';
     wrap.appendChild(icon); wrap.appendChild(m);
     this._toastNode(wrap, t === 'err' ? 'terror' : '');
-  },
-  toastHtml(html, cls='') {
-    const c = document.getElementById('toast-ct');
-    while (c.children.length >= 3) c.removeChild(c.firstChild);
-    const t = document.createElement('div'); t.className=`toast ${cls}`; t.innerHTML=html;
-    c.appendChild(t);
-    setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)';t.style.transition='.3s';setTimeout(()=>t.remove(),300)},3500);
   },
   _toastNode(node, cls='') {
     const c = document.getElementById('toast-ct');
@@ -3209,19 +3197,28 @@ const app = {
   _confirmInContainer(container, title, body, confirmLabel, onConfirm) {
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;border-radius:inherit';
-    overlay.innerHTML = `<div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--rl);padding:20px;max-width:300px;width:100%;text-align:center;position:relative;z-index:10000">
-      <div style="font-family:var(--fd);color:var(--gold);font-size:.9rem;letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px">${title}</div>
-      <div style="font-size:.82rem;color:var(--muted);margin-bottom:16px">${body}</div>
-      <div style="display:flex;gap:8px">
-        <button id="_conf_cancel" class="btn btn-g" style="flex:1">Cancelar</button>
-        <button id="_conf_ok" class="btn btn-p" style="flex:1">${confirmLabel}</button>
-      </div></div>`;
-    // El container (dialog) necesita position:relative para que el overlay absoluto lo cubra
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--panel);border:1px solid var(--border);border-radius:var(--rl);padding:20px;max-width:300px;width:100%;text-align:center;position:relative;z-index:10000';
+    const tEl = document.createElement('div');
+    tEl.style.cssText = 'font-family:var(--fd);color:var(--gold);font-size:.9rem;letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px';
+    tEl.textContent = title;
+    const bEl = document.createElement('div');
+    bEl.style.cssText = 'font-size:.82rem;color:var(--muted);margin-bottom:16px';
+    bEl.textContent = body;
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:8px';
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'btn btn-g'; cancelBtn.style.flex = '1'; cancelBtn.textContent = 'Cancelar';
+    const okBtn = document.createElement('button');
+    okBtn.className = 'btn btn-p'; okBtn.style.flex = '1'; okBtn.textContent = confirmLabel;
+    btnRow.appendChild(cancelBtn); btnRow.appendChild(okBtn);
+    card.appendChild(tEl); card.appendChild(bEl); card.appendChild(btnRow);
+    overlay.appendChild(card);
     const prevPosition = container.style.position;
     if (getComputedStyle(container).position === 'static') container.style.position = 'relative';
     container.appendChild(overlay);
-    overlay.querySelector('#_conf_cancel').onclick = () => { overlay.remove(); container.style.position = prevPosition; };
-    overlay.querySelector('#_conf_ok').onclick = () => { overlay.remove(); container.style.position = prevPosition; onConfirm(); };
+    cancelBtn.onclick = () => { overlay.remove(); container.style.position = prevPosition; };
+    okBtn.onclick = () => { overlay.remove(); container.style.position = prevPosition; onConfirm(); };
   },
 
   _doCleanTalents() {
@@ -3405,7 +3402,7 @@ const app = {
       return sec==='tricks' ? isTrick : !isTrick;
     }).filter(k => sel.has(k));
 
-    if (countEl) countEl.innerText = items.length;
+    if (countEl) countEl.textContent = items.length;
 
     if (!items.length) {
       const label = sec==='tricks' ? 'trucos' : 'conjuros';
@@ -3463,15 +3460,15 @@ const app = {
       topRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:6px';
       const nameSpan = document.createElement('span');
       nameSpan.style.cssText = `font-family:var(--fd);font-size:.78rem;color:${isSelected?'var(--ice)':'var(--gold)'};font-weight:600`;
-      nameSpan.innerText = s.name||k;
+      nameSpan.textContent = s.name||k;
       const badge = document.createElement('span');
       badge.style.cssText = `font-family:var(--fm);font-size:.6rem;padding:1px 7px;border-radius:10px;background:${isSelected?'rgba(74,158,202,.2)':'rgba(200,169,110,.1)'};color:${isSelected?'var(--ice)':'var(--muted)'};white-space:nowrap;flex-shrink:0`;
-      badge.innerText = isSelected ? '✓ Quitar' : '+ Añadir';
+      badge.textContent = isSelected ? '✓ Quitar' : '+ Añadir';
       topRow.appendChild(nameSpan); topRow.appendChild(badge);
       if (s.txt) {
         const desc = document.createElement('div');
         desc.style.cssText = 'font-size:.72rem;color:var(--muted);margin-top:3px;line-height:1.4';
-        desc.innerText = s.txt.length > 90 ? s.txt.slice(0,90)+'…' : s.txt;
+        desc.textContent = s.txt.length > 90 ? s.txt.slice(0,90)+'…' : s.txt;
         card.appendChild(topRow); card.appendChild(desc);
       } else { card.appendChild(topRow); }
       card.onclick = () => {
@@ -3492,7 +3489,7 @@ const app = {
       availList.innerHTML = `<div class="apt-empty"><p>No hay ${label} en la base de datos.<br>Añádelos en el Editor de Reglas.</p><button class="btn btn-g" style="font-size:.68rem" onclick="document.getElementById('db_editor_modal').showModal()">⚙ Editor de Reglas</button></div>`;
     } else {
       notSel.forEach(k => availList.appendChild(makeCard(k, false)));
-      if (!notSel.length) { const d=document.createElement('p'); d.className='txt-it-c'; d.innerText='Todos añadidos.'; availList.appendChild(d); }
+      if (!notSel.length) { const d=document.createElement('p'); d.className='txt-it-c'; d.textContent='Todos añadidos.'; availList.appendChild(d); }
     }
 
     isSel.forEach(k => selList.appendChild(makeCard(k, true)));
@@ -3526,7 +3523,7 @@ const app = {
     lc.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h3 style="font-family:var(--fd);color:var(--gold);font-size:.86rem;text-transform:uppercase;letter-spacing:.08em">${catLabel}</h3><button class="btn btn-g" style="font-size:.7rem;padding:5px 9px" onclick="app.dbEditEntry('new')">+ Nuevo</button></div>`;
     if (cat === 'talents') {
       Object.keys(src).forEach(sub => {
-        const h = document.createElement('div'); h.style.cssText='font-family:var(--fm);font-size:.6rem;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;padding:4px 0;border-bottom:1px solid var(--rim);margin:8px 0 4px'; h.innerText=sub; lc.appendChild(h);
+        const h = document.createElement('div'); h.style.cssText='font-family:var(--fm);font-size:.6rem;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;padding:4px 0;border-bottom:1px solid var(--rim);margin:8px 0 4px'; h.textContent=sub; lc.appendChild(h);
         src[sub].forEach((item,i) => this._dbListItem(lc, item.name, `${sub}|${i}`));
       });
     } else {
@@ -4121,7 +4118,11 @@ const app = {
     const data = {
       _schemaVersion: STORAGE.SCHEMA_VERSION,
       inputs:{}, selects:{}, checks:[], hidden_talents:[],
-      portrait: document.getElementById('char_img').src,
+      portrait: (() => {
+        const src = document.getElementById('char_img')?.src || '';
+        // Don't persist the default SVG placeholder — waste of space
+        return src.startsWith('data:image/svg') ? '' : src;
+      })(),
       concept: document.getElementById('char_concept').value,
       notes: document.getElementById('char_notes').value,
       alignment: this.alignment,
@@ -4162,7 +4163,7 @@ const app = {
     if (data.concept) document.getElementById('char_concept').value = data.concept;
     if (data.notes) document.getElementById('char_notes').value = data.notes;
     // Alignment
-    if (data.alignment) document.querySelectorAll('.aopt').forEach(b=>b.classList.toggle('active',b.innerText===data.alignment));
+    if (data.alignment) document.querySelectorAll('.aopt').forEach(b=>b.classList.toggle('active',b.dataset.ali===data.alignment));
     // Apply identity selects FIRST so updateOptions can read them and build sel_filo options
     ['sel_desc','sel_arq','sel_bg'].forEach(id=>{const el=document.getElementById(id);if(el&&data.selects[id])el.value=data.selects[id];});
     this.updateOptions(false);
@@ -4380,14 +4381,15 @@ const app = {
     btn.classList.toggle('open', open);
     btn.setAttribute('aria-expanded', String(open));
     if (open) {
+      // Close on next outside click — {once:true} auto-removes the listener
       setTimeout(() => {
         document.addEventListener('click', function _close(e) {
-          if (!document.getElementById('sdial').contains(e.target)) {
+          if (!document.getElementById('sdial')?.contains(e.target)) {
             menu.classList.remove('open');
             btn.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
           }
-          document.removeEventListener('click', _close);
-        });
+        }, {once:true});
       }, 10);
     }
   },
@@ -4435,7 +4437,7 @@ const app = {
     // 5. Alineamiento aleatorio
     const ali = ALIGNMENTS[Math.floor(Math.random()*ALIGNMENTS.length)];
     this.alignment = ali;
-    document.querySelectorAll('.aopt').forEach(b=>b.classList.toggle('active',b.innerText===ali));
+    document.querySelectorAll('.aopt').forEach(b=>b.classList.toggle('active',b.dataset.ali===ali));
 
     // 6. updateOptions para construir filos y habilidades (ya tiene arq/desc/bg en los selects)
     this.updateOptions(true);
@@ -4489,10 +4491,10 @@ const app = {
 
     // 13. Calc
     this.calc();
-    const pv=document.getElementById('max_pv'); const cpv=document.getElementById('cur_pv'); if(pv&&cpv)cpv.value=pv.innerText;
-    const adr=document.getElementById('max_adr'); const cadr=document.getElementById('cur_adr'); if(adr&&cadr)cadr.value=adr.innerText;
-    const ing=document.getElementById('max_ing'); const cing=document.getElementById('cur_ing'); if(ing&&cing)cing.value=ing.innerText;
-    const carne=document.getElementById('res_carne'); const ccarne=document.getElementById('cur_carne'); if(carne&&ccarne)ccarne.value=carne.innerText;
+    const pv=document.getElementById('max_pv'); const cpv=document.getElementById('cur_pv'); if(pv&&cpv)cpv.value=pv.textContent;
+    const adr=document.getElementById('max_adr'); const cadr=document.getElementById('cur_adr'); if(adr&&cadr)cadr.value=adr.textContent;
+    const ing=document.getElementById('max_ing'); const cing=document.getElementById('cur_ing'); if(ing&&cing)cing.value=ing.textContent;
+    const carne=document.getElementById('res_carne'); const ccarne=document.getElementById('cur_carne'); if(carne&&ccarne)ccarne.value=carne.textContent;
     this.renderInventory();
 
     // 14. Cerrar TODAS las secciones en modo resumen
@@ -4532,6 +4534,16 @@ const app = {
     // Dismiss loader after init — short delay so first paint is ready
     setTimeout(dismissLoader, 300);
   }
+
+  // Keyboard shortcut: Ctrl+S / Cmd+S to save
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault();
+      if (document.getElementById('app-screen')?.classList.contains('hidden') === false) {
+        app.saveChar();
+      }
+    }
+  });
 
   // Register SW independently (non-blocking, no relation to app init)
   if ('serviceWorker' in navigator) {
