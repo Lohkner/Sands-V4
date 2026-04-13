@@ -110,10 +110,11 @@ body{font-family:var(--fb);background:var(--void);color:var(--text);min-height:-
 .sdial-btn:active{transform:scale(.92)}
 .sdial-menu{position:absolute;top:calc(100% + 8px);right:0;display:flex;flex-direction:column;gap:6px;opacity:0;pointer-events:none;transform:translateY(-6px);transition:opacity .18s,transform .18s;z-index:100}
 .sdial-menu.open{opacity:1;pointer-events:auto;transform:translateY(0)}
-.sdial-item{width:34px;height:34px;border-radius:10px;background:linear-gradient(145deg,var(--panel),var(--deep));border:1px solid var(--border);color:var(--dim);font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;box-shadow:0 4px 12px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.05)}
-.sdial-item:hover{border-color:var(--gold);color:var(--gold);background:linear-gradient(145deg,rgba(200,169,110,.12),rgba(200,169,110,.04));box-shadow:0 0 0 1px rgba(200,169,110,.2),0 4px 14px rgba(0,0,0,.5)}
-.sdial-item:active{transform:scale(.9)}
-.sdial-danger:hover{border-color:var(--blood);color:var(--blood);background:linear-gradient(145deg,rgba(176,48,64,.12),rgba(176,48,64,.04))}
+.sdial-item{width:34px;height:34px;border-radius:10px;background:var(--panel);border:1px solid var(--border);color:var(--dim);font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s,border-color .12s,color .12s,transform .1s,box-shadow .12s;box-shadow:0 4px 12px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.05);-webkit-tap-highlight-color:transparent}
+.sdial-item:hover{border-color:var(--gold);color:var(--gold);background:rgba(200,169,110,.14);box-shadow:0 0 0 1px rgba(200,169,110,.2),0 4px 14px rgba(0,0,0,.5)}
+.sdial-item:active{transform:scale(.88);background:rgba(200,169,110,.22);border-color:var(--gold);color:var(--gold);box-shadow:none}
+.sdial-danger:hover{border-color:var(--blood);color:var(--blood);background:rgba(176,48,64,.14)}
+.sdial-danger:active{background:rgba(176,48,64,.28);border-color:var(--blood);color:var(--blood)}
 
 /* ══ PAGES ══ */
 .pages-wrapper{flex:1;overflow:hidden;position:relative;min-height:0;touch-action:pan-y}
@@ -633,7 +634,6 @@ input:focus-visible,textarea:focus-visible{outline:none}
       <button class="btn btn-gold" onclick="app.newChar()" style="width:100%;padding:11px 8px;font-size:.76rem">✦ Nuevo Personaje</button>
       <button class="btn btn-g" onclick="document.getElementById('json_char_input').click()" style="width:100%;padding:11px 8px;font-size:.76rem">↑ Importar JSON</button>
     </div>
-    <p class="roster-lbl">Héroes Guardados</p>
     <p style="font-family:var(--fm);font-size:.58rem;color:var(--border);text-align:center;margin-bottom:8px;letter-spacing:.08em">← Desliza izquierda para eliminar · Derecha para cerrar</p>
     <div id="home-roster"></div>
     <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--rim);display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
@@ -1668,6 +1668,7 @@ const app = {
   cropState: {img:null, x:0, y:0, zoom:1, rot:0, minZoom:.05, isDragging:false, lastX:0, lastY:0, pinch:null, velX:0, velY:0},
   _weaponDmgData: [{formula:'1',name:'Desarmado'},{formula:'1',name:'Desarmado'}],
   _editingCustomItem: null,
+  _charLoading: false,   // suppresses _markUnsaved during load/clear
 
   /* ── INIT ── */
   init() {
@@ -1723,6 +1724,7 @@ const app = {
   },
 
   newChar() {
+    this._charLoading = true;
     this.clearCharData();
     this.showScreen('app');
     this.unlockApp();
@@ -1735,6 +1737,10 @@ const app = {
     this.editSection('skills');
     this.editSection('combat');
     this.editSection('equipment');
+    this._charLoading = false;
+    // Clear header label for fresh character
+    const lbl = document.getElementById('last_saved_lbl');
+    if (lbl) { lbl.textContent = ''; lbl.className = 'last-saved'; }
     // Enfocar el campo nombre automáticamente
     requestAnimationFrame(() => {
       const nameInput = document.getElementById('char_name');
@@ -1746,11 +1752,16 @@ const app = {
     const roster = STORAGE.loadRoster();
     const data = roster[name];
     if (!data) return;
+    this._charLoading = true;
     this.clearCharData();
     this.showScreen('app');
     this.unlockApp();
     this.applyCharData(data);
     this.goToPage(0);
+    // Clear last-saved label and reset unsaved state cleanly
+    const lbl = document.getElementById('last_saved_lbl');
+    if (lbl) { lbl.textContent = ''; lbl.className = 'last-saved'; }
+    this._charLoading = false;
     this.toast(`Cargado: ${this._esc(name)}`);
   },
 
@@ -4037,13 +4048,14 @@ const app = {
     }
   },
 
-  /** Marks the header as having unsaved changes. Call on any meaningful edit. */
+  /** Marks the header as having unsaved changes. Suppressed during load/clear. */
   _markUnsaved() {
+    if (this._charLoading) return;
     const lbl = document.getElementById('last_saved_lbl');
     if (!lbl) return;
     if (!lbl.classList.contains('fresh') && !lbl.classList.contains('unsaved')) {
       lbl.classList.add('unsaved');
-      if (!lbl.textContent || lbl.textContent === '') lbl.textContent = 'sin guardar';
+      lbl.textContent = 'sin guardar';
     }
   },
 
@@ -4097,11 +4109,15 @@ const app = {
           apt_tricks:   Array.isArray(raw.apt_tricks)     ? raw.apt_tricks     : [],
           apt_spells:   Array.isArray(raw.apt_spells)     ? raw.apt_spells     : []
         };
+        this._charLoading = true;
         this.clearCharData();
         this.showScreen('app');
         this.unlockApp();
         this.applyCharData(data);
         this.goToPage(0);
+        const lbl = document.getElementById('last_saved_lbl');
+        if (lbl) { lbl.textContent = ''; lbl.className = 'last-saved'; }
+        this._charLoading = false;
         this.toast('Personaje importado');
       } catch(err) { this.toast(err.message || 'JSON inválido','Error'); }
     };
