@@ -461,10 +461,14 @@ input[type=range]{flex:1;accent-color:var(--gold);cursor:pointer;min-width:0;hei
 .bsave:active{transform:scale(.98);opacity:.9}
 /* ══ TOAST ══ */
 #toast-ct{position:fixed;bottom:calc(var(--nav) + var(--safe-b) + 12px);left:50%;transform:translateX(-50%);z-index:998;display:flex;flex-direction:column;gap:5px;pointer-events:none;align-items:center}
-.toast{background:var(--panel);color:var(--bright);padding:8px 16px;border-radius:var(--rl);border:1px solid var(--border);font-family:var(--fm);font-size:.74rem;box-shadow:var(--lg);display:flex;align-items:center;gap:7px;animation:slideUp .22s cubic-bezier(.18,.89,.32,1.28) forwards;min-width:170px;max-width:320px;justify-content:center}
+.toast{background:var(--panel);color:var(--bright);padding:9px 14px;border-radius:var(--rl);border:1px solid var(--border);font-family:var(--fm);font-size:.76rem;box-shadow:var(--lg);display:flex;align-items:center;gap:9px;animation:slideUp .22s cubic-bezier(.18,.89,.32,1.28) forwards;min-width:150px;max-width:300px}
 .toast.crit{border-color:var(--blood);background:rgba(125,28,42,.35)}
-
-.tinf{display:flex;flex-direction:column}.tlbl{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+.toast.terror{border-color:var(--ember);background:rgba(125,28,42,.2)}
+.t-icon{font-size:1rem;line-height:1;flex-shrink:0;display:flex;align-items:center;justify-content:center;width:18px}
+.t-icon.gold{color:var(--gold)}
+.t-icon.err{color:var(--ember)}
+.t-icon.ok{color:var(--sage)}
+.t-msg{flex:1;line-height:1.35}
 @keyframes slideUp{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
 /* ══ DICE ROLL OVERLAY ══ */
 #dice-overlay{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;pointer-events:none;background:transparent}
@@ -1762,7 +1766,7 @@ const app = {
     const lbl = document.getElementById('last_saved_lbl');
     if (lbl) { lbl.textContent = ''; lbl.className = 'last-saved'; }
     this._charLoading = false;
-    this.toast(`Cargado: ${this._esc(name)}`);
+    this.toast(`Cargado: ${this._esc(name)}`,'ok');
   },
 
   /* ── HOME ROSTER ── */
@@ -2396,7 +2400,7 @@ const app = {
         lbl.style.background = 'rgba(176,48,64,.18)';
         setTimeout(() => { lbl.style.background = ''; }, 400);
       }
-      this.toast(`Máximo ${limit} habilidades`, 'Límite');
+      this.toast(`Máximo ${limit} habilidades`,'err');
     }
   },
 
@@ -2637,7 +2641,7 @@ const app = {
     this.inventory.push(item);
     this.renderInventory();
     this.syncCombatOptions();
-    this.toast(`${data.name} añadido`, 'Inventario');
+    this.toast(`${data.name} añadido`,'ok');
   },
 
   addCustomItem() {
@@ -2674,7 +2678,7 @@ const app = {
 
   saveCustomItem() {
     const name = document.getElementById('ci_name')?.value?.trim();
-    if (!name) { this.toast('Se requiere nombre', 'Error'); return; }
+    if (!name) { this.toast('Se requiere nombre','err'); return; }
     const slots = parseInt(document.getElementById('ci_slots')?.value)||1;
     const type = document.getElementById('ci_type')?.value||'misc';
     const isEdit = this._editingCustomItem !== null;
@@ -2685,7 +2689,7 @@ const app = {
     this._editingCustomItem = null;
     this.renderInventory();
     this.syncCombatOptions();
-    this.toast(isEdit?'Actualizado':'Añadido', 'Inventario');
+    this.toast(isEdit?'Actualizado':'Añadido','ok');
   },
 
   removeInvItem(idx) { this.inventory.splice(idx,1); this.renderInventory(); this.syncCombatOptions(); },
@@ -2984,12 +2988,32 @@ const app = {
     });
   },
 
-  toast(msg, lbl='Info') {
-    const wrap = document.createElement('div'); wrap.className='tinf';
-    const l = document.createElement('span'); l.className='tlbl'; l.textContent = String(lbl);
-    const m = document.createElement('span'); m.textContent = String(msg);
-    wrap.appendChild(l); wrap.appendChild(m);
-    this._toastNode(wrap);
+  /**
+   * Show a toast notification.
+   * @param {string} msg  - Message text
+   * @param {string} type - 'ok' | 'err' | 'info' (default)
+   */
+  toast(msg, type='info') {
+    const icon = document.createElement('span');
+    icon.className = 't-icon';
+    // Normalize legacy emoji/string labels to semantic types
+    const t = {
+      '💾':'ok', 'ok':'ok', 'OK':'ok',
+      '✦':'ok',
+      'Error':'err', 'error':'err', '⚠':'err',
+    }[type] ?? 'info';
+
+    if (t === 'ok')       { icon.textContent = '✦'; icon.classList.add('gold'); }
+    else if (t === 'err') { icon.textContent = '✕'; icon.classList.add('err'); }
+    else                  { icon.textContent = '✦'; icon.classList.add('gold'); }
+
+    const m = document.createElement('span');
+    m.className = 't-msg'; m.textContent = String(msg);
+
+    const wrap = document.createElement('div');
+    wrap.style.display = 'flex'; wrap.style.alignItems = 'center'; wrap.style.gap = '9px';
+    wrap.appendChild(icon); wrap.appendChild(m);
+    this._toastNode(wrap, t === 'err' ? 'terror' : '');
   },
   toastHtml(html, cls='') {
     const c = document.getElementById('toast-ct');
@@ -3075,7 +3099,7 @@ const app = {
     const card = chk.closest('.tc');
     if (chk.checked) {
       const count = document.querySelectorAll('input[name="chk_talents_hidden"]').length;
-      if (count >= 3) { this.toast('Solo puedes elegir 3 talentos.', '⚠'); chk.checked=false; return; }
+      if (count >= 3) { this.toast('Solo puedes elegir 3 talentos.','err'); chk.checked=false; return; }
       if (!hidden) {
         hidden = document.createElement('input'); hidden.type='hidden'; hidden.name='chk_talents_hidden';
         hidden.value=name; hidden.setAttribute('data-desc',chk.getAttribute('data-desc'));
@@ -3541,7 +3565,7 @@ const app = {
       const tcat = document.getElementById('db_tcat')?.value?.trim() || (isTalent?oldKey.split('|')[0]:'general');
       const name = document.getElementById('db_name')?.value?.trim();
       const desc = document.getElementById('db_txt')?.value?.trim();
-      if (!name) { this.toast('Nombre requerido','Error'); return; }
+      if (!name) { this.toast('Nombre requerido','err'); return; }
       if (!this.DB.talents[tcat]) this.DB.talents[tcat] = [];
       if (isTalent) {
         const idx = parseInt(oldKey.split('|')[1]);
@@ -3551,7 +3575,7 @@ const app = {
       }
     } else {
       const key = (document.getElementById('db_key')?.value||'').trim().toLowerCase().replace(/\s+/g,'_');
-      if (!key) { this.toast('Clave requerida','Error'); return; }
+      if (!key) { this.toast('Clave requerida','err'); return; }
       const name = document.getElementById('db_name')?.value?.trim() || key;
       let entry = {name};
       if (cat==='descriptors') {
@@ -3602,7 +3626,7 @@ const app = {
     document.getElementById('db_form_container').style.display = 'none';
     this.dbEditCategory(cat);
     this.unlockApp();
-    this.toast('Guardado','DB');
+    this.toast('Guardado','ok');
   },
 
   dbDeleteEntry(key) {
@@ -3620,7 +3644,7 @@ const app = {
       this.saveRulesToLocal();
       this.dbEditCategory(cat);
       this.unlockApp();
-      this.toast('Eliminado','DB');
+      this.toast('Eliminado','ok');
     });
   },
 
@@ -3675,7 +3699,7 @@ const app = {
     const r = new FileReader();
     r.onload = e => {
       const img = new Image();
-      img.onerror = () => this.toast('Imagen inválida','Error');
+      img.onerror = () => this.toast('Imagen inválida','err');
       img.onload = () => {
         this.cropState.img = img;
         this.cropState.rot = 0;
@@ -3944,7 +3968,7 @@ const app = {
     // Reset crop state so next image starts clean
     this.cropState = {img:null, x:0, y:0, zoom:1, rot:0, minZoom:.05,
       isDragging:false, lastX:0, lastY:0, pinch:null, velX:0, velY:0};
-    this.toast('Retrato actualizado', '✦');
+    this.toast('Retrato actualizado','ok');
   },
 
   /* ── RULES IMPORT ── */
@@ -3952,7 +3976,7 @@ const app = {
     if (!input.files?.[0]) return;
     const file = input.files[0];
     // Reject files larger than 2 MB
-    if (file.size > MAX_JSON_BYTES) { this.toast('Archivo demasiado grande (máx 2 MB)','Error'); input.value=''; return; }
+    if (file.size > MAX_JSON_BYTES) { this.toast('Archivo demasiado grande (máx 2 MB)','err'); input.value=''; return; }
     const r = new FileReader();
     r.onload = e => {
       try {
@@ -3969,8 +3993,8 @@ const app = {
         app.DB = sanitizeObj(rules);
         app.saveRulesToLocal();
         app.unlockApp();
-        app.toast('Reglas cargadas','Sistema');
-      } catch(err) { app.toast(err.message || 'Formato JSON inválido','Error'); }
+        app.toast('Reglas cargadas','ok');
+      } catch(err) { app.toast(err.message || 'Formato JSON inválido','err'); }
     };
     r.readAsText(file); input.value='';
   },
@@ -4039,7 +4063,7 @@ const app = {
     if (this._saving) return; this._saving = true;
     setTimeout(() => { this._saving = false; }, 800);
     const name = document.getElementById('char_name').value.trim();
-    if (!name) { this._saving = false; this.toast('¡Se requiere nombre!','Error'); return; }
+    if (!name) { this._saving = false; this.toast('¡Se requiere nombre!','err'); return; }
     const roster = STORAGE.loadRoster();
     if (roster[name]) {
       this._confirm('¿Sobreescribir personaje?', `El personaje "${this._esc(name)}" ya existe y será reemplazado.`, '✓ Sobreescribir', () => this._doSaveChar(name));
@@ -4071,9 +4095,9 @@ const app = {
         lbl.classList.add('fresh');
         setTimeout(()=>lbl.classList.remove('fresh'), 4000);
       }
-      this.toast('Personaje guardado','💾');
+      this.toast('Personaje guardado','ok');
     } else {
-      this.toast('¡Almacenamiento lleno! Exporta tu personaje antes de perder datos.','⚠');
+      this.toast('¡Almacenamiento lleno! Exporta tu personaje.','err');
       setTimeout(()=>this.exportJSON(), 800);
     }
   },
@@ -4118,8 +4142,8 @@ const app = {
         const lbl = document.getElementById('last_saved_lbl');
         if (lbl) { lbl.textContent = ''; lbl.className = 'last-saved'; }
         this._charLoading = false;
-        this.toast('Personaje importado');
-      } catch(err) { this.toast(err.message || 'JSON inválido','Error'); }
+        this.toast('Personaje importado','ok');
+      } catch(err) { this.toast(err.message || 'JSON inválido','err'); }
     };
     r.readAsText(input.files[0]); input.value='';
   },
@@ -4254,13 +4278,13 @@ const app = {
       if (this.DB.descriptors) this.unlockApp();
       this.editSection('personal');
       ['identity','stats','saves','skills','combat','equipment'].forEach(s=>this.editSection(s));
-      this.toast('Hoja reseteada');
+      this.toast('Hoja reseteada','ok');
     });
   },
 
   /* ── RANDOMIZE ── */
   randomize() {
-    if (!this.DB.archetypes) { this.toast('Carga reglas primero','⚠'); return; }
+    if (!this.DB.archetypes) { this.toast('Carga reglas primero','err'); return; }
     this.clearCharData();
     this.unlockApp();
 
@@ -4356,7 +4380,7 @@ const app = {
     ['identity','stats','saves','skills','combat','equipment'].forEach(s=>this.confirmSection(s));
 
     this.buildDetailPage();
-    this.toast('Personaje aleatorio listo','⚄');
+    this.toast('Personaje aleatorio listo','ok');
   },
 
 
