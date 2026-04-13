@@ -60,24 +60,10 @@ html{padding-top:env(safe-area-inset-top,0px);box-sizing:border-box}
 .mt4{margin-top:4px}
 .g3c{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
 .txt-it-c{color:var(--muted);font-size:.8rem;font-style:italic;text-align:center;padding:8px}
-</style>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Fonts injected via JS so they never block window.load or app init -->
-<script>
-(function(){
-  var l=document.createElement('link');
-  l.rel='stylesheet';l.media='print';l.onload=function(){this.media='all'};
-  l.href='https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;600&display=swap';
-  document.head.appendChild(l);
-})();
-</script>
-<style>
-/* :root moved to first style block */
+
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
 ::selection{background:rgba(200,169,110,.2);color:var(--bright)}
 ::-webkit-scrollbar{display:none}*{scrollbar-width:none;-ms-overflow-style:none}
-html{scroll-behavior:smooth}
 body{font-family:var(--fb);background:var(--void);color:var(--text);min-height:-webkit-fill-available;height:100dvh;font-size:var(--fs-base,15px);line-height:1.4;overflow:hidden;overscroll-behavior:none;
   background-image:radial-gradient(ellipse 100% 50% at 10% 0%,rgba(125,28,42,.10) 0%,transparent 55%),radial-gradient(ellipse 70% 70% at 90% 100%,rgba(29,78,143,.07) 0%,transparent 55%);}
 .screen{position:fixed;inset:0;display:flex;flex-direction:column;transition:opacity .28s,transform .28s;overflow:hidden;-webkit-backface-visibility:hidden;backface-visibility:hidden}
@@ -546,9 +532,29 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-
 input:focus-visible,textarea:focus-visible{outline:none}
 
 
-/* ══ PWA UPDATE TOAST ══ */
 
+/* ══ UTILITY CLASSES (replaces repeated inline styles) ══ */
+.u-center{text-align:center}
+.u-flex-center{display:flex;align-items:center;justify-content:center}
+.u-muted{color:var(--muted)}
+.u-gold{color:var(--gold)}
+.u-fm{font-family:var(--fm)}
+.u-fd{font-family:var(--fd)}
+.u-hide{display:none!important}
+.u-pre-wrap{white-space:pre-wrap}
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Fonts injected via JS so they never block window.load or app init -->
+<script>
+(function(){
+  var l=document.createElement('link');
+  l.rel='stylesheet';l.media='print';l.onload=function(){this.media='all'};
+  l.href='https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;600&display=swap';
+  document.head.appendChild(l);
+})();
+</script>
+
 </head>
 <body>
 <div id="ss-loader" aria-hidden="true">
@@ -685,8 +691,8 @@ input:focus-visible,textarea:focus-visible{outline:none}
                 </div>
               </div>
               <div style="padding:6px 4px 10px;text-align:center">
-                <div id="sum_align_ov" style="font-family:var(--fm);font-size:.64rem;color:var(--muted);margin-bottom:5px"></div>
-                <div id="sum_bio_ov" style="font-size:.8rem;font-style:italic;color:var(--text);white-space:pre-wrap;margin-bottom:4px"></div>
+                <div id="sum_align_ov" class="u-fm u-muted" style="font-size:.64rem;margin-bottom:5px"></div>
+                <div id="sum_bio_ov" class="u-pre-wrap" style="font-size:.8rem;font-style:italic;color:var(--text);margin-bottom:4px"></div>
                 <button class="bedit" onclick="app.editSection('personal')">✏ Editar</button>
               </div>
             </div>
@@ -1159,6 +1165,43 @@ input:focus-visible,textarea:focus-visible{outline:none}
 </dialog>
 
 <script>
+/* ════════════════════════════════════════════════════
+   Stars & Sorcery Companion — Application Script
+   ─────────────────────────────────────────────────
+   SECTIONS (in order):
+     1. DEFAULT_DB        — built-in rules database
+     2. ALIGNMENTS        — alignment options array
+     3. DEFAULT_PORTRAIT  — placeholder SVG data URI
+     4. CONSTANTS         — named app-wide constants
+     5. STORAGE           — localStorage abstraction
+     6. app               — main application object
+        ├ State           — properties & initial values
+        ├ Init            — boot and setup
+        ├ Screens         — screen transitions
+        ├ Home            — roster rendering
+        ├ Navigation      — page swipe + bottom nav
+        ├ Section toggles — edit/summary views
+        ├ Character       — save, load, clear, export
+        ├ Helpers         — fillSelect, getMod, etc.
+        ├ Options         — updateOptions, checkLimit
+        ├ Calc            — stat/resource calculations
+        ├ Inventory       — items, gold, combat sync
+        ├ Dice            — roll system + overlay
+        ├ Resources       — PV/Adr/Ing adjustments
+        ├ Talents         — manager, summary, count
+        ├ Detail page     — lore/archetype view
+        ├ Aptitudes       — spells/tricks manager
+        ├ DB Editor       — rule database CRUD
+        ├ Cropper         — portrait crop tool
+        ├ Rules import    — JSON rules loader
+        ├ Font size       — UI scale setting
+        ├ Lethality       — campaign config
+        ├ Misc            — dial, confirm, campana
+        ├ Randomize       — random character gen
+        └ Utilities       — debounce, PWA
+     7. Boot              — app startup sequence
+   ════════════════════════════════════════════════════ */
+
 /* ══════════════════════════════════════════
    DEFAULT RULES DATABASE
 ══════════════════════════════════════════ */
@@ -1516,9 +1559,24 @@ const DEFAULT_DB = {
 const ALIGNMENTS = ["Legal Bueno","Neutral Bueno","Caótico Bueno","Legal Neutral","Neutral Puro","Caótico Neutral","Legal Maligno","Neutral Maligno","Caótico Maligno"];
 const DEFAULT_PORTRAIT = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 24 24' fill='%23382f47'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E";
 
+
 /* ══════════════════════════════════════════
-   APP
+   CONSTANTS
 ══════════════════════════════════════════ */
+/** Stat keys in canonical order */
+const STATS = ['FUE','DES','CON','INT','SAB','CAR'];
+
+/** Proficiency bonus thresholds by level */
+const PROF_THRESHOLDS = [[9,5],[7,4],[5,3],[1,2]];
+
+/** XP required to reach each level (index = current level) */
+const XP_TABLE = [0, 1000, 3000, 6000, 10000, 15000, 21000, 28000, 36000, 45000];
+
+/** Inventory slots per card cap */
+const MAX_PORTRAIT_W = 600;
+
+/** Max JSON import size (bytes) */
+const MAX_JSON_BYTES = 2 * 1024 * 1024;
 
 /* ══════════════════════════════════════════
    STORAGE MODULE
@@ -1597,7 +1655,6 @@ const app = {
   currentEditorCat: '',
   cropState: {img:null, x:0, y:0, zoom:1, rot:0, minZoom:.05, isDragging:false, lastX:0, lastY:0, pinch:null, velX:0, velY:0},
   _weaponDmgData: [{formula:'1',name:'Desarmado'},{formula:'1',name:'Desarmado'}],
-  _swipe: {startX:0,startY:0,startT:0,active:false},
   _editingCustomItem: null,
 
   /* ── INIT ── */
@@ -1693,6 +1750,7 @@ const app = {
     return String(str || '').replace(/<[^>]*>/g, '').replace(/javascript:/gi, '');
   },
 
+  /** Renders the saved-character roster on the home screen. */
   renderHome() {
     const el = document.getElementById('home-roster');
     const roster = STORAGE.loadRoster();
@@ -2028,10 +2086,10 @@ const app = {
     }
     const name = document.getElementById('char_name').value || 'Sin nombre';
     const lvl = document.getElementById('char_lvl').value || '1';
-    const sno = document.getElementById('sum_name_ov'); if(sno) sno.innerText = name;
-    const slo = document.getElementById('sum_lvl_ov'); if(slo) slo.innerText = 'Nivel ' + lvl;
-    const sao = document.getElementById('sum_align_ov'); if(sao) sao.innerText = this.alignment || '';
-    const sbo = document.getElementById('sum_bio_ov'); if(sbo) sbo.innerText = document.getElementById('char_concept')?.value || '';
+    const sno = document.getElementById('sum_name_ov'); if(sno) sno.textContent = name;
+    const slo = document.getElementById('sum_lvl_ov'); if(slo) slo.textContent = 'Nivel ' + lvl;
+    const sao = document.getElementById('sum_align_ov'); if(sao) sao.textContent = this.alignment || '';
+    const sbo = document.getElementById('sum_bio_ov'); if(sbo) sbo.textContent = document.getElementById('char_concept')?.value || '';
     const ev = document.getElementById('personal_edit_view'); if(ev) ev.style.display = 'none';
     const sv = document.getElementById('personal_summary_view'); if(sv) { sv.style.display = 'block'; }
   },
@@ -2042,9 +2100,9 @@ const app = {
       const desc = this.DB.descriptors?.[document.getElementById('sel_desc').value];
       const arq = this.DB.archetypes?.[document.getElementById('sel_arq').value];
       const bg = this.DB.backgrounds?.[document.getElementById('sel_bg').value];
-      document.getElementById('sum_desc_badge').innerText = desc?.name || '—';
-      document.getElementById('sum_arq_badge').innerText = arq?.name || '—';
-      document.getElementById('sum_bg_badge').innerText = bg?.name || '—';
+      document.getElementById('sum_desc_badge').textContent = desc?.name || '—';
+      document.getElementById('sum_arq_badge').textContent = arq?.name || '—';
+      document.getElementById('sum_bg_badge').textContent = bg?.name || '—';
     }
     if (sec === 'stats') this._buildStatsSummary();
     if (sec === 'saves') this._buildSavesSummary();
@@ -2193,21 +2251,21 @@ const app = {
   },
 
   // Tabla de XP necesario para subir al siguiente nivel (acumulativo)
-  _XP_TABLE: [0, 1000, 3000, 6000, 10000, 15000, 21000, 28000, 36000, 45000],
+  // XP_TABLE is defined as a top-level constant
 
   updateXpHint() {
     const lvl  = parseInt(document.getElementById('char_lvl')?.value) || 1;
     const xp   = parseInt(document.getElementById('char_xp')?.value)  || 0;
     const lbl  = document.getElementById('xp_next_lbl');
     if (!lbl) return;
-    if (lvl >= 10) { lbl.innerText = '(máx nivel)'; lbl.style.color = 'var(--gold)'; return; }
-    const need = this._XP_TABLE[lvl] || 0;
+    if (lvl >= 10) { lbl.textContent = '(máx nivel)'; lbl.style.color = 'var(--gold)'; return; }
+    const need = XP_TABLE[lvl] || 0;
     const left = need - xp;
     if (left <= 0) {
-      lbl.innerText = '¡Sube de nivel!';
+      lbl.textContent = '¡Sube de nivel!';
       lbl.style.color = 'var(--sage)';
     } else {
-      lbl.innerText = `(faltan ${left.toLocaleString('es')})`;
+      lbl.textContent = `(faltan ${left.toLocaleString('es')})`;
       lbl.style.color = 'var(--muted)';
     }
   },
@@ -2227,6 +2285,7 @@ const app = {
   },
 
   /* ── OPTIONS UPDATE ── */
+  /** Rebuilds dependent selects (filo, skills, traits) after identity changes. */
   updateOptions(reset=false) {
     if (!this.DB.archetypes) return;
     const descKey = document.getElementById('sel_desc').value;
@@ -2303,10 +2362,12 @@ const app = {
   },
 
   /* ── CALC ── */
+  /** Recalculates all derived stats and updates the DOM. Called on any input change. */
   calc() {
-    const STATS = ['FUE','DES','CON','INT','SAB','CAR'];
+    // STATS is defined as a top-level constant
     // Cache DOM refs used multiple times in this call
     const $  = id => document.getElementById(id);
+    // Read base stat values
     const raw = {};
     STATS.forEach(s => raw[s] = parseInt($('base_'+s)?.value)||8);
 
@@ -2324,7 +2385,7 @@ const app = {
     const arq = this.DB.archetypes?.[arqKey];
     const lvl = parseInt($('char_lvl')?.value)||1;
     this.updateXpHint();
-    const prof = lvl >= 9 ? 5 : lvl >= 7 ? 4 : lvl >= 5 ? 3 : 2;
+    const prof = (PROF_THRESHOLDS.find(([min]) => lvl >= min) ?? [1,2])[1];
 
     // Resources — fórmulas según tabla de Arquetipos (Cap.II Paso 3)
     // PV Nivel 1: base_arquetipo + Puntuación CON
@@ -2606,6 +2667,7 @@ const app = {
     this.renderInventory();
   },
 
+  /** Re-renders the inventory list and summary from this.inventory. */
   renderInventory() {
     const list = document.getElementById('inv_backpack_list');
     if (list) {
@@ -2652,7 +2714,7 @@ const app = {
         sumList.appendChild(row);
       });
     }
-    const gd = document.getElementById('gold_coins_display'); if (gd) gd.innerText = this.gold;
+    const gd = document.getElementById('gold_coins_display'); if (gd) gd.textContent = this.gold;
     const ge = document.getElementById('gold_coins_edit'); if (ge && document.activeElement!==ge) ge.value = this.gold;
     this.calc();
   },
@@ -2868,7 +2930,7 @@ const app = {
     Object.keys(this.DB.talents).forEach(k => {
       const btn = document.createElement('button'); btn.className='catbtn'; btn.type='button';
       btn.setAttribute('data-cat', k);
-      btn.innerText = k.charAt(0).toUpperCase()+k.slice(1);
+      btn.textContent = k.charAt(0).toUpperCase()+k.slice(1);
       btn.onclick = () => this.showTalentCategory(k, btn);
       cc.appendChild(btn);
     });
@@ -2977,8 +3039,8 @@ const app = {
 
   updateTalentCount() {
     const n = document.querySelectorAll('input[name="chk_talents_hidden"]').length;
-    const el1 = document.getElementById('talent_count_main'); if(el1) el1.innerText=n;
-    const el2 = document.getElementById('talent_count_modal'); if(el2) el2.innerText=n;
+    const el1 = document.getElementById('talent_count_main'); if(el1) el1.textContent=n;
+    const el2 = document.getElementById('talent_count_modal'); if(el2) el2.textContent=n;
     // Update category dots
     if (this.DB.talents) {
       Object.keys(this.DB.talents).forEach(k => {
@@ -3025,7 +3087,7 @@ const app = {
     const dt = document.getElementById('detail_desc_title');
     const db = document.getElementById('detail_desc_body');
     if (desc) {
-      dt.innerText = 'Linaje: '+this._sanitize(desc.name);
+      dt.textContent = 'Linaje: '+this._sanitize(desc.name);
       db.innerHTML = '';
       // txt paragraph (DB content — sanitized)
       const dtxt = document.createElement('p');
@@ -3058,13 +3120,13 @@ const app = {
         });
         db.appendChild(mw);
       }
-    } else { dt.innerText='Linaje: —'; db.innerHTML='<p style="color:var(--muted);font-size:.8rem;font-style:italic">Selecciona un Linaje.</p>'; }
+    } else { dt.textContent='Linaje: —'; db.innerHTML='<p style="color:var(--muted);font-size:.8rem;font-style:italic">Selecciona un Linaje.</p>'; }
 
     // Archetype
     const at = document.getElementById('detail_arq_title');
     const ab = document.getElementById('detail_arq_body');
     if (arq) {
-      at.innerText = 'Arquetipo: '+this._sanitize(arq.name);
+      at.textContent = 'Arquetipo: '+this._sanitize(arq.name);
       ab.innerHTML = '';
       const atxt = document.createElement('p');
       atxt.style.cssText='font-size:.82rem;color:var(--text);line-height:1.6;margin-bottom:8px';
@@ -3096,7 +3158,7 @@ const app = {
         selSkills.forEach(s => { const sp=document.createElement('span'); sp.style.cssText='font-family:var(--fm);font-size:.7rem;background:var(--raised);border:1px solid var(--border);border-radius:20px;padding:2px 8px;color:var(--text)'; sp.textContent=this._sanitize(String(s)); sw.appendChild(sp); });
         ab.appendChild(sw);
       }
-    } else { at.innerText='Arquetipo: —'; ab.innerHTML='<p style="color:var(--muted);font-size:.8rem;font-style:italic">Selecciona un Arquetipo.</p>'; }
+    } else { at.textContent='Arquetipo: —'; ab.innerHTML='<p style="color:var(--muted);font-size:.8rem;font-style:italic">Selecciona un Arquetipo.</p>'; }
 
     // Talents
     const tl = document.getElementById('detail_talents_list');
@@ -3177,7 +3239,7 @@ const app = {
     this._modalOpener = document.activeElement; // remember opener for focus restore
     const modal = document.getElementById('apt_manager_modal');
     const title = document.getElementById('apt_manager_title');
-    title.innerText = sec === 'tricks' ? 'Gestor de Trucos' : 'Gestor de Conjuros';
+    title.textContent = sec === 'tricks' ? 'Gestor de Trucos' : 'Gestor de Conjuros';
     this._renderAptManager();
     modal.showModal();
     // Move focus to close button
@@ -3242,7 +3304,7 @@ const app = {
 
     isSel.forEach(k => selList.appendChild(makeCard(k, true)));
     selEmpty.style.display = isSel.length ? 'none' : 'block';
-    if (selCount) selCount.innerText = isSel.length;
+    if (selCount) selCount.textContent = isSel.length;
   },
 
   closeAptManager() {
@@ -3638,7 +3700,7 @@ const app = {
     const sl = document.getElementById('crop_zoom');
     if (sl) { sl.min = cs.minZoom || 0.05; sl.value = cs.zoom; }
     const lbl = document.getElementById('cr_zoom_lbl');
-    if (lbl) lbl.innerText = Math.round(cs.zoom * 100) + '%';
+    if (lbl) lbl.textContent = Math.round(cs.zoom * 100) + '%';
   },
 
   // ── Drag ──
@@ -3779,8 +3841,8 @@ const app = {
     const cs = this.cropState;
     if (!cs.img) return;
     const {w: FW, h: FH} = this._cropFrameSize();
-    // Cap at 600×800px max to keep portrait size reasonable in localStorage
-    const MAX_W = 600;
+    // Cap portrait size — see MAX_PORTRAIT_W constant
+    const MAX_W = MAX_PORTRAIT_W;
     const SC = Math.min(2, MAX_W / FW);
     const canvas = document.createElement('canvas');
     canvas.width = Math.round(FW * SC); canvas.height = Math.round(FH * SC);
@@ -3807,7 +3869,7 @@ const app = {
     if (!input.files?.[0]) return;
     const file = input.files[0];
     // Reject files larger than 2 MB
-    if (file.size > 2 * 1024 * 1024) { this.toast('Archivo demasiado grande (máx 2 MB)','Error'); input.value=''; return; }
+    if (file.size > MAX_JSON_BYTES) { this.toast('Archivo demasiado grande (máx 2 MB)','Error'); input.value=''; return; }
     const r = new FileReader();
     r.onload = e => {
       try {
@@ -3830,7 +3892,10 @@ const app = {
     r.readAsText(file); input.value='';
   },
 
-  /* ── SAVE / LOAD ── */
+  /* ─────────────────────────────────────────
+   ── CHARACTER PERSISTENCE (Save / Load)
+   ───────────────────────────────────────── */
+  /** Serializes the current character form state into a JSON-safe object. */
   gatherCharData() {
     const data = {
       _schemaVersion: STORAGE.SCHEMA_VERSION,
@@ -3852,6 +3917,7 @@ const app = {
     return data;
   },
 
+  /** Hydrates the form from a deserialized character data object. */
   applyCharData(data) {
     this.inventory = data.inventory||[];
     this.gold = data.gold||0;
@@ -3905,7 +3971,7 @@ const app = {
       const now = new Date();
       const ts = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
       const lbl = document.getElementById('last_saved_lbl');
-      if (lbl) { lbl.innerText = `guardado ${ts}`; lbl.classList.add('fresh'); setTimeout(()=>lbl.classList.remove('fresh'),2500); }
+      if (lbl) { lbl.textContent = `guardado ${ts}`; lbl.classList.add('fresh'); setTimeout(()=>lbl.classList.remove('fresh'),2500); }
       this.toast('Personaje guardado','💾');
     } else {
       this.toast('¡Almacenamiento lleno! Exporta tu personaje antes de perder datos.','⚠');
@@ -3957,9 +4023,9 @@ const app = {
 
   triggerLoadJSON() { document.getElementById('json_char_input').click(); },
 
-  /* ── CLEAR ── */
+  /* ── CLEAR CHARACTER DATA ── */
   clearCharData() {
-    ['base_FUE','base_DES','base_CON','base_INT','base_SAB','base_CAR'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=8});
+    STATS.forEach(s=>{const el=document.getElementById('base_'+s);if(el)el.value=8});
     ['char_name','char_concept','char_notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     const lvlEl=document.getElementById('char_lvl');if(lvlEl)lvlEl.value=1;
     ['char_xp','cur_pv','cur_adr','cur_ing','cur_carne'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=0});
@@ -3985,7 +4051,10 @@ const app = {
   },
 
 
-  /* ── FONT SIZE ══
+  /* ─────────────────────────────────────────
+   ── UI SETTINGS
+   ───────────────────────────────────────── */
+  /* ── FONT SIZE ──
      Todos los tamaños del CSS usan rem, que escalan desde el font-size de <html>.
      Cambiando document.documentElement.style.fontSize toda la interfaz responde. */
   setFontSize(size) {
@@ -4019,7 +4088,7 @@ const app = {
     // Update summary label
     const labels = {1:'Letalidad 1 — +1 PV/nivel', 2:'Letalidad 2 — +2 PV/nivel', 3:'Letalidad 3 — +3 PV/nivel'};
     const lbl = document.getElementById('campana_leth_label');
-    if(lbl) lbl.innerText = labels[n]||labels[1];
+    if(lbl) lbl.textContent = labels[n]||labels[1];
     this.calc();
   },
 
@@ -4093,7 +4162,6 @@ const app = {
     this.unlockApp();
 
     // 1. Stats (3d6 cada uno)
-    const STATS = ['FUE','DES','CON','INT','SAB','CAR'];
     STATS.forEach(s => {
       const roll = [0,1,2].reduce((sum, _) => sum + Math.floor(Math.random()*6)+1, 0);
       const el = document.getElementById('base_'+s); if(el) el.value = roll;
