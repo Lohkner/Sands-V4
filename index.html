@@ -1962,28 +1962,13 @@ const app = {
 
   /* ── UNLOCK / SETUP APP ── */
   unlockApp() {
-    // Preserve current identity selections before rebuilding selects
-    const prevDesc = document.getElementById('sel_desc')?.value || '';
-    const prevArq  = document.getElementById('sel_arq')?.value  || '';
-    const prevBg   = document.getElementById('sel_bg')?.value   || '';
-
     this.fillSelect('sel_desc', this.DB.descriptors || {});
-    this.fillSelect('sel_arq',  this.DB.archetypes  || {});
-    this.fillSelect('sel_bg',   this.DB.backgrounds || {});
-
-    // Restore if the key still exists in the (possibly updated) DB
-    const sd = document.getElementById('sel_desc');
-    const sa = document.getElementById('sel_arq');
-    const sb = document.getElementById('sel_bg');
-    if (sd && prevDesc && this.DB.descriptors?.[prevDesc]) sd.value = prevDesc;
-    if (sa && prevArq  && this.DB.archetypes?.[prevArq])   sa.value = prevArq;
-    if (sb && prevBg   && this.DB.backgrounds?.[prevBg])   sb.value = prevBg;
-
+    this.fillSelect('sel_arq', this.DB.archetypes || {});
+    this.fillSelect('sel_bg', this.DB.backgrounds || {});
     this.updateDbSelect();
     this.syncCombatOptions();
     this.initTalentManager();
-    // reset=false → keeps skill checkboxes already selected
-    this.updateOptions(false);
+    this.updateOptions(true);
     this.renderInventory();
   },
 
@@ -2018,21 +2003,6 @@ const app = {
       track.style.transition = 'none';
     }, {passive:true});
 
-    // Track whether the touch started inside an internal scrollable element
-    // (e.g. .skill-area). If so, don't hijack horizontal swipe.
-    let _touchInScroll = false;
-    w.addEventListener('touchstart', e => {
-      _touchInScroll = false;
-      let node = e.target;
-      while (node && node !== w) {
-        const oy = window.getComputedStyle(node).overflowY;
-        if ((oy === 'auto' || oy === 'scroll') && node.scrollHeight > node.clientHeight + 1) {
-          _touchInScroll = true; break;
-        }
-        node = node.parentElement;
-      }
-    }, {passive:true, capture:true});
-
     w.addEventListener('touchmove', e => {
       const t = e.touches[0];
       const dx = t.clientX - startX;
@@ -2042,9 +2012,7 @@ const app = {
       // dx must be > 12px AND at least 1.5× the vertical movement
       if (!locked) {
         if (Math.abs(dx) > Math.abs(dy) * 1.5 && Math.abs(dx) > 12) {
-          // Only lock horizontal if touch didn't start in a scrollable sub-element
-          if (!_touchInScroll) { locked = true; dragging = true; }
-          else { locked = true; } // release — let native scroll handle it
+          locked = true; dragging = true;
         } else if (Math.abs(dy) > Math.abs(dx) * 1.2 && Math.abs(dy) > 12) {
           locked = true; // vertical scroll — release entirely
         }
@@ -2211,18 +2179,16 @@ const app = {
     if (ev) ev.style.display = 'none';
     if (sv) sv.style.display = 'block';
 
-    // combat y equipment viven en page_3. Al colapsar el edit_view, el contenido
-    // encoge y el scrollTop puede quedar en zona vacía (pantalla negra).
-    // Doble rAF: espera a que el reflow termine antes de medir/corregir.
+    // combat y equipment viven en page_3. Al colapsar el edit_view, el scrollTop
+    // puede quedar apuntando a zona vacía, dejando pantalla negra.
     if (sec === 'combat' || sec === 'equipment') {
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          const page = document.getElementById('page_3');
-          if (!page) return;
-          if (page.scrollTop > page.scrollHeight - page.clientHeight + 1) {
-            page.scrollTop = 0;
-          }
-        });
+        const page = document.getElementById('page_3');
+        if (!page) return;
+        // Si el scroll superó el alto real del contenido, volver al top
+        if (page.scrollTop > page.scrollHeight - page.clientHeight + 1) {
+          page.scrollTop = 0;
+        }
       });
     }
   },
