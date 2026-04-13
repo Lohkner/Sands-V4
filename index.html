@@ -480,9 +480,18 @@ input[type=range]{flex:1;accent-color:var(--gold);cursor:pointer;min-width:0;hei
 #dice-overlay.closing .dice-card{opacity:0;transform:scale(.92) translateY(-8px);transition:opacity .22s ease,transform .22s ease}
 #dice-overlay.closing .dice-backdrop{opacity:0}
 .dice-label{font-family:var(--fd);font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.15em;text-align:center}
-.dice-face{width:88px;height:88px;border-radius:14px;background:linear-gradient(145deg,var(--deep),var(--void));border:2px solid var(--rim);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;box-shadow:inset 0 2px 8px rgba(0,0,0,.6),0 4px 16px rgba(0,0,0,.5)}
+.dice-faces-row{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;max-width:360px}
+.dice-face{width:88px;height:88px;border-radius:14px;background:linear-gradient(145deg,var(--deep),var(--void));border:2px solid var(--rim);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;box-shadow:inset 0 2px 8px rgba(0,0,0,.6),0 4px 16px rgba(0,0,0,.5);flex-shrink:0}
+/* Scale down faces when 3+ dice */
+.dice-faces-row.many .dice-face{width:66px;height:66px;border-radius:10px}
+.dice-faces-row.many .dice-num{font-size:2rem}
+/* Scale down faces when 5+ dice */
+.dice-faces-row.many5 .dice-face{width:54px;height:54px;border-radius:8px}
+.dice-faces-row.many5 .dice-num{font-size:1.6rem}
 .dice-face::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 25%,rgba(255,255,255,.06) 0%,transparent 60%);pointer-events:none}
 .dice-num{font-family:var(--ft);font-size:2.8rem;font-weight:700;color:var(--gold);line-height:1;text-shadow:0 0 20px rgba(200,169,110,.6);transition:none;will-change:transform,opacity}
+/* separator between dice */
+.dice-face-plus{font-family:var(--fd);font-size:.9rem;color:var(--dim);flex-shrink:0;align-self:center}
 .dice-num.rolling{animation:diceFlip .07s ease-in-out}
 .dice-num.result-pop{animation:resultPop .4s cubic-bezier(.18,.89,.32,1.28) forwards}
 .dice-num.crit-glow{color:var(--goldb);text-shadow:0 0 30px rgba(232,201,126,.9),0 0 60px rgba(200,169,110,.5)}
@@ -585,8 +594,8 @@ input:focus-visible,textarea:focus-visible{outline:none}
   <div class="dice-backdrop" id="dice-backdrop" onclick="app.closeDiceOverlay()"></div>
   <div class="dice-card" id="dice-card">
     <div class="dice-label" id="dice-label">Tirada</div>
-    <div class="dice-face">
-      <span class="dice-num" id="dice-num">20</span>
+    <div class="dice-faces-row" id="dice-faces-row">
+      <!-- Populated dynamically by showDiceRoll() -->
     </div>
     <div class="dice-deco-line"></div>
     <div class="dice-detail" id="dice-detail"></div>
@@ -2812,7 +2821,7 @@ const app = {
     this.showDiceRoll({
       label,
       die: 20,
-      finalFace: d20,
+      finalFaces: [d20],   // single d20 as array for consistency
       isCrit, isFail,
       detail: detailTxt,
       total: total,
@@ -2822,20 +2831,19 @@ const app = {
 
   rollDice(formula, label) {
     const match = formula.match(/(\d+)d(\d+)([+-]\d+)?/i);
-    if (!match) { this.toast(`${label}: ${formula}`, 'Daño'); return; }
-    const num=parseInt(match[1]),die=parseInt(match[2]),bonus=parseInt(match[3]||0);
-    let rolls=[],total=0;
-    for (let i=0;i<num;i++){const r=Math.floor(Math.random()*die)+1;rolls.push(r);total+=r}
+    if (!match) { this.toast(`${label}: ${formula}`, 'info'); return; }
+    const num = parseInt(match[1]), die = parseInt(match[2]), bonus = parseInt(match[3] || 0);
+    const rolls = [];
+    let total = 0;
+    for (let i = 0; i < num; i++) { const r = Math.floor(Math.random() * die) + 1; rolls.push(r); total += r; }
     total += bonus;
-    const isMax = rolls.some(r=>r===die);
-    const bonusStr = bonus>0?`+${bonus}`:bonus<0?String(bonus):'';
-    const detailTxt = num > 1
-      ? `[${rolls.join(' + ')}]${bonusStr}`
-      : `${rolls[0]}${bonusStr}`;
+    const bonusStr = bonus > 0 ? `+${bonus}` : bonus < 0 ? String(bonus) : '';
+    // Detail line: show individual rolls + bonus
+    const detailTxt = num > 1 ? `[${rolls.join(' + ')}]${bonusStr}` : `${rolls[0]}${bonusStr}`;
     this.showDiceRoll({
       label,
       die,
-      finalFace: rolls[rolls.length-1],
+      finalFaces: rolls,       // pass all rolls — overlay shows one face per die
       isCrit: false, isFail: false,
       detail: detailTxt,
       total,
@@ -2843,65 +2851,110 @@ const app = {
     });
   },
 
-  showDiceRoll({label, die, finalFace, isCrit, isFail, detail, total, totalLabel}) {
-    const overlay = document.getElementById('dice-overlay');
-    const numEl   = document.getElementById('dice-num');
-    const labelEl = document.getElementById('dice-label');
-    const detailEl= document.getElementById('dice-detail');
-    const totalRow= document.getElementById('dice-total-row');
-    const totalEl = document.getElementById('dice-total');
-    const badgeEl = document.getElementById('dice-badge');
-    const hintEl  = document.getElementById('dice-close-btn');
+  /**
+   * Show the dice overlay.
+   * @param {object} opts
+   * @param {string}   opts.label
+   * @param {number}   opts.die          - die type (d6, d20…)
+   * @param {number[]} opts.finalFaces   - one value per die (NEW: array)
+   * @param {number}   opts.finalFace    - legacy single-die fallback
+   * @param {boolean}  opts.isCrit
+   * @param {boolean}  opts.isFail
+   * @param {string}   opts.detail
+   * @param {number}   opts.total
+   * @param {string}   opts.totalLabel
+   */
+  showDiceRoll({label, die, finalFaces, finalFace, isCrit, isFail, detail, total, totalLabel}) {
+    // Normalise: support both old finalFace (single) and new finalFaces (array)
+    const faces = finalFaces ?? [finalFace ?? 1];
+    const numDice = faces.length;
 
-    // Reset state
+    const overlay   = document.getElementById('dice-overlay');
+    const facesRow  = document.getElementById('dice-faces-row');
+    const labelEl   = document.getElementById('dice-label');
+    const detailEl  = document.getElementById('dice-detail');
+    const totalRow  = document.getElementById('dice-total-row');
+    const totalEl   = document.getElementById('dice-total');
+    const badgeEl   = document.getElementById('dice-badge');
+    const hintEl    = document.getElementById('dice-close-btn');
+
+    // ── Reset ──
     overlay.classList.remove('closing');
-    numEl.className = 'dice-num';
-    detailEl.className = 'dice-detail';
-    totalRow.className = 'dice-total-row';
-    totalEl.className = 'dice-total';
+    detailEl.className  = 'dice-detail';
+    totalRow.className  = 'dice-total-row';
+    totalEl.className   = 'dice-total';
     badgeEl.style.display = 'none';
-    hintEl.className = 'dice-close-btn';
+    hintEl.className    = 'dice-close-btn';
     detailEl.textContent = '';
-    totalEl.textContent = '';
+    totalEl.textContent  = '';
+
+    // ── Build N die faces ──
+    facesRow.innerHTML = '';
+    facesRow.className = 'dice-faces-row'
+      + (numDice >= 5 ? ' many5' : numDice >= 3 ? ' many' : '');
+
+    const numEls = faces.map((_, i) => {
+      if (i > 0) {
+        const plus = document.createElement('span');
+        plus.className = 'dice-face-plus';
+        plus.textContent = '+';
+        facesRow.appendChild(plus);
+      }
+      const face = document.createElement('div');
+      face.className = 'dice-face';
+      const span = document.createElement('span');
+      span.className = 'dice-num';
+      span.textContent = Math.floor(Math.random() * die) + 1;
+      face.appendChild(span);
+      facesRow.appendChild(face);
+      return span;
+    });
 
     labelEl.textContent = label;
-    numEl.textContent = Math.floor(Math.random()*die)+1;
     overlay.classList.add('active');
     if (navigator.vibrate) navigator.vibrate(12);
 
-    // Rolling animation: decelerating random numbers
-    const totalTicks = 7;
-    const doTick = (tick) => {
-      numEl.classList.remove('rolling');
-      void numEl.offsetWidth;
-      numEl.classList.add('rolling');
-      if (tick < totalTicks) {
-        numEl.textContent = Math.floor(Math.random()*die)+1;
-        // Decelerate: starts ~35ms, ends ~110ms
-        setTimeout(() => doTick(tick+1), 35 + tick * 12);
-      } else {
-        // Final result
-        numEl.textContent = finalFace;
+    // ── Animate each die, staggered ──
+    const TICKS = 7;
+    let settled = 0;
+
+    numEls.forEach((numEl, dieIdx) => {
+      const finalVal = faces[dieIdx];
+      const staggerDelay = dieIdx * 55; // each die starts slightly later
+
+      const doTick = (tick) => {
         numEl.classList.remove('rolling');
-        numEl.classList.add('result-pop');
-        if (isCrit) numEl.classList.add('crit-glow');
-        if (isFail) numEl.classList.add('fail-glow');
-        // Show detail + total after pop
-        setTimeout(() => {
-          detailEl.textContent = detail;
-          detailEl.classList.add('show');
-          totalEl.textContent = (total>=0&&totalLabel!=='Daño'?'+':'')+total;
-          if (isCrit) totalEl.classList.add('crit');
-          if (isFail) totalEl.classList.add('fail');
-          totalRow.classList.add('show');
-          if (isCrit) { badgeEl.textContent='✦ Crítico ✦'; badgeEl.className='dice-badge crit'; badgeEl.style.display=''; }
-          if (isFail) { badgeEl.textContent='☠ Fallo Total ☠'; badgeEl.className='dice-badge fail'; badgeEl.style.display=''; }
-          hintEl.classList.add('show');
-        }, 160);
-        // Player must close manually — no auto-dismiss
-      }
-    };
-    doTick(0);
+        void numEl.offsetWidth;
+        numEl.classList.add('rolling');
+        if (tick < TICKS) {
+          numEl.textContent = Math.floor(Math.random() * die) + 1;
+          setTimeout(() => doTick(tick + 1), staggerDelay * (tick === 0 ? 1 : 0) + 35 + tick * 12);
+        } else {
+          numEl.textContent = finalVal;
+          numEl.classList.remove('rolling');
+          numEl.classList.add('result-pop');
+          // Crit/fail glow only on single d20 rolls
+          if (numDice === 1 && isCrit) numEl.classList.add('crit-glow');
+          if (numDice === 1 && isFail) numEl.classList.add('fail-glow');
+          settled++;
+          // Once all dice have settled, show summary
+          if (settled === numDice) {
+            setTimeout(() => {
+              detailEl.textContent = detail;
+              detailEl.classList.add('show');
+              totalEl.textContent = (total >= 0 && totalLabel !== 'Daño' ? '+' : '') + total;
+              if (isCrit) totalEl.classList.add('crit');
+              if (isFail) totalEl.classList.add('fail');
+              totalRow.classList.add('show');
+              if (isCrit) { badgeEl.textContent = '✦ Crítico ✦'; badgeEl.className = 'dice-badge crit'; badgeEl.style.display = ''; }
+              if (isFail) { badgeEl.textContent = '☠ Fallo Total ☠'; badgeEl.className = 'dice-badge fail'; badgeEl.style.display = ''; }
+              hintEl.classList.add('show');
+            }, 160);
+          }
+        }
+      };
+      setTimeout(() => doTick(0), staggerDelay);
+    });
   },
 
   closeDiceOverlay() {
@@ -3480,7 +3533,11 @@ const app = {
     let formHtml = `<h3 style="font-family:var(--fd);font-size:.78rem;color:var(--gold);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">${key==='new'?'Nuevo':'Editar'} Entrada</h3>`;
 
     if (cat === 'descriptors') {
-      formHtml += `<div style="margin-bottom:6px"><span class="dfl">Clave (ID único)</span><input type="text" id="db_key" value="${key==='new'?'':key}" placeholder="ej: elfo_oscuro"></div>
+      formHtml += `<div style="margin-bottom:10px">
+        <span class="dfl">Clave <span style="font-family:var(--fb);font-size:.62rem;color:var(--dim);text-transform:none;letter-spacing:0;font-style:italic;font-weight:400">— ID interno único</span></span>
+        <input type="text" id="db_key" value="${key==='new'?'':key}" placeholder="ej: elfo_oscuro" autocomplete="off" spellcheck="false">
+        <div style="font-family:var(--fb);font-size:.66rem;color:var(--muted);font-style:italic;margin-top:3px;line-height:1.4;padding-left:2px">Sin espacios ni acentos. Solo letras, números y guión bajo. Ej: <em>elfo_oscuro</em>, <em>humano_variante</em></div>
+      </div>
       <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
       <div style="margin-bottom:6px"><span class="dfl">Descripción</span><textarea id="db_txt" style="min-height:56px">${existing?.txt||''}</textarea></div>
       <div style="margin-bottom:6px"><span class="dfl">Bono</span><input type="text" id="db_bonus" value="${existing?.bonus||''}" placeholder="ej: +1 DES"></div>
@@ -3491,7 +3548,11 @@ const app = {
         </div>
       </div>`;
     } else if (cat === 'archetypes') {
-      formHtml += `<div style="margin-bottom:6px"><span class="dfl">Clave</span><input type="text" id="db_key" value="${key==='new'?'':key}" placeholder="ej: paladín"></div>
+      formHtml += `<div style="margin-bottom:10px">
+        <span class="dfl">Clave <span style="font-family:var(--fb);font-size:.62rem;color:var(--dim);text-transform:none;letter-spacing:0;font-style:italic;font-weight:400">— ID interno único</span></span>
+        <input type="text" id="db_key" value="${key==='new'?'':key}" placeholder="ej: paladin" autocomplete="off" spellcheck="false">
+        <div style="font-family:var(--fb);font-size:.66rem;color:var(--muted);font-style:italic;margin-top:3px;line-height:1.4;padding-left:2px">Sin espacios ni acentos. Ej: <em>paladin</em>, <em>brujo_pacto</em></div>
+      </div>
       <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
       <div style="margin-bottom:6px"><span class="dfl">Descripción</span><textarea id="db_txt" style="min-height:56px">${existing?.txt||''}</textarea></div>
       <div class="g3" style="gap:6px;margin-bottom:6px">
@@ -3502,13 +3563,21 @@ const app = {
       <div style="margin-bottom:6px"><span class="dfl">Filos (separados por coma)</span><input type="text" id="db_edges" value="${(existing?.edges||[]).join(', ')}"></div>
       <div style="margin-bottom:6px"><span class="dfl">Habilidades (separadas por coma)</span><input type="text" id="db_skills" value="${(existing?.skills||[]).join(', ')}"></div>`;
     } else if (cat === 'backgrounds') {
-      formHtml += `<div style="margin-bottom:6px"><span class="dfl">Clave</span><input type="text" id="db_key" value="${key==='new'?'':key}"></div>
+      formHtml += `<div style="margin-bottom:10px">
+        <span class="dfl">Clave <span style="font-family:var(--fb);font-size:.62rem;color:var(--dim);text-transform:none;letter-spacing:0;font-style:italic;font-weight:400">— ID interno único</span></span>
+        <input type="text" id="db_key" value="${key==='new'?'':key}" placeholder="ej: marinero" autocomplete="off" spellcheck="false">
+        <div style="font-family:var(--fb);font-size:.66rem;color:var(--muted);font-style:italic;margin-top:3px;line-height:1.4;padding-left:2px">Sin espacios ni acentos. Ej: <em>marinero</em>, <em>ex_soldado</em></div>
+      </div>
       <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
       <div style="margin-bottom:6px"><span class="dfl">Descripción</span><textarea id="db_txt" style="min-height:56px">${existing?.txt||''}</textarea></div>
       <div style="margin-bottom:6px"><span class="dfl">Rasgos (coma)</span><input type="text" id="db_grant" value="${(existing?.grant||[]).join(', ')}"></div>
       <div style="margin-bottom:6px"><span class="dfl">Habilidades (coma)</span><input type="text" id="db_skills" value="${(existing?.skills||[]).join(', ')}"></div>`;
     } else if (cat === 'weapons') {
-      formHtml += `<div style="margin-bottom:6px"><span class="dfl">Clave</span><input type="text" id="db_key" value="${key==='new'?'':key}"></div>
+      formHtml += `<div style="margin-bottom:10px">
+        <span class="dfl">Clave <span style="font-family:var(--fb);font-size:.62rem;color:var(--dim);text-transform:none;letter-spacing:0;font-style:italic;font-weight:400">— ID interno único</span></span>
+        <input type="text" id="db_key" value="${key==='new'?'':key}" placeholder="ej: espada_larga" autocomplete="off" spellcheck="false">
+        <div style="font-family:var(--fb);font-size:.66rem;color:var(--muted);font-style:italic;margin-top:3px;line-height:1.4;padding-left:2px">Sin espacios ni acentos. Ej: <em>espada_larga</em>, <em>ballesta_mano</em></div>
+      </div>
       <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
       <div class="g2" style="gap:6px;margin-bottom:6px">
         <div><span class="dfl">Daño (ej: 1d8)</span><input type="text" id="db_dmg" value="${existing?.dmg||'1d6'}"></div>
@@ -3520,7 +3589,11 @@ const app = {
         <div><span class="dfl">Req. DES</span><input type="number" id="db_req_des" value="${existing?.req_DES||0}"></div>
       </div>`;
     } else if (cat === 'armors') {
-      formHtml += `<div style="margin-bottom:6px"><span class="dfl">Clave</span><input type="text" id="db_key" value="${key==='new'?'':key}"></div>
+      formHtml += `<div style="margin-bottom:10px">
+        <span class="dfl">Clave <span style="font-family:var(--fb);font-size:.62rem;color:var(--dim);text-transform:none;letter-spacing:0;font-style:italic;font-weight:400">— ID interno único</span></span>
+        <input type="text" id="db_key" value="${key==='new'?'':key}" placeholder="ej: cota_malla" autocomplete="off" spellcheck="false">
+        <div style="font-family:var(--fb);font-size:.66rem;color:var(--muted);font-style:italic;margin-top:3px;line-height:1.4;padding-left:2px">Sin espacios ni acentos. Ej: <em>cota_malla</em>, <em>cuero_tachonado</em></div>
+      </div>
       <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
       <div class="g3" style="gap:6px;margin-bottom:6px">
         <div><span class="dfl">CA Base</span><input type="number" id="db_ca" value="${existing?.ca||10}"></div>
@@ -3528,14 +3601,22 @@ const app = {
         <div><span class="dfl">Slots</span><input type="number" id="db_slots" value="${existing?.slots||1}"></div>
       </div>`;
     } else if (cat === 'shields') {
-      formHtml += `<div style="margin-bottom:6px"><span class="dfl">Clave</span><input type="text" id="db_key" value="${key==='new'?'':key}"></div>
+      formHtml += `<div style="margin-bottom:10px">
+        <span class="dfl">Clave <span style="font-family:var(--fb);font-size:.62rem;color:var(--dim);text-transform:none;letter-spacing:0;font-style:italic;font-weight:400">— ID interno único</span></span>
+        <input type="text" id="db_key" value="${key==='new'?'':key}" placeholder="ej: escudo_torre" autocomplete="off" spellcheck="false">
+        <div style="font-family:var(--fb);font-size:.66rem;color:var(--muted);font-style:italic;margin-top:3px;line-height:1.4;padding-left:2px">Sin espacios ni acentos. Ej: <em>escudo_madera</em>, <em>escudo_torre</em></div>
+      </div>
       <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
       <div class="g2" style="gap:6px;margin-bottom:6px">
         <div><span class="dfl">Bono CA</span><input type="number" id="db_bonus_ca" value="${existing?.bonus||1}"></div>
         <div><span class="dfl">Slots</span><input type="number" id="db_slots" value="${existing?.slots||1}"></div>
       </div>`;
     } else if (cat === 'spells') {
-      formHtml += `<div style="margin-bottom:6px"><span class="dfl">Clave</span><input type="text" id="db_key" value="${key==='new'?'':key}"></div>
+      formHtml += `<div style="margin-bottom:10px">
+        <span class="dfl">Clave <span style="font-family:var(--fb);font-size:.62rem;color:var(--dim);text-transform:none;letter-spacing:0;font-style:italic;font-weight:400">— ID interno único</span></span>
+        <input type="text" id="db_key" value="${key==='new'?'':key}" placeholder="ej: bola_fuego" autocomplete="off" spellcheck="false">
+        <div style="font-family:var(--fb);font-size:.66rem;color:var(--muted);font-style:italic;margin-top:3px;line-height:1.4;padding-left:2px">Sin espacios ni acentos. Ej: <em>bola_fuego</em>, <em>truco_luz</em>, <em>rayo_helado</em></div>
+      </div>
       <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
       <div style="margin-bottom:6px"><span class="dfl">Descripción</span><textarea id="db_txt" style="min-height:60px">${existing?.txt||''}</textarea></div>
       <div class="g2" style="gap:6px;margin-bottom:6px">
