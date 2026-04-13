@@ -110,11 +110,11 @@ body{font-family:var(--fb);background:var(--void);color:var(--text);min-height:-
 .sdial-btn:active{transform:scale(.92)}
 .sdial-menu{position:absolute;top:calc(100% + 8px);right:0;display:flex;flex-direction:column;gap:6px;opacity:0;pointer-events:none;transform:translateY(-6px);transition:opacity .18s,transform .18s;z-index:100}
 .sdial-menu.open{opacity:1;pointer-events:auto;transform:translateY(0)}
-.sdial-item{width:34px;height:34px;border-radius:10px;background:var(--panel);border:1px solid var(--border);color:var(--dim);font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s,border-color .12s,color .12s,transform .1s,box-shadow .12s;box-shadow:0 4px 12px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.05);-webkit-tap-highlight-color:transparent}
-.sdial-item:hover{border-color:var(--gold);color:var(--gold);background:rgba(200,169,110,.14);box-shadow:0 0 0 1px rgba(200,169,110,.2),0 4px 14px rgba(0,0,0,.5)}
-.sdial-item:active{transform:scale(.88);background:rgba(200,169,110,.22);border-color:var(--gold);color:var(--gold);box-shadow:none}
-.sdial-danger:hover{border-color:var(--blood);color:var(--blood);background:rgba(176,48,64,.14)}
-.sdial-danger:active{background:rgba(176,48,64,.28);border-color:var(--blood);color:var(--blood)}
+.sdial-item{width:34px;height:34px;border-radius:10px;background-color:#2a2337;border:1px solid #4a3f5e;color:#a899be;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background-color .15s,border-color .15s,color .15s,transform .1s,box-shadow .15s;box-shadow:0 4px 12px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.05);-webkit-tap-highlight-color:transparent}
+.sdial-item:hover{border-color:#c8a96e;color:#c8a96e;background-color:#3d3020;box-shadow:0 0 0 1px rgba(200,169,110,.25),0 4px 14px rgba(0,0,0,.5)}
+.sdial-item:active{transform:scale(.88);background-color:#4a3a18;border-color:#c8a96e;color:#e8c97e;box-shadow:none}
+.sdial-danger:hover{border-color:#b03040;color:#b03040;background-color:#3a1a1e}
+.sdial-danger:active{background-color:#4a1820;border-color:#b03040;color:#e05a2b}
 
 /* ══ PAGES ══ */
 .pages-wrapper{flex:1;overflow:hidden;position:relative;min-height:0;touch-action:pan-y}
