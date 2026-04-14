@@ -2210,33 +2210,32 @@ const app = {
 
   _buildStatsSummary() {
     // STATS is a top-level constant
-    const c = document.getElementById('stats_summary_boxes');
-    c.innerHTML = '';
-    STATS.forEach(s => {
-      const raw = parseInt(document.getElementById('base_'+s).value)||8;
-      const mod = this.getMod(raw);
-      const modStr = (mod>=0?'+':'')+mod;
+    // Get descriptor mods (same as calc()) so displayed values include racial bonuses
+    const descKey = document.getElementById('sel_desc')?.value || '';
+    const descMods = this.DB.descriptors?.[descKey]?.mods || {};
+
+    const makeBox = (s, forSummary) => {
+      const base  = parseInt(document.getElementById('base_'+s)?.value) || 8;
+      const dm    = descMods[s] || 0;
+      const final = base + dm;
+      const mod   = this.getMod(final);
+      const modStr = (mod >= 0 ? '+' : '') + mod;
       const box = document.createElement('div');
       box.className = 'sbox';
       box.onclick = () => this.rollCheck(s, mod);
-      box.innerHTML = `<div class="lbl">${s}</div><div class="mod">${modStr}</div><div class="val">${raw}</div>`;
-      c.appendChild(box);
-    });
-    // Also update the live display in edit view (rebuilt independently to avoid stale onclick handlers)
+      // Show final value; if a racial bonus applies, show it as a subtle annotation
+      const valHtml = dm !== 0
+        ? `${final}<span style="font-size:.48rem;color:var(--gold);margin-left:1px">${dm>0?'+':''}${dm}</span>`
+        : `${final}`;
+      box.innerHTML = `<div class="lbl">${s}</div><div class="mod">${modStr}</div><div class="val">${valHtml}</div>`;
+      return box;
+    };
+
+    const c = document.getElementById('stats_summary_boxes');
+    if (c) { c.innerHTML = ''; STATS.forEach(s => c.appendChild(makeBox(s, true))); }
+
     const live = document.getElementById('stats_boxes_display');
-    if (live) {
-      live.innerHTML = '';
-      STATS.forEach(s => {
-        const raw2 = parseInt(document.getElementById('base_'+s).value)||8;
-        const mod2 = this.getMod(raw2);
-        const modStr2 = (mod2>=0?'+':'')+mod2;
-        const box2 = document.createElement('div');
-        box2.className = 'sbox';
-        box2.onclick = () => this.rollCheck(s, mod2);
-        box2.innerHTML = `<div class="lbl">${s}</div><div class="mod">${modStr2}</div><div class="val">${raw2}</div>`;
-        live.appendChild(box2);
-      });
-    }
+    if (live) { live.innerHTML = ''; STATS.forEach(s => live.appendChild(makeBox(s, false))); }
   },
 
   _buildSavesSummary() {
@@ -2248,11 +2247,14 @@ const app = {
       const c = document.getElementById(id);
       if (!c) return;
       c.innerHTML = '';
+      const descKey2 = document.getElementById('sel_desc')?.value || '';
+      const descMods2 = this.DB.descriptors?.[descKey2]?.mods || {};
       STATS.forEach(s => {
-        const raw = parseInt(document.getElementById('base_'+s).value)||8;
-        const base = this.getMod(raw);
+        const base  = parseInt(document.getElementById('base_'+s)?.value) || 8;
+        const final = base + (descMods2[s] || 0);
+        const mod   = this.getMod(final);
         const isProf = (s===common||s===uncommon);
-        const total = base + (isProf?prof:0);
+        const total = mod + (isProf?prof:0);
         const box = document.createElement('div');
         box.className = 'svsbox' + (isProf?' prof':'');
         box.onclick = () => this.rollCheck('Salvación '+s, total);
