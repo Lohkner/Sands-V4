@@ -142,15 +142,15 @@ body{font-family:var(--fb);background:var(--void);color:var(--text);min-height:-
 .port-card-edit:hover .port-hint,.port-card-edit:focus .port-hint{opacity:1}
 /* Camera icon badge on portrait — always visible on touch devices */
 .port-hint::before{content:'✦';position:absolute;top:10px;right:10px;width:28px;height:28px;background:rgba(200,169,110,.18);border:1px solid rgba(200,169,110,.45);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;color:var(--gold);backdrop-filter:blur(4px)}
-.port-card{position:relative;width:308px;max-width:100%;height:464px;overflow:hidden;border-radius:var(--rl);border:1px solid rgba(200,169,110,.35);flex-shrink:0;box-shadow:0 4px 24px rgba(0,0,0,.5)}
+.port-card{position:relative;width:277px;max-width:100%;height:418px;overflow:hidden;border-radius:var(--rl);border:1px solid rgba(200,169,110,.35);flex-shrink:0;box-shadow:0 4px 24px rgba(0,0,0,.5)}
 .port-card img{display:block;width:100%;height:100%;object-fit:cover;background:var(--raised)}
-.port-card-edit{position:relative;width:308px;max-width:100%;height:464px;overflow:hidden;border-radius:var(--rl);border:1px dashed rgba(200,169,110,.5);flex-shrink:0;cursor:pointer;transition:border-color .2s}
+.port-card-edit{position:relative;width:277px;max-width:100%;height:418px;overflow:hidden;border-radius:var(--rl);border:1px dashed rgba(200,169,110,.5);flex-shrink:0;cursor:pointer;transition:border-color .2s}
 .port-card-edit:hover{border-color:var(--gold);border-style:solid}
 .port-card-edit:hover .port-hint{opacity:1}
 .port-card-edit:hover img{transform:scale(1.03)}
 .port-card-edit img{display:block;width:100%;height:100%;object-fit:cover;background:var(--raised);transition:transform .3s ease}
 
-.port-identity{width:308px;max-width:100%;text-align:center;padding:10px 0 4px}
+.port-identity{width:277px;max-width:100%;text-align:center;padding:10px 0 4px}
 .port-name{font-family:var(--fd);font-size:1.1rem;color:var(--goldb);letter-spacing:.05em}
 .port-divider{width:55%;margin:8px auto 7px;height:1px;background:linear-gradient(90deg,transparent,rgba(200,169,110,.55) 15%,var(--gold) 50%,rgba(200,169,110,.55) 85%,transparent)}
 .port-lvl{font-family:var(--fm);font-size:.6rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
@@ -2223,11 +2223,7 @@ const app = {
       const box = document.createElement('div');
       box.className = 'sbox';
       box.onclick = () => this.rollCheck(s, mod);
-      // Show final value; if a racial bonus applies, show it as a subtle annotation
-      const valHtml = dm !== 0
-        ? `${final}<span style="font-size:.48rem;color:var(--gold);margin-left:1px">${dm>0?'+':''}${dm}</span>`
-        : `${final}`;
-      box.innerHTML = `<div class="lbl">${s}</div><div class="mod">${modStr}</div><div class="val">${valHtml}</div>`;
+      box.innerHTML = `<div class="lbl">${s}</div><div class="mod">${modStr}</div><div class="val">${final}</div>`;
       return box;
     };
 
@@ -3780,7 +3776,7 @@ const app = {
     const wsW = ws.clientWidth, wsH = ws.clientHeight;
     // Fill 88% of workspace keeping exact portrait card ratio (308 × 464)
     const maxW = wsW * 0.88, maxH = wsH * 0.88;
-    const CROP_W = 308, CROP_H = 464;
+    const CROP_W = 277, CROP_H = 418;
     let fw = maxW, fh = fw * (CROP_H / CROP_W);
     if (fh > maxH) { fh = maxH; fw = fh * (CROP_W / CROP_H); }
     return {w: Math.round(fw), h: Math.round(fh)};
@@ -3833,7 +3829,7 @@ const app = {
           cs.minZoom = cs.zoom * 0.25;
           // Center image on first open (x=0, y=0 = centered by CSS transform-origin)
           cs.x = 0; cs.y = 0;
-          this._cropApply();
+          this._cropSnap();
           this._cropUpdateSlider();
         }));
       };
@@ -3855,7 +3851,7 @@ const app = {
     cs.zoom = Math.max(FW / natW, FH / natH);
     cs.minZoom = cs.zoom * 0.25;
     cs.x = 0; cs.y = 0;
-    this._cropApply();
+    this._cropSnap();
     this._cropUpdateSlider();
   },
 
@@ -3865,7 +3861,7 @@ const app = {
     cs.zoom = Math.max(cs.minZoom || 0.05, Math.min(8, cs.zoom + delta));
     const ratio = cs.zoom / prev;
     cs.x *= ratio; cs.y *= ratio;
-    this._cropApply();
+    this._cropSnap(); // snap to bounds after zoom
     this._cropUpdateSlider();
   },
 
@@ -3875,7 +3871,7 @@ const app = {
     cs.zoom = parseFloat(val);
     const ratio = cs.zoom / prev;
     cs.x *= ratio; cs.y *= ratio;
-    this._cropApply();
+    this._cropSnap();
     this._cropUpdateSlider();
   },
 
@@ -3892,14 +3888,20 @@ const app = {
       isDragging:false, lastX:0, lastY:0, pinch:null, velX:0, velY:0};
   },
 
-  // ── Internal: apply transform ──
+  // ── Internal: apply transform (no clamp — user drags freely) ──
   _cropApply() {
     const cs = this.cropState;
     if (!cs.img) return;
-    cs.x = this._cropClamp('x');
-    cs.y = this._cropClamp('y');
     const img = document.getElementById('crop_preview');
     img.style.transform = `translate(${cs.x}px,${cs.y}px) rotate(${cs.rot}deg) scale(${cs.zoom})`;
+  },
+
+  // Snap position back within bounds — called only on release and zoom
+  _cropSnap() {
+    const cs = this.cropState;
+    cs.x = this._cropClamp('x');
+    cs.y = this._cropClamp('y');
+    this._cropApply();
   },
 
   _cropClamp(axis) {
@@ -4043,8 +4045,12 @@ const app = {
     const cs = this.cropState;
     let vx = cs.velX * 80, vy = cs.velY * 80;
     const step = () => {
-      if (!cs.img) return; // guard: crop cancelled mid-inertia
-      if (Math.abs(vx) < 0.3 && Math.abs(vy) < 0.3) return;
+      if (!cs.img) return;
+      if (Math.abs(vx) < 0.3 && Math.abs(vy) < 0.3) {
+        // Motion stopped — snap to bounds
+        this._cropSnap();
+        return;
+      }
       cs.x += vx; cs.y += vy;
       vx *= 0.88; vy *= 0.88;
       this._cropApply();
