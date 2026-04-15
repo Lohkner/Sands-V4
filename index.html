@@ -213,16 +213,29 @@ input[type=radio]:checked::after{transform:scale(1)}
 .sc-clickable{background:var(--raised);border:1px solid var(--rim);border-radius:var(--r);padding:4px;text-align:center;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent}
 .sc-clickable:active{transform:scale(.94);border-color:var(--gold)}
 /* ══ ATTACKS ══ */
-.atk-card{background:var(--raised);border:1px solid var(--rim);border-radius:var(--r);padding:6px 8px;margin-top:4px}
-.atk-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
-.atk-nm{font-family:var(--fd);font-size:.78rem;color:var(--gold);font-weight:600}
-.atk-btns{display:grid;grid-template-columns:1fr 1fr;gap:5px}
-.abtn{border:none;border-radius:var(--r);cursor:pointer;font-family:var(--fd);font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:8px 8px;transition:transform .1s,box-shadow .15s,background .15s,opacity .1s;display:flex;flex-direction:column;align-items:center;gap:1px;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;position:relative;overflow:hidden}
-.abtn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.18);opacity:0;transition:opacity .25s}
-.abtn:active{transform:scale(.91);opacity:.9}.abtn:active::after{opacity:1}
-.abtn-a{background:linear-gradient(135deg,var(--crimson),var(--blood));color:#fff;box-shadow:0 2px 8px rgba(125,28,42,.4)}.abtn-a:hover{box-shadow:0 0 0 1px rgba(176,48,64,.5),0 4px 14px rgba(125,28,42,.5)}.abtn-a:active{box-shadow:none}
-.abtn-d{background:rgba(200,169,110,.1);border:1px solid rgba(200,169,110,.35);color:var(--goldb)}.abtn-d:hover{background:rgba(200,169,110,.2);border-color:var(--gold)}.abtn-d:active{background:rgba(200,169,110,.3)}
-.asub{font-size:.58rem;font-weight:400;opacity:.8}.aval{font-size:.9rem}
+/* ══ ATTACK CARD ══ */
+.atk-card{background:linear-gradient(145deg,var(--raised),var(--deep));border:1px solid rgba(74,63,94,.65);border-radius:10px;overflow:hidden;box-shadow:0 3px 14px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.04);position:relative;margin-top:6px}
+.atk-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,rgba(176,48,64,.7) 0%,rgba(176,48,64,.0) 70%)}
+.atk-card.secondary::before{background:linear-gradient(90deg,rgba(200,169,110,.45) 0%,rgba(200,169,110,.0) 70%)}
+.atk-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 12px 2px}
+.atk-nm{font-family:var(--fd);font-size:.82rem;color:var(--goldb);font-weight:600;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70%}
+.atk-role-badge{font-family:var(--fm);font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(138,122,158,.6);background:rgba(74,63,94,.3);padding:2px 8px;border-radius:20px;border:1px solid rgba(74,63,94,.45);flex-shrink:0}
+.atk-stats-line{font-family:var(--fm);font-size:.65rem;color:rgba(138,122,158,.65);padding:0 12px 5px;letter-spacing:.02em}
+/* strip: two action zones side by side */
+.atk-btns{display:grid;grid-template-columns:1fr 1px 1fr;margin:0 10px 10px;border:1px solid rgba(74,63,94,.45);border-radius:7px;overflow:hidden;background:rgba(7,6,10,.4)}
+.atk-btn-sep{background:rgba(74,63,94,.45)}
+.abtn{border:none;background:transparent;cursor:pointer;display:flex;align-items:center;gap:8px;padding:9px 11px;transition:background .12s,transform .08s;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;position:relative;overflow:hidden;width:100%}
+.abtn:active{background:rgba(255,255,255,.04);transform:scale(.97)}
+.abtn-a:active{background:rgba(176,48,64,.1)}
+.abtn-d:active{background:rgba(200,169,110,.08)}
+.abtn-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.72rem;font-family:var(--fd);font-weight:700}
+.abtn-a .abtn-icon{background:linear-gradient(135deg,rgba(176,48,64,.35),rgba(176,48,64,.15));border:1px solid rgba(176,48,64,.45);color:#e07080}
+.abtn-d .abtn-icon{background:linear-gradient(135deg,rgba(200,169,110,.18),rgba(200,169,110,.06));border:1px solid rgba(200,169,110,.28);color:var(--gold)}
+.abtn-text{display:flex;flex-direction:column;gap:1px}
+.asub{font-family:var(--fd);font-size:.5rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(138,122,158,.65);line-height:1}
+.aval{font-family:var(--fm);font-size:.96rem;font-weight:700;line-height:1;margin-top:1px}
+.abtn-a .aval{color:#e07080}
+.abtn-d .aval{color:var(--goldb)}
 /* ══ COMBAT CARDS ══ */
 .ccard{background:var(--raised);border:1px solid var(--rim);border-radius:var(--r);padding:5px 8px;display:flex;justify-content:space-between;align-items:center;margin-top:4px;transition:border-color .15s}
 .clbl{font-size:.62rem;color:var(--muted);font-family:var(--fd);text-transform:uppercase;letter-spacing:.09em;display:block;margin-bottom:1px}
@@ -835,12 +848,38 @@ input:focus-visible,textarea:focus-visible{outline:none}
           <div class="panel">
             <div class="ph" style="margin-bottom:4px"><span class="pt">Ataques</span><span style="font-family:var(--fm);font-size:.58rem;color:var(--muted);margin-left:auto">desde equipo</span></div>
             <div class="atk-card">
-              <div class="atk-hdr"><span class="atk-nm" id="atk_name_1">Desarmado</span><span style="font-family:var(--fm);font-size:.65rem;color:var(--muted)">Principal</span></div>
-              <div class="atk-btns"><button class="abtn abtn-a" onclick="app.rollWeaponAtk(1)" aria-label="Tirar ataque arma principal"><span class="asub">Atacar</span><span class="aval" id="atk_bonus_1">+0</span></button><button class="abtn abtn-d" onclick="app.rollWeaponDmg(1)" aria-label="Tirar daño arma principal"><span class="asub">Daño</span><span class="aval" id="atk_dmg_1">1</span></button></div>
+              <div class="atk-hdr">
+                <span class="atk-nm" id="atk_name_1">Desarmado</span>
+                <span class="atk-role-badge">Principal</span>
+              </div>
+              <div class="atk-btns">
+                <button class="abtn abtn-a" onclick="app.rollWeaponAtk(1)" aria-label="Tirar ataque arma principal">
+                  <span class="abtn-icon">ATK</span>
+                  <span class="abtn-text"><span class="asub">Atacar</span><span class="aval" id="atk_bonus_1">+0</span></span>
+                </button>
+                <div class="atk-btn-sep"></div>
+                <button class="abtn abtn-d" onclick="app.rollWeaponDmg(1)" aria-label="Tirar daño arma principal">
+                  <span class="abtn-icon">DMG</span>
+                  <span class="abtn-text"><span class="asub">Daño</span><span class="aval" id="atk_dmg_1">1</span></span>
+                </button>
+              </div>
             </div>
-            <div class="atk-card" style="margin-top:4px">
-              <div class="atk-hdr"><span class="atk-nm" id="atk_name_2">Desarmado</span><span style="font-family:var(--fm);font-size:.65rem;color:var(--muted)">Secundaria</span></div>
-              <div class="atk-btns"><button class="abtn abtn-a" onclick="app.rollWeaponAtk(2)"><span class="asub">Atacar</span><span class="aval" id="atk_bonus_2">+0</span></button><button class="abtn abtn-d" onclick="app.rollWeaponDmg(2)"><span class="asub">Daño</span><span class="aval" id="atk_dmg_2">1</span></button></div>
+            <div class="atk-card secondary">
+              <div class="atk-hdr">
+                <span class="atk-nm" id="atk_name_2">Desarmado</span>
+                <span class="atk-role-badge">Secundaria</span>
+              </div>
+              <div class="atk-btns">
+                <button class="abtn abtn-a" onclick="app.rollWeaponAtk(2)" aria-label="Tirar ataque arma secundaria">
+                  <span class="abtn-icon">ATK</span>
+                  <span class="abtn-text"><span class="asub">Atacar</span><span class="aval" id="atk_bonus_2">+0</span></span>
+                </button>
+                <div class="atk-btn-sep"></div>
+                <button class="abtn abtn-d" onclick="app.rollWeaponDmg(2)" aria-label="Tirar daño arma secundaria">
+                  <span class="abtn-icon">DMG</span>
+                  <span class="abtn-text"><span class="asub">Daño</span><span class="aval" id="atk_dmg_2">1</span></span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -1007,14 +1046,40 @@ input:focus-visible,textarea:focus-visible{outline:none}
                 <div class="fbox"><div class="flbl">Escudo</div><div class="fval" style="font-size:.74rem"><span id="sum_shield">—</span></div></div>
               </div>
               <div class="atk-card">
-                <div class="atk-hdr"><span class="atk-nm" id="sum_wep1_name">—</span><span style="font-family:var(--fm);font-size:.62rem;color:var(--muted)">Principal</span></div>
-                <div style="font-family:var(--fm);font-size:.7rem;color:var(--muted);margin-bottom:5px" id="sum_wep1_stats">—</div>
-                <div class="atk-btns"><button class="abtn abtn-a" onclick="app.rollWeaponAtk(1)"><span class="asub">Atacar</span><span class="aval" id="sum_atk1_bonus">+0</span></button><button class="abtn abtn-d" onclick="app.rollWeaponDmg(1)"><span class="asub">Daño</span><span class="aval" id="sum_atk1_dmg">1</span></button></div>
+                <div class="atk-hdr">
+                  <span class="atk-nm" id="sum_wep1_name">—</span>
+                  <span class="atk-role-badge">Principal</span>
+                </div>
+                <div class="atk-stats-line" id="sum_wep1_stats">—</div>
+                <div class="atk-btns">
+                  <button class="abtn abtn-a" onclick="app.rollWeaponAtk(1)" aria-label="Tirar ataque arma principal">
+                    <span class="abtn-icon">ATK</span>
+                    <span class="abtn-text"><span class="asub">Atacar</span><span class="aval" id="sum_atk1_bonus">+0</span></span>
+                  </button>
+                  <div class="atk-btn-sep"></div>
+                  <button class="abtn abtn-d" onclick="app.rollWeaponDmg(1)" aria-label="Tirar daño arma principal">
+                    <span class="abtn-icon">DMG</span>
+                    <span class="abtn-text"><span class="asub">Daño</span><span class="aval" id="sum_atk1_dmg">1</span></span>
+                  </button>
+                </div>
               </div>
-              <div class="atk-card" style="margin-top:4px">
-                <div class="atk-hdr"><span class="atk-nm" id="sum_wep2_name">—</span><span style="font-family:var(--fm);font-size:.62rem;color:var(--muted)">Secundaria</span></div>
-                <div style="font-family:var(--fm);font-size:.7rem;color:var(--muted);margin-bottom:5px" id="sum_wep2_stats">—</div>
-                <div class="atk-btns"><button class="abtn abtn-a" onclick="app.rollWeaponAtk(2)"><span class="asub">Atacar</span><span class="aval" id="sum_atk2_bonus">+0</span></button><button class="abtn abtn-d" onclick="app.rollWeaponDmg(2)"><span class="asub">Daño</span><span class="aval" id="sum_atk2_dmg">1</span></button></div>
+              <div class="atk-card secondary">
+                <div class="atk-hdr">
+                  <span class="atk-nm" id="sum_wep2_name">—</span>
+                  <span class="atk-role-badge">Secundaria</span>
+                </div>
+                <div class="atk-stats-line" id="sum_wep2_stats">—</div>
+                <div class="atk-btns">
+                  <button class="abtn abtn-a" onclick="app.rollWeaponAtk(2)" aria-label="Tirar ataque arma secundaria">
+                    <span class="abtn-icon">ATK</span>
+                    <span class="abtn-text"><span class="asub">Atacar</span><span class="aval" id="sum_atk2_bonus">+0</span></span>
+                  </button>
+                  <div class="atk-btn-sep"></div>
+                  <button class="abtn abtn-d" onclick="app.rollWeaponDmg(2)" aria-label="Tirar daño arma secundaria">
+                    <span class="abtn-icon">DMG</span>
+                    <span class="abtn-text"><span class="asub">Daño</span><span class="aval" id="sum_atk2_dmg">1</span></span>
+                  </button>
+                </div>
               </div>
               <button class="bedit" onclick="app.editSection('combat')">✏ Editar</button>
             </div>
