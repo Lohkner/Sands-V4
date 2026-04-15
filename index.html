@@ -2926,9 +2926,9 @@ const app = {
     for (let i = 0; i < num; i++) { const r = Math.floor(Math.random() * die) + 1; rolls.push(r); total += r; }
     total += bonus;
     const bonusStr = bonus > 0 ? `+${bonus}` : bonus < 0 ? String(bonus) : '';
-    // Detail line: formula + individual rolls + bonus
+    // Format mirrors rollCheck: "2d6: [4 + 3]  (+2)"
     const rollsPart = num > 1 ? `[${rolls.join(' + ')}]` : `${rolls[0]}`;
-    const detailTxt = `${num}d${die}${bonusStr}  →  ${rollsPart}${bonusStr}`;
+    const detailTxt = `${num}d${die}: ${rollsPart}${bonusStr !== '' ? '  (' + bonusStr + ')' : ''}`;
     this.showDiceRoll({
       label,
       die,
