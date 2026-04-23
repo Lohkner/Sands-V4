@@ -15,6 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="S&amp;S Companion">
 <meta name="application-name" content="S&amp;S Companion">
 <meta name="msapplication-TileColor" content="#07060a">
+<meta name="color-scheme" content="dark">
 <style>:root{
   --void:#07060a;--deep:#0f0c14;--surface:#171320;--raised:#201b2a;--panel:#2a2337;--rim:#382f47;--border:#4a3f5e;
   --muted:#8a7a9e;--dim:#a899be;--text:#d8cce8;--bright:#ede5f6;
@@ -47,9 +48,69 @@ html{padding-top:env(safe-area-inset-top,0px);box-sizing:border-box}
   .lfill { transition: none; }
 }
 
-.leth-btn{background:var(--raised);border:1px solid var(--rim);border-radius:var(--r);padding:7px 4px;cursor:pointer;transition:all .18s;text-align:center;width:100%}
-.leth-btn.active{background:rgba(200,169,110,.08);border-color:var(--gold)}
-.leth-btn:hover{border-color:var(--border)}
+/* ══ LETHALITY CARD REVAMP ══ */
+.leth-card{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:12px 8px 10px;
+  background:linear-gradient(160deg,var(--raised),var(--deep));
+  border:2px solid var(--rim);
+  border-radius:12px;
+  cursor:pointer;
+  transition:border-color .18s,background .18s,box-shadow .18s,transform .1s;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+  position:relative;overflow:hidden;
+  width:100%;
+}
+.leth-card::before{
+  content:'';position:absolute;inset:0;
+  border-radius:10px;
+  opacity:0;transition:opacity .18s;
+}
+.leth-card:active{transform:scale(.95)}
+/* Tier colors */
+.leth-card[data-tier="1"]::before{background:radial-gradient(ellipse at 50% 0%,rgba(176,48,64,.18) 0%,transparent 70%)}
+.leth-card[data-tier="2"]::before{background:radial-gradient(ellipse at 50% 0%,rgba(200,169,110,.18) 0%,transparent 70%)}
+.leth-card[data-tier="3"]::before{background:radial-gradient(ellipse at 50% 0%,rgba(76,175,125,.18) 0%,transparent 70%)}
+/* Active state */
+.leth-card.active{
+  background:linear-gradient(160deg,var(--raised),var(--deep));
+  transform:none;
+}
+.leth-card[data-tier="1"].active{border-color:var(--blood);box-shadow:0 0 0 1px rgba(176,48,64,.3),0 4px 16px rgba(176,48,64,.2),inset 0 1px 0 rgba(176,48,64,.1)}
+.leth-card[data-tier="2"].active{border-color:var(--gold);box-shadow:0 0 0 1px rgba(200,169,110,.3),0 4px 16px rgba(200,169,110,.2),inset 0 1px 0 rgba(200,169,110,.1)}
+.leth-card[data-tier="3"].active{border-color:var(--sage);box-shadow:0 0 0 1px rgba(76,175,125,.3),0 4px 16px rgba(76,175,125,.2),inset 0 1px 0 rgba(76,175,125,.1)}
+.leth-card.active::before{opacity:1}
+/* Inner elements */
+.leth-name{font-family:var(--fd);font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;transition:color .18s}
+.leth-card[data-tier="1"] .leth-name{color:var(--blood)}
+.leth-card[data-tier="2"] .leth-name{color:var(--goldb)}
+.leth-card[data-tier="3"] .leth-name{color:var(--sage)}
+.leth-bonus{font-family:var(--fm);font-size:.6rem;color:var(--muted);margin-top:1px;transition:color .18s}
+.leth-card.active .leth-bonus{color:var(--dim)}
+/* Selected badge */
+.leth-check{
+  position:absolute;top:5px;right:6px;
+  width:14px;height:14px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.55rem;font-weight:700;
+  opacity:0;transform:scale(.5);
+  transition:opacity .18s,transform .18s;
+}
+.leth-card[data-tier="1"] .leth-check{background:var(--blood);color:#fff}
+.leth-card[data-tier="2"] .leth-check{background:var(--gold);color:#1a1625}
+.leth-card[data-tier="3"] .leth-check{background:var(--sage);color:#fff}
+.leth-card.active .leth-check{opacity:1;transform:scale(1)}
+/* Summary badge */
+.leth-summary-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 12px;border-radius:20px;
+  font-family:var(--fd);font-size:.72rem;font-weight:600;letter-spacing:.06em;
+  border:1px solid;
+}
+.leth-summary-badge[data-tier="1"]{color:var(--blood);border-color:rgba(176,48,64,.35);background:rgba(176,48,64,.08)}
+.leth-summary-badge[data-tier="2"]{color:var(--goldb);border-color:rgba(200,169,110,.35);background:rgba(200,169,110,.08)}
+.leth-summary-badge[data-tier="3"]{color:var(--sage);border-color:rgba(76,175,125,.35);background:rgba(76,175,125,.08)}
 .fs-btn{background:var(--raised);border:1px solid var(--rim);border-radius:var(--r);padding:5px 10px;cursor:pointer;color:var(--dim);font-family:var(--fd);transition:all .15s;line-height:1;min-width:32px;text-align:center}
 .fs-btn.active{background:rgba(200,169,110,.18);border-color:var(--gold);color:var(--gold);box-shadow:0 0 0 1px rgba(200,169,110,.25),0 2px 6px rgba(0,0,0,.3)}
 .fs-btn:hover:not(.active){border-color:var(--border);color:var(--text);background:var(--panel)}
@@ -67,7 +128,7 @@ html{padding-top:env(safe-area-inset-top,0px);box-sizing:border-box}
 ::-webkit-scrollbar{display:none}*{scrollbar-width:none;-ms-overflow-style:none}
 body{font-family:var(--fb);background:var(--void);color:var(--text);min-height:-webkit-fill-available;height:100dvh;font-size:var(--fs-base,15px);line-height:1.4;overflow:hidden;overscroll-behavior:none;
   background-image:radial-gradient(ellipse 100% 50% at 10% 0%,rgba(125,28,42,.10) 0%,transparent 55%),radial-gradient(ellipse 70% 70% at 90% 100%,rgba(29,78,143,.07) 0%,transparent 55%);}
-.screen{position:fixed;inset:0;display:flex;flex-direction:column;transition:opacity .3s ease,transform .3s ease;overflow:hidden;-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;transition:opacity .22s cubic-bezier(.22,.61,.36,1),transform .22s cubic-bezier(.22,.61,.36,1);overflow:hidden;-webkit-backface-visibility:hidden;backface-visibility:hidden}
 .screen.hidden{opacity:0;pointer-events:none;transform:scale(.97)}
 /* ══ HOME ══ */
 #home-screen{overflow-y:auto;overflow-x:hidden;padding:env(safe-area-inset-top,0px) 0 60px;-webkit-overflow-scrolling:touch}
@@ -122,13 +183,14 @@ body{font-family:var(--fb);background:var(--void);color:var(--text);min-height:-
 .page{min-width:100%;width:100%;flex-shrink:0;height:100%;min-height:100%;overflow-y:auto;overflow-x:hidden;padding:10px 14px 20px;display:flex;flex-direction:column;gap:12px;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}
 /* ══ BOTTOM NAV ══ */
 .bnav{height:calc(var(--nav) + var(--safe-b));padding-bottom:var(--safe-b);background:linear-gradient(180deg,var(--void) 0%,var(--deep) 100%);border-top:1px solid rgba(74,63,94,.5);display:flex;flex-shrink:0;z-index:10;backdrop-filter:blur(8px)}
-.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:transparent;border:none;cursor:pointer;color:var(--muted);transition:color .2s,transform .1s;padding:6px 2px;position:relative;font-family:var(--fd);-webkit-tap-highlight-color:transparent}
-.nbtn:active{transform:scale(.9)}
-.nbtn.active{color:var(--gold)}.nbtn.active::before{content:'';position:absolute;top:0;left:15%;right:15%;height:2px;background:var(--gold);border-radius:0 0 3px 3px;box-shadow:var(--gg);animation:tabSlideIn .2s cubic-bezier(.175,.885,.32,1.275) forwards}
+.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:transparent;border:none;cursor:pointer;color:var(--muted);transition:color .16s,transform .08s;padding:6px 2px;position:relative;font-family:var(--fd);-webkit-tap-highlight-color:transparent}
+.nbtn:active{transform:scale(.88)}
+.nbtn.active{color:var(--gold)}.nbtn.active::before{content:'';position:absolute;top:0;left:15%;right:15%;height:2px;background:var(--gold);border-radius:0 0 3px 3px;box-shadow:var(--gg);animation:tabSlideIn .18s cubic-bezier(.22,.61,.36,1) forwards}
+@keyframes tabSlideIn{from{transform:scaleX(0);opacity:0}to{transform:scaleX(1);opacity:1}}
+.nbtn:hover:not(.active){color:var(--dim)}
 /* ══ ROSTER STAGGER ══ */
-@keyframes cardSlideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
-.char-card-wrap{animation:cardSlideIn .22s ease forwards;opacity:0}
-@keyframes tabSlideIn{from{transform:scaleX(0);opacity:0}to{transform:scaleX(1);opacity:1}}.nbtn:hover:not(.active){color:var(--dim)}
+@keyframes cardSlideIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+.char-card-wrap{animation:cardSlideIn .2s cubic-bezier(.22,.61,.36,1) forwards;opacity:0}
 .nico{font-size:1.15rem;line-height:1}.nlbl{font-size:.5rem;letter-spacing:.07em;text-transform:uppercase;font-weight:600}
 /* ══ PANELS ══ */
 .panel{background:var(--surface);border:1px solid rgba(74,63,94,.6);border-radius:10px;padding:12px 14px;box-shadow:0 4px 20px rgba(0,0,0,.45),0 1px 3px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.035);min-width:0;width:100%}
@@ -142,15 +204,15 @@ body{font-family:var(--fb);background:var(--void);color:var(--text);min-height:-
 .port-card-edit:hover .port-hint,.port-card-edit:focus .port-hint{opacity:1}
 /* Camera icon badge on portrait — always visible on touch devices */
 .port-hint::before{content:'✦';position:absolute;top:10px;right:10px;width:28px;height:28px;background:rgba(200,169,110,.18);border:1px solid rgba(200,169,110,.45);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;color:var(--gold);backdrop-filter:blur(4px)}
-.port-card{position:relative;width:308px;max-width:100%;height:441px;overflow:hidden;border-radius:var(--rl);border:1px solid rgba(200,169,110,.35);flex-shrink:0;box-shadow:0 4px 24px rgba(0,0,0,.5)}
+.port-card{position:relative;width:296px;max-width:100%;height:423px;overflow:hidden;border-radius:var(--rl);border:1px solid rgba(200,169,110,.35);flex-shrink:0;box-shadow:0 4px 24px rgba(0,0,0,.5)}
 .port-card img{display:block;width:100%;height:100%;object-fit:cover;background:var(--raised)}
-.port-card-edit{position:relative;width:308px;max-width:100%;height:441px;overflow:hidden;border-radius:var(--rl);border:1px dashed rgba(200,169,110,.5);flex-shrink:0;cursor:pointer;transition:border-color .2s}
+.port-card-edit{position:relative;width:296px;max-width:100%;height:423px;overflow:hidden;border-radius:var(--rl);border:1px dashed rgba(200,169,110,.5);flex-shrink:0;cursor:pointer;transition:border-color .2s}
 .port-card-edit:hover{border-color:var(--gold);border-style:solid}
 .port-card-edit:hover .port-hint{opacity:1}
 .port-card-edit:hover img{transform:scale(1.03)}
 .port-card-edit img{display:block;width:100%;height:100%;object-fit:cover;background:var(--raised);transition:transform .3s ease}
 
-.port-identity{width:308px;max-width:100%;text-align:center;padding:10px 0 4px}
+.port-identity{width:296px;max-width:100%;text-align:center;padding:10px 0 4px}
 .port-name{font-family:var(--fd);font-size:1.1rem;color:var(--goldb);letter-spacing:.05em}
 .port-divider{width:55%;margin:8px auto 7px;height:1px;background:linear-gradient(90deg,transparent,rgba(200,169,110,.55) 15%,var(--gold) 50%,rgba(200,169,110,.55) 85%,transparent)}
 .port-lvl{font-family:var(--fm);font-size:.6rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
@@ -180,7 +242,7 @@ input[type=radio]:checked::after{transform:scale(1)}
 .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .g6{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px}
 /* ══ STAT BOX ══ */
-.sbox{background:linear-gradient(145deg,var(--raised),var(--deep));border:1px solid rgba(74,63,94,.65);border-radius:10px;text-align:center;padding:8px 3px;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .1s;position:relative;overflow:hidden;box-shadow:0 3px 14px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.04)}
+.sbox{background:linear-gradient(145deg,var(--raised),var(--deep));border:1px solid rgba(74,63,94,.65);border-radius:10px;text-align:center;padding:8px 3px;cursor:pointer;transition:border-color .12s,box-shadow .12s,transform .07s;position:relative;overflow:hidden;box-shadow:0 3px 14px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.04)}
 .sbox:hover{border-color:rgba(200,169,110,.5);box-shadow:0 0 0 1px rgba(200,169,110,.15),0 3px 14px rgba(0,0,0,.45)}.sbox:active{transform:scale(.87)}
 .sbox .mod{font-family:var(--fd);font-size:1.25rem;font-weight:700;color:var(--goldb);line-height:1;text-shadow:0 0 12px rgba(200,169,110,.35)}
 .sbox .val{font-family:var(--fm);font-size:.72rem;color:var(--dim);margin-top:2px;border-top:1px solid var(--rim);padding-top:2px}
@@ -224,8 +286,8 @@ input[type=radio]:checked::after{transform:scale(1)}
 /* strip: two action zones side by side */
 .atk-btns{display:grid;grid-template-columns:1fr 1px 1fr;margin:0 10px 10px;border:1px solid rgba(74,63,94,.45);border-radius:7px;overflow:hidden;background:rgba(7,6,10,.4)}
 .atk-btn-sep{background:rgba(74,63,94,.45)}
-.abtn{border:none;background:transparent;cursor:pointer;display:flex;align-items:center;gap:8px;padding:9px 11px;transition:background .12s,transform .08s;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;position:relative;overflow:hidden;width:100%}
-.abtn:active{background:rgba(255,255,255,.04);transform:scale(.97)}
+.abtn{border:none;background:transparent;cursor:pointer;display:flex;align-items:center;gap:8px;padding:9px 11px;transition:background .09s,transform .06s;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;position:relative;overflow:hidden;width:100%}
+.abtn:active{background:rgba(255,255,255,.04);transform:scale(.96)}
 .abtn-a:active{background:rgba(176,48,64,.1)}
 .abtn-d:active{background:rgba(200,169,110,.08)}
 .abtn-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.72rem;font-family:var(--fd);font-weight:700}
@@ -249,7 +311,7 @@ input[type=radio]:checked::after{transform:scale(1)}
 .stag:hover{border-color:rgba(200,169,110,.5);color:var(--goldb)}.stag.g1{border-color:rgba(176,48,64,.5);color:#e07080;background:rgba(125,28,42,.18)}
 /* ══ SAVES ══ */
 .saves-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:6px;border-top:1px solid var(--rim);padding-top:6px}
-.svsbox{text-align:center;padding:7px 2px;background:linear-gradient(145deg,var(--raised),var(--deep));border:1px solid rgba(74,63,94,.65);border-radius:10px;font-family:var(--fm);font-weight:700;font-size:.9rem;cursor:pointer;transition:border-color .15s,transform .1s;color:var(--bright);-webkit-user-select:none;user-select:none;min-height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 3px 14px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.04)}.svsbox:active{transform:scale(.88)}
+.svsbox{text-align:center;padding:7px 2px;background:linear-gradient(145deg,var(--raised),var(--deep));border:1px solid rgba(74,63,94,.65);border-radius:10px;font-family:var(--fm);font-weight:700;font-size:.9rem;cursor:pointer;transition:border-color .12s,transform .07s;color:var(--bright);-webkit-user-select:none;user-select:none;min-height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 3px 14px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.04)}.svsbox:active{transform:scale(.91)}
 .svsbox:hover{border-color:rgba(200,169,110,.4);box-shadow:0 0 0 1px rgba(200,169,110,.12),0 3px 14px rgba(0,0,0,.4)}.svsbox.prof{color:var(--goldb);border-color:rgba(200,169,110,.45);box-shadow:0 0 0 1px rgba(200,169,110,.12),0 0 8px rgba(200,169,110,.1),0 3px 14px rgba(0,0,0,.4)}
 .svslbl{font-size:.56rem;font-family:var(--fd);color:var(--muted);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:1px}
 /* ══ INVENTORY ══ */
@@ -294,33 +356,92 @@ input[type=radio]:checked::after{transform:scale(1)}
 .infobox{background:rgba(7,6,10,.5);border:1px solid rgba(74,63,94,.5);border-left:2px solid rgba(74,63,94,.8);border-radius:8px;padding:6px 10px;font-size:.73rem;color:rgba(168,153,190,.7);font-style:italic;line-height:1.55;margin-top:5px}
 .infobox:not(:empty){border-left-color:rgba(200,169,110,.4)}
 /* ══ BUTTONS ══ */
-.btn{font-family:var(--fd);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;padding:6px 8px;cursor:pointer;border-radius:var(--r);transition:background .12s,border-color .12s,box-shadow .12s,transform .07s,opacity .12s;display:inline-flex;align-items:center;justify-content:center;gap:4px;font-weight:600;white-space:nowrap;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation}
+.btn{font-family:var(--fd);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;padding:6px 8px;cursor:pointer;border-radius:var(--r);transition:background .1s,border-color .1s,box-shadow .1s,transform .06s,opacity .1s;display:inline-flex;align-items:center;justify-content:center;gap:4px;font-weight:600;white-space:nowrap;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation}
 .btn:active{transform:scale(.94);opacity:.85}
 .btn-p{background:linear-gradient(135deg,var(--crimson),var(--blood));border:1px solid var(--blood);color:#fff;box-shadow:0 2px 10px rgba(125,28,42,.4)}.btn-p:hover{background:linear-gradient(135deg,var(--blood),#c04050);box-shadow:var(--gb)}.btn-p:active{box-shadow:none}
 .btn-g{background:transparent;border:1px solid var(--border);color:var(--dim)}.btn-g:hover{border-color:var(--gold);color:var(--gold);background:rgba(200,169,110,.06)}.btn-g:active{background:rgba(200,169,110,.12);border-color:var(--gold)}
 .btn-gold{background:linear-gradient(135deg,var(--gold),var(--goldb));border:1px solid var(--goldb);color:var(--void);box-shadow:0 2px 10px rgba(200,169,110,.25);font-weight:700}.btn-gold:hover{box-shadow:var(--gg);transform:translateY(-1px)}.btn-gold:active{transform:scale(.93);box-shadow:none}
-.bcnf{width:100%;background:linear-gradient(135deg,rgba(200,169,110,.15) 0%,rgba(200,169,110,.08) 100%);border:1px solid rgba(200,169,110,.55);color:var(--goldb);font-size:.74rem;letter-spacing:.1em;padding:11px;cursor:pointer;border-radius:8px;margin-top:10px;font-family:var(--fd);text-transform:uppercase;transition:background .15s,border-color .15s,transform .1s,box-shadow .15s;min-height:46px;-webkit-tap-highlight-color:transparent;user-select:none;box-shadow:0 2px 12px rgba(200,169,110,.12),inset 0 1px 0 rgba(200,169,110,.1)}
+.bcnf{width:100%;background:linear-gradient(135deg,rgba(200,169,110,.15) 0%,rgba(200,169,110,.08) 100%);border:1px solid rgba(200,169,110,.55);color:var(--goldb);font-size:.74rem;letter-spacing:.1em;padding:11px;cursor:pointer;border-radius:8px;margin-top:10px;font-family:var(--fd);text-transform:uppercase;transition:background .12s,border-color .12s,transform .08s,box-shadow .12s;min-height:46px;-webkit-tap-highlight-color:transparent;user-select:none;box-shadow:0 2px 12px rgba(200,169,110,.12),inset 0 1px 0 rgba(200,169,110,.1)}
 .bcnf:hover{background:linear-gradient(135deg,rgba(200,169,110,.25),rgba(200,169,110,.12));border-color:var(--goldb);box-shadow:0 4px 16px rgba(200,169,110,.2),inset 0 1px 0 rgba(200,169,110,.15)}
-.bcnf:active{transform:scale(.97);background:rgba(200,169,110,.22);box-shadow:inset 0 1px 3px rgba(0,0,0,.2)}
+.bcnf:active{transform:scale(.98);background:rgba(200,169,110,.22);box-shadow:inset 0 1px 3px rgba(0,0,0,.2)}
 
 /* ══ SECTION REVEAL ANIMATION ══ */
-@keyframes sectionFadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
-.section-reveal{animation:sectionFadeIn .2s ease forwards}
+@keyframes sectionFadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.section-reveal{animation:sectionFadeIn .24s cubic-bezier(.22,.61,.36,1) forwards}
 @keyframes bcnfSuccess{0%{background:rgba(200,169,110,.08)}40%{background:rgba(76,175,125,.25);border-color:var(--sage)}100%{background:rgba(200,169,110,.08)}}
 .bcnf.success{animation:bcnfSuccess .55s ease forwards}
-.bedit{display:flex;align-items:center;justify-content:center;gap:4px;background:transparent;border:1px solid var(--rim);color:var(--muted);font-family:var(--fm);font-size:.62rem;padding:4px 14px;cursor:pointer;border-radius:var(--r);margin:6px auto 0;transition:all .18s;text-transform:uppercase;letter-spacing:.08em;-webkit-tap-highlight-color:transparent}
-.bedit:hover{border-color:var(--gold);color:var(--gold);background:rgba(200,169,110,.06)}.bedit:active{transform:scale(.95);background:rgba(200,169,110,.1)}
+/* ── Swipe drag: suppress all interactive press states ── */
+.pages-track.is-dragging *{pointer-events:none!important}
+.pages-track.is-dragging button,
+.pages-track.is-dragging .sbox,
+.pages-track.is-dragging .sc-clickable,
+.pages-track.is-dragging .nbtn{
+  -webkit-tap-highlight-color:transparent!important;
+  outline:none!important;
+}
+.toggle-btn{
+  position:relative;flex-shrink:0;
+  width:40px;height:22px;
+  background:var(--raised);
+  border:1px solid var(--rim);
+  border-radius:11px;
+  cursor:pointer;
+  transition:background .22s,border-color .22s,box-shadow .22s;
+  -webkit-tap-highlight-color:transparent;
+}
+.toggle-btn::after{
+  content:'';
+  position:absolute;top:2px;left:2px;
+  width:16px;height:16px;
+  border-radius:50%;
+  background:var(--muted);
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1),background .22s;
+  box-shadow:0 1px 3px rgba(0,0,0,.4);
+}
+.toggle-btn[aria-pressed="true"]{
+  background:rgba(200,169,110,.2);
+  border-color:var(--gold);
+  box-shadow:0 0 0 1px rgba(200,169,110,.2);
+}
+.toggle-btn[aria-pressed="true"]::after{
+  transform:translateX(18px);
+  background:var(--gold);
+}
+.identity-edit-header{display:none}
+#identity_edit_view:not([style*="display: none"]) ~ .identity-edit-header,
+#identity_edit_view.section-reveal ~ .identity-edit-header{display:flex}
+/* Simpler approach: JS toggles a class on the panel */
+.panel.identity-editing .identity-edit-header{display:flex}
+
+/* ── Revamped .bedit button ── */
+.bedit{
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  background:transparent;
+  border:1px solid var(--rim);
+  color:var(--muted);
+  font-family:var(--fm);font-size:.62rem;
+  padding:4px 14px;
+  cursor:pointer;
+  border-radius:var(--r);
+  margin:6px auto 0;
+  transition:border-color .14s,color .14s,background .14s,box-shadow .14s;
+  text-transform:uppercase;letter-spacing:.08em;
+  -webkit-tap-highlight-color:transparent;
+  box-shadow:0 1px 4px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.03);
+}
+.bedit:hover{border-color:var(--gold);color:var(--gold);background:rgba(200,169,110,.06);box-shadow:0 2px 8px rgba(0,0,0,.3),0 0 0 1px rgba(200,169,110,.1),inset 0 1px 0 rgba(255,255,255,.04)}
+.bedit:active{transform:scale(.96);background:rgba(200,169,110,.1);box-shadow:none}
 .bmini{font-family:var(--fm);font-size:.6rem;padding:3px 7px;cursor:pointer;border-radius:2px;border:1px solid;letter-spacing:.05em;text-transform:uppercase;transition:all .15s}
 .bmini.bl{background:rgba(29,78,143,.18);border-color:var(--ice);color:var(--ice)}.bmini.bl:hover{background:rgba(74,158,202,.3);color:#fff}
 .bmini.br{background:rgba(125,28,42,.18);border-color:var(--crimson);color:var(--ember)}.bmini.br:hover{background:var(--crimson);color:#fff}
 .bmini.bg{background:rgba(26,107,58,.18);border-color:var(--sage);color:var(--sage)}.bmini.bg:hover{background:rgba(76,175,125,.3);color:#fff}
 /* ══ MODALS ══ */
 dialog.modal{background:linear-gradient(160deg,var(--surface) 0%,var(--deep) 100%);color:var(--text);border:1px solid rgba(74,63,94,.7);border-radius:12px;width:min(96vw,920px);padding:0;box-shadow:0 24px 80px rgba(0,0,0,.9),0 0 0 1px rgba(200,169,110,.06);position:fixed;inset:0;margin:auto;max-height:min(90svh,calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)));display:none;flex-direction:column;z-index:200;overflow:hidden}
-dialog.modal[open]{display:flex;animation:popIn .28s cubic-bezier(.175,.885,.32,1.275) forwards}
+dialog.modal[open]{display:flex;animation:popIn .26s cubic-bezier(.22,.61,.36,1) forwards}
 /* crop_modal overrides the global max-height */
 #crop_modal{max-height:none}
 dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(8px)}
-@keyframes popIn{from{opacity:0;transform:scale(.92) translateY(20px)}to{opacity:1;transform:none}}
+@keyframes popIn{from{opacity:0;transform:scale(.96) translateY(12px)}to{opacity:1;transform:none}}
 .mhd{background:var(--surface);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);flex-shrink:0;padding-top:max(10px,env(safe-area-inset-top,10px))}
 .mttl{font-family:var(--fd);font-size:.86rem;color:var(--gold);letter-spacing:.07em;text-transform:uppercase}
 .mbd{padding:14px;overflow-y:auto;flex:1;min-width:0;overscroll-behavior:contain}
@@ -551,7 +672,7 @@ details>summary::before{content:'▸';color:var(--gold);font-size:.56rem;transit
 .res-btn-ing{border-color:rgba(74,158,202,.35);color:rgba(74,158,202,.7)}.res-btn-ing:hover{background:rgba(74,158,202,.15);border-color:var(--ice);color:var(--ice);box-shadow:0 0 0 1px rgba(74,158,202,.2)}
 /* ══ UTILITY BADGES ══ */
 .pill-badge{display:inline-flex;align-items:center;gap:3px;font-family:var(--fm);font-size:.66rem;color:var(--muted);margin-left:auto;background:var(--raised);border:1px solid var(--border);border-radius:20px;padding:2px 9px}
-.leth-sub{font-family:var(--fm);font-size:.58rem;color:var(--muted);margin-top:2px}
+
 
 .last-saved{font-family:var(--fm);font-size:.52rem;color:var(--muted);letter-spacing:.04em;transition:color .5s;text-align:center;margin-top:1px}
 .last-saved.fresh{color:var(--sage)!important}
@@ -577,6 +698,15 @@ details>summary::before{content:'▸';color:var(--gold);font-size:.56rem;transit
 :focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:var(--r)}
 button:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 input:focus-visible,textarea:focus-visible{outline:none}
+/* Suprimir focus-visible en botones dentro del track de páginas —
+   en móvil el swipe puede otorgar :focus a un botón que el dedo
+   rozó, dejando el outline dorado pegado aunque no se haya pulsado. */
+.pages-track button:focus,.pages-track button:focus-visible,
+.pages-track .sbox:focus,.pages-track .svsbox:focus,
+.pages-track .aopt:focus,.pages-track .aopt:focus-visible{outline:none!important;box-shadow:none!important}
+/* Durante un drag activo ningún hijo debe mostrar estado de foco */
+.pages-track.is-dragging *:focus,
+.pages-track.is-dragging *:focus-visible{outline:none!important;box-shadow:none!important}
 
 
 /* ══ UTILITY CLASSES (replaces repeated inline styles) ══ */
@@ -588,6 +718,32 @@ input:focus-visible,textarea:focus-visible{outline:none}
 .u-fd{font-family:var(--fd)}
 .u-hide{display:none!important}
 .u-pre-wrap{white-space:pre-wrap}
+/* ── Aptitude manager card states ──
+   Toggling .apt-card--sel on an existing card avoids a full re-render
+   of the manager list on every add/remove click.              */
+.apt-card{background:var(--raised);border:1px solid var(--rim);border-radius:var(--r);padding:6px 9px;cursor:pointer;transition:background .15s,border-color .15s}
+.apt-card:hover{border-color:var(--gold)}
+.apt-card--sel{background:rgba(74,158,202,.08);border-color:rgba(74,158,202,.4)}
+.apt-card--sel:hover{border-color:var(--blood)}
+.apt-card__name{font-family:var(--fd);font-size:.78rem;color:var(--gold);font-weight:600}
+.apt-card--sel .apt-card__name{color:var(--ice)}
+.apt-card__badge{font-family:var(--fm);font-size:.6rem;padding:1px 7px;border-radius:10px;background:rgba(200,169,110,.1);color:var(--muted);white-space:nowrap;flex-shrink:0}
+.apt-card--sel .apt-card__badge{background:rgba(74,158,202,.2);color:var(--ice)}
+.apt-card__desc{font-size:.72rem;color:var(--muted);margin-top:3px;line-height:1.4}
+.apt-card__row{display:flex;justify-content:space-between;align-items:center;gap:6px}
+/* These replace the most repeated inline style strings produced by JS methods
+   (buildDetailPage, showTalentSummary, _renderAptManager, etc.).
+   Never remove without auditing those methods first.              */
+.js-detail-txt{font-size:.82rem;color:var(--text);line-height:1.6;margin-bottom:8px}
+.js-section-lbl{font-family:var(--fd);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
+.js-badge-gold{font-family:var(--fm);font-size:.72rem;color:var(--gold);background:rgba(200,169,110,.1);border:1px solid rgba(200,169,110,.3);border-radius:20px;padding:2px 10px}
+.js-tag-neutral{font-family:var(--fm);font-size:.7rem;background:var(--raised);border:1px solid var(--border);border-radius:20px;padding:2px 8px;color:var(--text)}
+.js-grade-block{font-family:var(--fm);font-size:.66rem;color:var(--blood);display:block;margin-top:3px;padding:3px 6px;background:rgba(125,28,42,.15);border-radius:3px}
+.js-talent-title{font-family:var(--fd);font-size:.8rem;color:var(--gold);margin-bottom:2px}
+.js-talent-desc{font-size:.75rem;color:var(--text)}
+.js-res-formula{text-align:center;border-radius:var(--r);padding:6px}
+.js-res-formula-lbl{font-family:var(--fm);font-size:.56rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.js-res-formula-val{font-family:var(--fd);font-size:.82rem;color:var(--bright);font-weight:700}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -609,7 +765,7 @@ input:focus-visible,textarea:focus-visible{outline:none}
   <div class="loader-sub">Companion</div>
   <div class="loader-orb"></div>
 </div>
-<div id="toast-ct"></div>
+<div id="toast-ct" role="status" aria-live="polite" aria-atomic="false"></div>
 <div id="dice-overlay">
   <div class="dice-backdrop" id="dice-backdrop" onclick="app.closeDiceOverlay()"></div>
   <div class="dice-card" id="dice-card">
@@ -745,7 +901,7 @@ input:focus-visible,textarea:focus-visible{outline:none}
 
           <!-- Identidad & Origen -->
           <div class="panel">
-            <div class="ph"><span class="pt">Identidad &amp; Origen</span></div>
+            <div class="ph identity-edit-header"><span class="pt">Identidad &amp; Origen</span></div>
             <div id="identity_edit_view">
               <div class="g2">
                 <div><span class="fl">Linaje (Raza)</span><select id="sel_desc" onchange="app.updateOptions()"></select><div id="desc_info" class="infobox"></div></div>
@@ -772,27 +928,27 @@ input:focus-visible,textarea:focus-visible{outline:none}
               <div class="res-box res-box-pv">
                 <div class="res-lbl res-lbl-pv">PV</div>
                 <div class="res-ctrl res-ctrl-pv">
-                  <button class="res-btn res-btn-pv" onclick="app.adjustRes('cur_pv','max_pv',-1)" aria-label="Reducir puntos de vida"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
+                  <button class="res-btn res-btn-pv" data-cur="cur_pv" data-max="max_pv" data-delta="-1" onclick="app.adjustRes('cur_pv','max_pv',-1)" aria-label="Reducir puntos de vida"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
                   <input type="text" inputmode="numeric" id="cur_pv" value="0" class="fin res-fin" aria-label="Puntos de vida actuales" inputmode="numeric">
-                  <button class="res-btn res-btn-pv" onclick="app.adjustRes('cur_pv','max_pv',1)" aria-label="Aumentar puntos de vida"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="2" x2="5" y2="8"/><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
+                  <button class="res-btn res-btn-pv" data-cur="cur_pv" data-max="max_pv" data-delta="1" onclick="app.adjustRes('cur_pv','max_pv',1)" aria-label="Aumentar puntos de vida"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="2" x2="5" y2="8"/><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
                 </div>
                 <div class="res-max res-max-pv">/ <span id="max_pv">0</span></div>
               </div>
               <div class="res-box res-box-adr">
                 <div class="res-lbl res-lbl-adr">Adrenalina</div>
                 <div class="res-ctrl res-ctrl-adr">
-                  <button class="res-btn res-btn-adr" onclick="app.adjustRes('cur_adr','max_adr',-1)" aria-label="Reducir adrenalina"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
+                  <button class="res-btn res-btn-adr" data-cur="cur_adr" data-max="max_adr" data-delta="-1" onclick="app.adjustRes('cur_adr','max_adr',-1)" aria-label="Reducir adrenalina"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
                   <input type="text" inputmode="numeric" id="cur_adr" value="0" class="fin res-fin" aria-label="Adrenalina actual" inputmode="numeric">
-                  <button class="res-btn res-btn-adr" onclick="app.adjustRes('cur_adr','max_adr',1)" aria-label="Aumentar adrenalina"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="2" x2="5" y2="8"/><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
+                  <button class="res-btn res-btn-adr" data-cur="cur_adr" data-max="max_adr" data-delta="1" onclick="app.adjustRes('cur_adr','max_adr',1)" aria-label="Aumentar adrenalina"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="2" x2="5" y2="8"/><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
                 </div>
                 <div class="res-max res-max-adr">/ <span id="max_adr">0</span></div>
               </div>
               <div class="res-box res-box-ing">
                 <div class="res-lbl res-lbl-ing">Ingenio</div>
                 <div class="res-ctrl res-ctrl-ing">
-                  <button class="res-btn res-btn-ing" onclick="app.adjustRes('cur_ing','max_ing',-1)" aria-label="Reducir ingenio"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
+                  <button class="res-btn res-btn-ing" data-cur="cur_ing" data-max="max_ing" data-delta="-1" onclick="app.adjustRes('cur_ing','max_ing',-1)" aria-label="Reducir ingenio"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
                   <input type="text" inputmode="numeric" id="cur_ing" value="0" class="fin res-fin" aria-label="Ingenio actual" inputmode="numeric">
-                  <button class="res-btn res-btn-ing" onclick="app.adjustRes('cur_ing','max_ing',1)" aria-label="Aumentar ingenio"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="2" x2="5" y2="8"/><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
+                  <button class="res-btn res-btn-ing" data-cur="cur_ing" data-max="max_ing" data-delta="1" onclick="app.adjustRes('cur_ing','max_ing',1)" aria-label="Aumentar ingenio"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="2" x2="5" y2="8"/><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
                 </div>
                 <div class="res-max res-max-ing">/ <span id="max_ing">0</span></div>
               </div>
@@ -818,9 +974,9 @@ input:focus-visible,textarea:focus-visible{outline:none}
               <div class="sc" style="padding:4px 3px">
                 <div class="sc-lbl" style="color:#a0683a">Carne</div>
                 <div style="display:flex;align-items:center;justify-content:center;gap:3px;font-family:var(--fm);font-weight:600;font-size:.92rem;">
-                  <button class="res-btn res-btn-carne" onclick="app.adjustRes('cur_carne','res_carne',-1)" aria-label="Reducir daño de carne"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
+                  <button class="res-btn res-btn-carne" data-cur="cur_carne" data-max="res_carne" data-delta="-1" onclick="app.adjustRes('cur_carne','res_carne',-1)" aria-label="Reducir daño de carne"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
                   <input type="text" inputmode="numeric" id="cur_carne" value="0" class="fin" style="color:var(--bright);width:5ch;max-width:5ch;text-align:center;font-size:.88rem">
-                  <button class="res-btn res-btn-carne" onclick="app.adjustRes('cur_carne','res_carne',1)" aria-label="Aumentar daño de carne"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="2" x2="5" y2="8"/><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
+                  <button class="res-btn res-btn-carne" data-cur="cur_carne" data-max="res_carne" data-delta="1" onclick="app.adjustRes('cur_carne','res_carne',1)" aria-label="Aumentar daño de carne"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="2" x2="5" y2="8"/><line x1="2" y1="5" x2="8" y2="5"/></svg></button>
                 </div>
                 <div style="font-family:var(--fm);font-size:.58rem;color:rgba(160,104,58,.8);margin-top:1px">/ <span id="res_carne">0</span></div>
               </div>
@@ -1124,29 +1280,37 @@ input:focus-visible,textarea:focus-visible{outline:none}
               <span class="pt">Configuración de Campaña</span>
             </div>
             <!-- Summary view -->
-            <div id="campana_summary" style="padding:4px 0;text-align:center">
-              <div id="campana_leth_label" style="font-family:var(--fd);font-size:.78rem;color:var(--gold);font-weight:600;margin-bottom:6px">Letalidad 1 — +1 PV/nivel</div>
+            <div id="campana_summary" style="padding:6px 0 4px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">
+              <span class="leth-summary-badge" id="campana_leth_badge" data-tier="1">
+                <span id="campana_leth_label">Letalidad 1 — +1 PV/nivel</span>
+              </span>
               <button class="bedit" id="campana_edit_btn" onclick="app.editCampana()">✏ Editar</button>
             </div>
             <!-- Edit view -->
-            <div id="campana_edit" style="display:none;margin-top:6px">
-              <span class="fl">Nivel de Letalidad</span>
-              <div class="g3 mt4">
-                <button class="leth-btn active" id="leth_1" onclick="app.setLethality(1)">
-                  <div style="font-family:var(--fd);font-size:.65rem;color:var(--blood);font-weight:600">Letalidad 1</div>
-                  <div class="leth-sub">+1 PV/nivel</div>
+            <div id="campana_edit" style="display:none;margin-top:8px">
+              <span class="fl" style="margin-bottom:8px;display:block">Nivel de Letalidad</span>
+              <div class="g3" style="gap:8px">
+                <button class="leth-card active" id="leth_1" data-tier="1"
+                  onclick="app.setLethality(1)" onmousedown="this.blur()">
+                  <div class="leth-check">✓</div>
+                  <div class="leth-name">Letalidad 1</div>
+                  <div class="leth-bonus">+1 PV/nivel</div>
                 </button>
-                <button class="leth-btn" id="leth_2" onclick="app.setLethality(2)">
-                  <div style="font-family:var(--fd);font-size:.65rem;color:var(--gold);font-weight:600">Letalidad 2</div>
-                  <div class="leth-sub">+2 PV/nivel</div>
+                <button class="leth-card" id="leth_2" data-tier="2"
+                  onclick="app.setLethality(2)" onmousedown="this.blur()">
+                  <div class="leth-check">✓</div>
+                  <div class="leth-name">Letalidad 2</div>
+                  <div class="leth-bonus">+2 PV/nivel</div>
                 </button>
-                <button class="leth-btn" id="leth_3" onclick="app.setLethality(3)">
-                  <div style="font-family:var(--fd);font-size:.65rem;color:var(--sage);font-weight:600">Letalidad 3</div>
-                  <div class="leth-sub">+3 PV/nivel</div>
+                <button class="leth-card" id="leth_3" data-tier="3"
+                  onclick="app.setLethality(3)" onmousedown="this.blur()">
+                  <div class="leth-check">✓</div>
+                  <div class="leth-name">Letalidad 3</div>
+                  <div class="leth-bonus">+3 PV/nivel</div>
                 </button>
               </div>
-              <div style="font-family:var(--fm);font-size:.62rem;color:var(--muted);margin-top:5px;font-style:italic;line-height:1.4">PV adicionales a partir del Nivel 2. No afectan al Nivel 1.</div>
-              <button class="bcnf" style="margin-top:8px;width:100%" onclick="app.confirmCampana()">✓ Confirmar</button>
+              <p style="font-family:var(--fm);font-size:.62rem;color:var(--muted);margin-top:8px;font-style:italic;line-height:1.45">PV adicionales a partir del Nivel 2. No afectan al Nivel 1.</p>
+              <button class="bcnf" onclick="app.confirmCampana()">✓ Confirmar</button>
             </div>
           </div>
           <div class="panel"><div class="ph"><span class="pt" id="detail_desc_title">Linaje: —</span></div><div id="detail_desc_body"><p style="color:var(--muted);font-size:.8rem;font-style:italic">Selecciona un Linaje.</p></div></div>
@@ -1180,6 +1344,13 @@ input:focus-visible,textarea:focus-visible{outline:none}
           <button class="fs-btn" id="fs_large" onclick="app.setFontSize('large')" title="Grande" style="font-size:17px">A</button>
           <button class="fs-btn" id="fs_xlarge" onclick="app.setFontSize('xlarge')" title="Muy Grande" style="font-size:20px">A</button>
         </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px">
+        <div>
+          <span id="scroll_preserve_lbl" style="font-family:var(--fd);font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Activar recordar posición al volver</span>
+          <div style="font-family:var(--fm);font-size:.6rem;color:var(--border);margin-top:2px">Mantiene el scroll de cada sección al cambiar de pestaña</div>
+        </div>
+        <button id="scroll_preserve_btn" class="toggle-btn" onclick="app.toggleScrollPreserve()" aria-pressed="false" title="Activar/desactivar recordar posición de scroll"></button>
       </div>
     </div>
     <div><div class="dvdr">Reglas del Juego</div><div style="display:flex;flex-direction:column;gap:6px"><button class="btn btn-g" style="width:100%" onclick="document.getElementById('json_rules_input').click()">↑ Importar Reglas (JSON)</button><button class="btn btn-gold" style="width:100%" onclick="app.openDatabaseEditor()">⚙ Editor de Base de Datos</button></div></div>
@@ -1680,10 +1851,11 @@ const MAX_JSON_BYTES = 2 * 1024 * 1024;
 const STORAGE = {
   SCHEMA_VERSION: 1,
   KEYS: {
-    rules:   'sands_rules',
-    roster:  'sands_roster',
-    font:    'ss_font_size',
-    version: 'sands_schema_v'
+    rules:          'sands_rules',
+    roster:         'sands_roster',
+    font:           'ss_font_size',
+    scrollPreserve: 'ss_scroll_preserve',
+    version:        'sands_schema_v'
   },
 
   /** Load rules DB – falls back to DEFAULT_DB */
@@ -1725,7 +1897,7 @@ const STORAGE = {
   },
 
   /** Save a single character into roster */
-  saveChar(name, data) {
+  saveCharData(name, data) {
     const roster = this.loadRoster();
     roster[String(name)] = data;
     return this.saveRoster(roster);
@@ -1748,6 +1920,8 @@ const app = {
   totalPages: 5,
   activeTalentCat: null,
   currentEditorCat: '',
+  scrollPreserve: false,        // persisted: whether to remember scroll per page
+  _pageScrolls: {},             // in-memory scroll positions per page index
   cropState: {img:null, x:0, y:0, zoom:1, rot:0, minZoom:.05, isDragging:false, lastX:0, lastY:0, pinch:null, velX:0, velY:0},
   _weaponDmgData: [{formula:'1',name:'Desarmado'},{formula:'1',name:'Desarmado'}],
   _editingCustomItem: null,
@@ -1761,6 +1935,8 @@ const app = {
     } catch(e) {
       this.DB = JSON.parse(JSON.stringify(DEFAULT_DB));
     }
+    // Debounced calc — prevents cascading recalculations during rapid input
+    this._debouncedCalc = this._debounce(this.calc.bind(this), 80);
     // Build home screen
     this.renderHome();
     // Setup alignment for app
@@ -1772,6 +1948,7 @@ const app = {
     const ws = document.getElementById('crop_ws');
     if (ws) ws.addEventListener('wheel', e => this._cropWheel(e), {passive:false});
     this._restoreFontSize();
+    this._restoreScrollPreserve();
     // Long-press repeat on resource +/- buttons
     this._initResLongPress();
   },
@@ -1780,6 +1957,15 @@ const app = {
   showScreen(id) {
     document.getElementById('home-screen').classList.toggle('hidden', id !== 'home');
     document.getElementById('app-screen').classList.toggle('hidden', id !== 'app');
+    // Limpiar el listener de cierre de swipe cuando salimos de la home,
+    // para evitar que se acumulen listeners en document con cada visita.
+    if (id !== 'home') {
+      const el = document.getElementById('home-roster');
+      if (el?._swipeCloseHandler) {
+        document.removeEventListener('touchstart', el._swipeCloseHandler);
+        el._swipeCloseHandler = null;
+      }
+    }
   },
 
   goHome() {
@@ -1801,7 +1987,11 @@ const app = {
     this.showScreen('app');
     this.unlockApp();
     this.goToPage(0);
-    // Abrir todas las secciones en edición para flujo de creación
+    this._pageScrolls = {}; // limpiar posiciones guardadas obsoletas
+    // Abrir todas las secciones en edición para flujo de creación.
+    // _bulkEditing suprime el scrollIntoView de combat/equipment para que
+    // el goToPage(0) de arriba no pierda la carrera contra el RAF.
+    this._bulkEditing = true;
     this.editSection('personal');
     this.editSection('identity');
     this.editSection('stats');
@@ -1809,6 +1999,7 @@ const app = {
     this.editSection('skills');
     this.editSection('combat');
     this.editSection('equipment');
+    this._bulkEditing = false;
     this._charLoading = false;
     // Clear header label for fresh character
     const lbl = document.getElementById('last_saved_lbl');
@@ -1985,13 +2176,23 @@ const app = {
     document.addEventListener('touchstart', el._swipeCloseHandler, {passive:true});
   },
 
-  /* ── CONFIRM HELPER ── */
-  _confirm(title, body, confirmLabel, onConfirm) {
+  /* ── CONFIRM HELPER ──
+   * @param {string}      title
+   * @param {string}      body
+   * @param {string}      confirmLabel
+   * @param {Function}    onConfirm
+   * @param {Element}     [container=document.body]  Pass an open <dialog> when
+   *                      calling from inside one so the overlay renders above it.
+   */
+  _confirm(title, body, confirmLabel, onConfirm, container = document.body) {
+    const isInDialog = container !== document.body;
     const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+    overlay.style.cssText = isInDialog
+      ? 'position:absolute;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;border-radius:inherit'
+      : 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
     // Build via DOM (no innerHTML) to prevent XSS from user-controlled title/body
     const card = document.createElement('div');
-    card.style.cssText = 'background:var(--panel);border:1px solid var(--border);border-radius:var(--rl);padding:20px;max-width:300px;width:100%;text-align:center';
+    card.style.cssText = 'background:var(--panel);border:1px solid var(--border);border-radius:var(--rl);padding:20px;max-width:300px;width:100%;text-align:center;position:relative;z-index:10000';
     const tEl = document.createElement('div');
     tEl.style.cssText = 'font-family:var(--fd);color:var(--gold);font-size:.9rem;letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px';
     tEl.textContent = title;
@@ -2007,9 +2208,17 @@ const app = {
     btnRow.appendChild(cancelBtn); btnRow.appendChild(okBtn);
     card.appendChild(tEl); card.appendChild(bEl); card.appendChild(btnRow);
     overlay.appendChild(card);
-    document.body.appendChild(overlay);
-    cancelBtn.onclick = () => overlay.remove();
-    okBtn.onclick = () => { overlay.remove(); onConfirm(); };
+    const prevPosition = isInDialog ? getComputedStyle(container).position : null;
+    if (isInDialog && prevPosition === 'static') container.style.position = 'relative';
+    container.appendChild(overlay);
+    const close = () => {
+      overlay.remove();
+      if (isInDialog && prevPosition === 'static') container.style.position = prevPosition;
+    };
+    cancelBtn.onclick = close;
+    okBtn.onclick = () => { close(); onConfirm(); };
+    // Focus the cancel button by default — safer UX for destructive confirmations
+    requestAnimationFrame(() => cancelBtn.focus());
   },
 
   deleteChar(name) {
@@ -2019,7 +2228,7 @@ const app = {
   _doDeleteChar(name) {
     STORAGE.deleteChar(name);
     this.renderHome();
-    this.toast(`"${this._esc(name)}" eliminado`, 'ok');
+    this.toast(`"${name}" eliminado`, 'ok');
   },
 
   /* ── UNLOCK / SETUP APP ── */
@@ -2054,111 +2263,173 @@ const app = {
     const w = document.getElementById('pages_wrapper');
     const track = document.getElementById('pages_track');
     let startX=0, startY=0, startT=0;
-    let lastX=0, lastT=0, vel=0;         // velocity tracking
+    let lastX=0, lastT=0;
+    // Exponential moving average velocity — más estable que la instantánea
+    let velEMA = 0;
     let dragging=false, locked=false;
+
+    // ── Ghost-input suppression ──────────────────────────────────────────────
+    // After a horizontal drag the browser fires a synthetic event sequence:
+    //   touchend → (pointerup) → mousedown → mouseup → click
+    // Suppress ALL of those at capture phase so stat-box buttons don't fire.
+    let _suppressClicks = false;
+    const SWIPE_SUPPRESS_EVENTS = ['touchstart','pointerdown','mousedown','click'];
+    const _swipeGuard = (e) => {
+      if (_suppressClicks) { e.stopPropagation(); e.preventDefault(); }
+    };
+    SWIPE_SUPPRESS_EVENTS.forEach(type =>
+      w.addEventListener(type, _swipeGuard, {capture:true, passive:false})
+    );
+    const suppressFor = (ms = 380) => {
+      _suppressClicks = true;
+      setTimeout(() => { _suppressClicks = false; }, ms);
+    };
+    w.addEventListener('pointerdown', () => {}, {passive:true});
 
     const pageW = () => w.clientWidth || window.innerWidth;
 
-    // Live position: follow finger with rubber-band at edges
+    // ── Live drag position with rubber-band at edges ──
     const setLive = (rawDx) => {
       const base = -this.currentPage * pageW();
-      let x = base + rawDx;
-      // Rubber-band resistance past edges
       const atStart = this.currentPage === 0 && rawDx > 0;
       const atEnd   = this.currentPage === this.totalPages - 1 && rawDx < 0;
-      if (atStart || atEnd) x = base + rawDx * 0.18;
+      // Resistance factor 0.10 — tight enough to signal edge, not sticky
+      const x = (atStart || atEnd) ? base + rawDx * 0.10 : base + rawDx;
       track.style.transition = 'none';
       track.style.transform = `translateX(${x}px)`;
     };
 
+    // ── Touch start ──
     w.addEventListener('touchstart', e => {
+      if (e.touches.length > 1) return; // ignore multi-touch
       const t = e.touches[0];
       startX = lastX = t.clientX;
       startY = t.clientY;
       startT = lastT = Date.now();
-      dragging = false; locked = false; vel = 0;
+      dragging = false; locked = false; velEMA = 0;
+      // Blur any focused child so :focus-visible gold border doesn't linger
+      const focused = w.querySelector(':focus');
+      if (focused) focused.blur();
     }, {passive:true});
 
+    // ── Touch move ──
     w.addEventListener('touchmove', e => {
-      if (!e.cancelable) return; // browser already handling this gesture
+      if (!e.cancelable || e.touches.length > 1) return;
       const t = e.touches[0];
       const dx = t.clientX - startX;
       const dy = t.clientY - startY;
-      const absDx = Math.abs(dx), absDy = Math.abs(dy);
 
       if (!locked) {
-        // Need at least 6px of movement before committing to a direction
-        if (absDx < 6 && absDy < 6) return;
-        if (absDx > absDy * 1.2) {
-          // Clearly horizontal — take over navigation
+        // Commit direction after 8px — reduces accidental horizontal locks
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        // Ratio 1.4 — prefer vertical scroll when ambiguous
+        if (Math.abs(dx) > Math.abs(dy) * 1.4) {
           locked = true; dragging = true;
           track.style.transition = 'none';
+          track.classList.add('is-dragging');
         } else {
-          // Vertical or ambiguous — release to native scroll
-          locked = true;
+          locked = true; // vertical — hand back to native scroll
         }
       }
 
       if (dragging) {
         e.preventDefault();
         const now = Date.now();
-        const dt = now - lastT || 1;
-        vel = vel * 0.6 + ((t.clientX - lastX) / dt) * 0.4;
+        const dt  = Math.max(now - lastT, 1);
+        const instantVel = (t.clientX - lastX) / dt;
+        // EMA alpha 0.35 — smooth but still responsive to quick flicks
+        velEMA = velEMA * 0.65 + instantVel * 0.35;
         lastX = t.clientX; lastT = now;
         setLive(dx);
       }
     }, {passive:false});
 
+    // ── Snap decision ──
+    // Uses momentum projection: if the finger is still moving fast, project
+    // where it would land (px/ms × remaining time budget) and use that to
+    // decide direction — feels much more natural than pure threshold.
+    const FLICK_VEL   = 0.22;  // px/ms — lower = more sensitive to quick flicks
+    const DRAG_RATIO  = 0.22;  // fraction of page width to commit on slow drag
+    const PROJ_MS     = 80;    // ms to project momentum forward
+
     const endSwipe = (clientX) => {
-      if (!dragging) { dragging=false; locked=false; vel=0; return; }
+      if (!dragging) {
+        dragging = false; locked = false; velEMA = 0;
+        track.classList.remove('is-dragging');
+        return;
+      }
       dragging = false; locked = false;
 
-      const dx    = clientX - startX;
-      const pW    = pageW();
-      const ratio = dx / pW;
-      const fast  = Math.abs(vel) > 0.35;  // flick threshold: responsive but not accidental
+      const dx       = clientX - startX;
+      const pW       = pageW();
+      const ratio    = dx / pW;
+      const absVel   = Math.abs(velEMA);
+      const isFlick  = absVel > FLICK_VEL;
+      // Projected displacement: where would the finger end up in PROJ_MS more?
+      const projected = dx + velEMA * PROJ_MS;
+      const projRatio = projected / pW;
 
       let target = this.currentPage;
-      if      (fast && vel < 0 && this.currentPage < this.totalPages-1) target = this.currentPage + 1;
-      else if (fast && vel > 0 && this.currentPage > 0)                 target = this.currentPage - 1;
-      else if (ratio < -0.28 && this.currentPage < this.totalPages-1)   target = this.currentPage + 1;
-      else if (ratio >  0.28 && this.currentPage > 0)                   target = this.currentPage - 1;
+      if (isFlick && velEMA < 0 && this.currentPage < this.totalPages - 1) {
+        target = this.currentPage + 1;
+      } else if (isFlick && velEMA > 0 && this.currentPage > 0) {
+        target = this.currentPage - 1;
+      } else if (projRatio < -DRAG_RATIO && this.currentPage < this.totalPages - 1) {
+        target = this.currentPage + 1;
+      } else if (projRatio > DRAG_RATIO && this.currentPage > 0) {
+        target = this.currentPage - 1;
+      }
 
+      // Suppress ghost events; keep is-dragging alive for the same window
+      const SUPPRESS_MS = 380;
+      suppressFor(SUPPRESS_MS);
+      setTimeout(() => track.classList.remove('is-dragging'), SUPPRESS_MS);
       this.goToPage(target);
     };
 
     w.addEventListener('touchend',    e => endSwipe(e.changedTouches[0].clientX), {passive:true});
-    w.addEventListener('touchcancel', e => this.goToPage(this.currentPage),        {passive:true});
+    w.addEventListener('touchcancel', () => {
+      track.classList.remove('is-dragging');
+      dragging = false; locked = false; velEMA = 0;
+      this.goToPage(this.currentPage);
+    }, {passive:true});
 
     // ── Desktop mouse drag ──
     let mStart = null;
     w.addEventListener('mousedown', e => {
       if (e.target.closest('input,select,textarea,button,label')) return;
-      mStart = {x:e.clientX, t:Date.now(), lastX:e.clientX, lastT:Date.now(), vel:0, dragging:false};
+      mStart = {x:e.clientX, lastX:e.clientX, lastT:Date.now(), velEMA:0, dragging:false};
       track.style.transition = 'none';
     });
     w.addEventListener('mousemove', e => {
       if (!mStart) return;
-      if (!mStart.dragging && Math.abs(e.clientX - mStart.x) > 12) mStart.dragging = true;
+      if (!mStart.dragging && Math.abs(e.clientX - mStart.x) > 10) {
+        mStart.dragging = true;
+        track.classList.add('is-dragging');
+      }
       if (mStart.dragging) {
-        const now = Date.now(), dt = now - mStart.lastT || 1;
-        mStart.vel = mStart.vel * 0.6 + ((e.clientX - mStart.lastX) / dt) * 0.4;
+        const now = Date.now(), dt = Math.max(now - mStart.lastT, 1);
+        const iv = (e.clientX - mStart.lastX) / dt;
+        mStart.velEMA = mStart.velEMA * 0.65 + iv * 0.35;
         mStart.lastX = e.clientX; mStart.lastT = now;
         setLive(e.clientX - mStart.x);
       }
     });
     const endMouse = (clientX) => {
+      track.classList.remove('is-dragging');
       if (!mStart) return;
-      const {x, dragging: was, vel: v} = mStart;
+      const {x, dragging: was, velEMA: v} = mStart;
       mStart = null;
       if (!was) return;
-      const dx = clientX - x, pW = pageW(), ratio = dx / pW;
-      const fast = Math.abs(v) > 0.35;
+      const dx = clientX - x, pW = pageW();
+      const projected = dx + v * PROJ_MS;
+      const projRatio = projected / pW;
+      const isFlick = Math.abs(v) > FLICK_VEL;
       let target = this.currentPage;
-      if      (fast && v < 0 && this.currentPage < this.totalPages-1) target = this.currentPage + 1;
-      else if (fast && v > 0 && this.currentPage > 0)                 target = this.currentPage - 1;
-      else if (ratio < -0.28 && this.currentPage < this.totalPages-1) target = this.currentPage + 1;
-      else if (ratio >  0.28 && this.currentPage > 0)                 target = this.currentPage - 1;
+      if      (isFlick && v < 0 && this.currentPage < this.totalPages-1) target = this.currentPage + 1;
+      else if (isFlick && v > 0 && this.currentPage > 0)                 target = this.currentPage - 1;
+      else if (projRatio < -DRAG_RATIO && this.currentPage < this.totalPages-1) target = this.currentPage + 1;
+      else if (projRatio > DRAG_RATIO && this.currentPage > 0)                  target = this.currentPage - 1;
       this.goToPage(target);
     };
     w.addEventListener('mouseup',    e => endMouse(e.clientX));
@@ -2167,20 +2438,35 @@ const app = {
 
   goToPage(n) {
     if (n !== this.currentPage && navigator.vibrate) navigator.vibrate(4);
+
+    // Save current page's scroll position if preserve mode is on
+    if (this.scrollPreserve) {
+      const curPage = document.getElementById('page_' + this.currentPage);
+      if (curPage) this._pageScrolls[this.currentPage] = curPage.scrollTop;
+    }
+
     this.currentPage = n;
     const w = document.getElementById('pages_wrapper');
     const track = document.getElementById('pages_track');
     const pageW = w ? w.clientWidth : window.innerWidth;
-    // Restore smooth spring transition for snap
-    track.style.transition = 'transform .32s cubic-bezier(.25,.46,.45,.94)';
+    // Easing: cubic-bezier(.15,.85,.3,1) — arranca rápido, desacelera con peso.
+    // Duración base 340ms; se percibe ágil en flicks y asentado en drags lentos.
+    track.style.transition = 'transform .34s cubic-bezier(.15,.85,.3,1)';
     track.style.transform  = `translateX(-${n * pageW}px)`;
     document.querySelectorAll('.nbtn').forEach((b,i) => b.classList.toggle('active', i===n));
     if (n === 4) this.buildDetailPage();
     if (n === 2) this.buildAptitudesPage();
-    // Resetear scroll de la página destino para evitar fondo negro
-    // si en una visita anterior el usuario había scrolleado hacia abajo.
+
     const destPage = document.getElementById('page_' + n);
-    if (destPage) destPage.scrollTop = 0;
+    if (destPage) {
+      if (this.scrollPreserve && this._pageScrolls[n] != null) {
+        // Restore saved scroll position after the transition settles
+        const saved = this._pageScrolls[n];
+        requestAnimationFrame(() => { destPage.scrollTop = saved; });
+      } else {
+        destPage.scrollTop = 0;
+      }
+    }
   },
 
   /* ── SECTION TOGGLES ── */
@@ -2191,19 +2477,19 @@ const app = {
       if (ev) { ev.style.display = 'block'; ev.classList.remove('section-reveal'); void ev.offsetWidth; ev.classList.add('section-reveal'); }
       if (sv) sv.style.display = 'none';
       // Restore alignment button active state
-      if (this.alignment) {
-        document.querySelectorAll('.aopt').forEach(b =>
-          b.classList.toggle('active', b.textContent === this.alignment)
-        );
-      }
+      if (this.alignment) this._syncAlignmentUI();
     } else {
       const ev = document.getElementById(`${sec}_edit_view`);
       const sv = document.getElementById(`${sec}_summary_view`);
       if (ev) { ev.style.display = 'block'; ev.classList.remove('section-reveal'); void ev.offsetWidth; ev.classList.add('section-reveal'); }
       if (sv) sv.style.display = 'none';
+      // Show panel header only while in edit mode for identity
+      if (sec === 'identity') ev?.closest('.panel')?.classList.add('identity-editing');
       if (sec === 'equipment') { this.updateDbSelect(); this.renderInventory(); }
-      // Scroll al panel en page_3 para que sea visible al expandirse
-      if (sec === 'combat' || sec === 'equipment') {
+      // Scroll al panel en page_3 para que sea visible al expandirse.
+      // Omitido durante resets en masa (_bulkEditing) para evitar que el RAF
+      // se ejecute después de goToPage(0) y desincronice el pages-track.
+      if ((sec === 'combat' || sec === 'equipment') && !this._bulkEditing) {
         requestAnimationFrame(() => {
           const panel = ev?.closest('.panel');
           if (panel) panel.scrollIntoView({behavior:'smooth', block:'start'});
@@ -2263,6 +2549,8 @@ const app = {
     const sv = document.getElementById(`${sec}_summary_view`);
     if (ev) ev.style.display = 'none';
     if (sv) sv.style.display = 'block';
+    // Hide panel header when collapsing identity section back to summary
+    if (sec === 'identity') ev?.closest('.panel')?.classList.remove('identity-editing');
 
     // combat/equipment viven en page_3. Al colapsar el edit_view el contenido
     // encoge y el scrollTop queda apuntando a zona vacía (pantalla negra).
@@ -2274,16 +2562,14 @@ const app = {
   },
 
   _buildStatsSummary() {
-    // STATS is a top-level constant
-    // Get descriptor mods (same as calc()) so displayed values include racial bonuses
-    const descKey = document.getElementById('sel_desc')?.value || '';
+    const descKey  = document.getElementById('sel_desc')?.value || '';
     const descMods = this.DB.descriptors?.[descKey]?.mods || {};
 
-    const makeBox = (s, forSummary) => {
-      const base  = parseInt(document.getElementById('base_'+s)?.value) || 8;
-      const dm    = descMods[s] || 0;
-      const final = base + dm;
-      const mod   = this.getMod(final);
+    const makeBox = s => {
+      const base   = parseInt(document.getElementById('base_'+s)?.value) || 8;
+      const dm     = descMods[s] || 0;
+      const final  = base + dm;
+      const mod    = this.getMod(final);
       const modStr = (mod >= 0 ? '+' : '') + mod;
       const box = document.createElement('div');
       box.className = 'sbox';
@@ -2292,34 +2578,41 @@ const app = {
       return box;
     };
 
-    const c = document.getElementById('stats_summary_boxes');
-    if (c) { c.innerHTML = ''; STATS.forEach(s => c.appendChild(makeBox(s, true))); }
-
-    const live = document.getElementById('stats_boxes_display');
-    if (live) { live.innerHTML = ''; STATS.forEach(s => live.appendChild(makeBox(s, false))); }
-  },
-
-  _buildSavesSummary() {
-    // STATS is a top-level constant
-    const common = document.querySelector('input[name="save_common"]:checked')?.value;
-    const uncommon = document.querySelector('input[name="save_uncommon"]:checked')?.value;
-    const prof = parseInt(document.getElementById('res_prof')?.textContent)||2;
-    ['saves_display','saves_summary_text'].forEach(id => {
+    // Render to both the edit-section summary and the live stats display
+    ['stats_summary_boxes', 'stats_boxes_display'].forEach(id => {
       const c = document.getElementById(id);
       if (!c) return;
       c.innerHTML = '';
-      const descKey2 = document.getElementById('sel_desc')?.value || '';
-      const descMods2 = this.DB.descriptors?.[descKey2]?.mods || {};
-      STATS.forEach(s => {
-        const base  = parseInt(document.getElementById('base_'+s)?.value) || 8;
-        const final = base + (descMods2[s] || 0);
-        const mod   = this.getMod(final);
-        const isProf = (s===common||s===uncommon);
-        const total = mod + (isProf?prof:0);
+      STATS.forEach(s => c.appendChild(makeBox(s)));
+    });
+  },
+
+  _buildSavesSummary() {
+    const common   = document.querySelector('input[name="save_common"]:checked')?.value;
+    const uncommon = document.querySelector('input[name="save_uncommon"]:checked')?.value;
+    const prof     = parseInt(document.getElementById('res_prof')?.textContent) || 2;
+
+    // Compute save totals once — shared across both container renders
+    const descKey  = document.getElementById('sel_desc')?.value || '';
+    const descMods = this.DB.descriptors?.[descKey]?.mods || {};
+    const saveData = STATS.map(s => {
+      const base   = parseInt(document.getElementById('base_'+s)?.value) || 8;
+      const final  = base + (descMods[s] || 0);
+      const mod    = this.getMod(final);
+      const isProf = (s === common || s === uncommon);
+      const total  = mod + (isProf ? prof : 0);
+      return { s, total, isProf };
+    });
+
+    ['saves_display', 'saves_summary_text'].forEach(id => {
+      const c = document.getElementById(id);
+      if (!c) return;
+      c.innerHTML = '';
+      saveData.forEach(({ s, total, isProf }) => {
         const box = document.createElement('div');
-        box.className = 'svsbox' + (isProf?' prof':'');
-        box.onclick = () => this.rollCheck('Salvación '+s, total);
-        box.innerHTML = `<span class="svslbl">${s}</span>${(total>=0?'+':'')}${total}`;
+        box.className = 'svsbox' + (isProf ? ' prof' : '');
+        box.onclick = () => this.rollCheck('Salvación ' + s, total);
+        box.innerHTML = `<span class="svslbl">${s}</span>${total >= 0 ? '+' : ''}${total}`;
         c.appendChild(box);
       });
     });
@@ -2412,16 +2705,28 @@ const app = {
 
   buildAlignmentPicker() {
     const c = document.getElementById('align_sel');
+    if (!c || c.dataset.built) return; // idempotente — construir una sola vez
+    c.dataset.built = '1';
     ALIGNMENTS.forEach(a => {
       const btn = document.createElement('button');
       btn.type = 'button'; btn.className = 'aopt'; btn.textContent = a;
+      btn.dataset.ali = a;
+      // preventDefault en mousedown evita que el botón robe el foco
+      // y que el outline dorado de :focus-visible aparezca en el campo anterior
+      btn.addEventListener('mousedown', e => e.preventDefault());
       btn.onclick = () => {
         this.alignment = a;
-        document.querySelectorAll('.aopt').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        this._syncAlignmentUI();
       };
       c.appendChild(btn);
     });
+  },
+
+  /** Sincroniza los botones .aopt con this.alignment (fuente única de verdad). */
+  _syncAlignmentUI() {
+    document.querySelectorAll('.aopt').forEach(b =>
+      b.classList.toggle('active', b.dataset.ali === this.alignment)
+    );
   },
 
   /* ── OPTIONS UPDATE ── */
@@ -2454,16 +2759,43 @@ const app = {
     }
 
     // Skills
+    // Antes de reconstruir, leer y guardar la selección actual en _skillsSel
+    // para que no se pierda cuando updateOptions reconstruye el DOM.
+    if (reset) {
+      this._skillsSel = { arq: new Set(), bg: new Set() };
+    } else {
+      // Preservar el estado actual del DOM si existe, o usar _skillsSel guardado
+      const curArq = Array.from(document.querySelectorAll('input[name="chk_arq"]:checked')).map(e=>e.value);
+      const curBg  = Array.from(document.querySelectorAll('input[name="chk_bg"]:checked')).map(e=>e.value);
+      if (curArq.length || curBg.length) {
+        this._skillsSel = { arq: new Set(curArq), bg: new Set(curBg) };
+      } else if (!this._skillsSel) {
+        this._skillsSel = { arq: new Set(), bg: new Set() };
+      }
+    }
+
     const buildSkills = (containerId, skills, name, limit) => {
       const div = document.getElementById(containerId);
       if (!div) return;
-      const checked = Array.from(div.querySelectorAll('input:checked')).map(el=>el.value);
+      const saved = name === 'chk_arq' ? this._skillsSel.arq : this._skillsSel.bg;
       div.innerHTML = '';
-      (skills||[]).forEach(s => {
+      (skills || []).forEach(s => {
         const lbl = document.createElement('label');
         lbl.className = 'skill-opt';
-        lbl.innerHTML = `<input type="checkbox" name="${name}" value="${s}" onchange="app.checkLimit('${name}',${limit});app.calc()"> ${s}`;
-        if (reset===false && checked.includes(s)) lbl.querySelector('input').checked = true;
+        const chk = document.createElement('input');
+        chk.type = 'checkbox';
+        chk.name = name;
+        chk.value = s;
+        chk.addEventListener('change', () => {
+          app.checkLimit(name, limit);
+          // Mantener _skillsSel sincronizado con el DOM
+          const set = name === 'chk_arq' ? this._skillsSel.arq : this._skillsSel.bg;
+          if (chk.checked) set.add(s); else set.delete(s);
+          app.calc();
+        });
+        if (saved.has(s)) chk.checked = true;
+        lbl.appendChild(chk);
+        lbl.append(' ' + s);
         div.appendChild(lbl);
       });
     };
@@ -2628,10 +2960,10 @@ const app = {
       const sumDmgEl  = document.getElementById(`sum_atk${n}_dmg`);
       const srcAtk    = document.getElementById(`w${n}_atk_val`);
       const srcDmg    = document.getElementById(`w${n}_dmg_val`);
-      if (atkEl    && srcAtk) atkEl.textContent = srcAtk.innerText;
+      if (atkEl    && srcAtk) atkEl.textContent = srcAtk.textContent;
       if (dmgEl    && srcDmg) dmgEl.textContent = srcDmg.textContent;
       if (sumBonusEl && srcAtk) sumBonusEl.textContent = srcAtk.textContent.replace(/[^+\-\d]/g,'')||'+0';
-      if (sumDmgEl && srcDmg) sumDmgEl.textContent = srcDmg.innerText;
+      if (sumDmgEl && srcDmg) sumDmgEl.textContent = srcDmg.textContent;
     });
 
     // Encumbrance
@@ -2639,7 +2971,7 @@ const app = {
     $('res_carga').textContent = `${inv.current}/${inv.max}`;
     const pct = inv.max > 0 ? Math.min(100, (inv.current/inv.max)*100) : 0;
     $('carga_bar').style.width = pct+'%';
-    $('carga_bar').style.background = pct > 100 ? 'var(--blood)' : '';
+    $('carga_bar').style.background = pct > 100 ? 'var(--blood)' : 'var(--gold)';
     const warn = $('carga_warn');
     warn.style.display = inv.current > inv.max ? 'block' : 'none';
     if ($('load_summary_display'))
@@ -2738,6 +3070,7 @@ const app = {
     this.inventory.push(item);
     this.renderInventory();
     this.syncCombatOptions();
+    this.calc();
     this.toast(`${data.name} añadido`,'ok');
   },
 
@@ -2754,7 +3087,7 @@ const app = {
     overlay.innerHTML = `
       <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--rl);width:100%;max-width:340px;padding:16px">
         <div style="font-family:var(--fd);color:var(--gold);font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px">${idx!==null?'Editar':'Nuevo'} Objeto</div>
-        <div style="margin-bottom:8px"><span class="fl">Nombre</span><input type="text" id="ci_name" value="${existing?.name||''}" placeholder="Nombre del objeto"></div>
+        <div style="margin-bottom:8px"><span class="fl">Nombre</span><input type="text" id="ci_name" value="${this._esc(existing?.name||'')}" placeholder="Nombre del objeto"></div>
         <div class="g2" style="gap:6px;margin-bottom:8px">
           <div><span class="fl">Slots</span><input type="number" id="ci_slots" value="${existing?.slots||1}" min="0" max="20"></div>
           <div><span class="fl">Tipo</span><select id="ci_type">
@@ -2786,15 +3119,16 @@ const app = {
     this._editingCustomItem = null;
     this.renderInventory();
     this.syncCombatOptions();
+    this.calc();
     this.toast(isEdit?'Actualizado':'Añadido','ok');
   },
 
-  removeInvItem(idx) { this.inventory.splice(idx,1); this.renderInventory(); this.syncCombatOptions(); },
+  removeInvItem(idx) { this.inventory.splice(idx,1); this.renderInventory(); this.syncCombatOptions(); this.calc(); },
   moveInvItem(idx, dir) {
     const newIdx = idx + dir;
     if (newIdx < 0 || newIdx >= this.inventory.length) return;
     [this.inventory[idx], this.inventory[newIdx]] = [this.inventory[newIdx], this.inventory[idx]];
-    this.renderInventory(); this.syncCombatOptions();
+    this.renderInventory(); this.syncCombatOptions(); this.calc();
   },
   updateInvItem(idx, field, value) {
     if (field==='slots') value = parseInt(value)||0;
@@ -2805,6 +3139,7 @@ const app = {
   syncGold(src) {
     if (src==='edit') this.gold = parseInt(document.getElementById('gold_coins_edit').value)||0;
     this.renderInventory();
+    this.calc();
   },
 
   /** Re-renders the inventory list and summary from this.inventory. */
@@ -2856,7 +3191,10 @@ const app = {
     }
     const gd = document.getElementById('gold_coins_display'); if (gd) gd.textContent = this.gold;
     const ge = document.getElementById('gold_coins_edit'); if (ge && document.activeElement!==ge) ge.value = this.gold;
-    this.calc();
+    // Note: calc() is intentionally NOT called here.
+    // renderInventory is always followed by calc() in its callers (addFromDB,
+    // saveCustomItem, syncCombatOptions chain, applyCharData, etc.).
+    // Calling it here would double-calculate on every inventory operation.
   },
 
   calcInventory() {
@@ -3090,17 +3428,16 @@ const app = {
   },
 
   /** Attach long-press repeat behavior to all .res-btn elements.
-   *  Called once from init(). Holding fires at 120ms intervals, accelerating. */
+   *  Called once from init(). Holding fires at 120ms intervals, accelerating.
+   *  Reads data-cur / data-max / data-delta attributes — no regex parsing. */
   _initResLongPress() {
     document.querySelectorAll('.res-btn').forEach(btn => {
-      // Parse adjustRes args once from onclick attribute
-      const oc = btn.getAttribute('onclick') || '';
-      const m  = oc.match(/adjustRes\('([^']+)','([^']+)',(-?\d+)\)/);
-      if (!m) return;
-      const [, curId, maxId, deltaStr] = m;
-      const delta = parseInt(deltaStr);
+      const { cur: curId, max: maxId, delta: deltaStr } = btn.dataset;
+      // Skip buttons that don't carry the required data attributes
+      if (!curId || !maxId || deltaStr === undefined) return;
+      const delta = parseInt(deltaStr, 10);
 
-      let _t = null;   // single timer reference — always cleared in stop
+      let _t    = null;
       let active = false;
 
       const fire = () => this.adjustRes(curId, maxId, delta);
@@ -3137,37 +3474,41 @@ const app = {
 
   /**
    * Show a toast notification.
-   * @param {string} msg  - Message text
+   * @param {string} msg  - Plain text message (not HTML)
    * @param {string} type - 'ok' | 'err' | 'info' (default)
    */
-  toast(msg, type='info') {
+  toast(msg, type = 'info') {
+    // Normalize legacy emoji/string labels to semantic types
+    const t = { '💾':'ok','ok':'ok','OK':'ok','✦':'ok','Error':'err','error':'err','⚠':'err' }[type] ?? 'info';
+
     const icon = document.createElement('span');
     icon.className = 't-icon';
-    // Normalize legacy emoji/string labels to semantic types
-    const t = {
-      '💾':'ok', 'ok':'ok', 'OK':'ok',
-      '✦':'ok',
-      'Error':'err', 'error':'err', '⚠':'err',
-    }[type] ?? 'info';
-
-    if (t === 'ok')       { icon.textContent = '✦'; icon.classList.add('gold'); }
+    if      (t === 'ok')  { icon.textContent = '✦'; icon.classList.add('gold'); }
     else if (t === 'err') { icon.textContent = '✕'; icon.classList.add('err'); }
     else                  { icon.textContent = '·'; icon.classList.add('dim'); }
 
     const m = document.createElement('span');
-    m.className = 't-msg'; m.textContent = String(msg);
+    m.className = 't-msg';
+    m.textContent = String(msg); // always plain text — never innerHTML
 
     const wrap = document.createElement('div');
-    wrap.style.display = 'flex'; wrap.style.alignItems = 'center'; wrap.style.gap = '9px';
-    wrap.appendChild(icon); wrap.appendChild(m);
-    this._toastNode(wrap, t === 'err' ? 'terror' : '');
-  },
-  _toastNode(node, cls='') {
+    wrap.style.cssText = 'display:flex;align-items:center;gap:9px';
+    wrap.appendChild(icon);
+    wrap.appendChild(m);
+
     const c = document.getElementById('toast-ct');
+    // Cap visible toasts at 3
     while (c.children.length >= 3) c.removeChild(c.firstChild);
-    const t = document.createElement('div'); t.className=`toast ${cls}`;
-    t.appendChild(node); c.appendChild(t);
-    setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)';t.style.transition='.3s';setTimeout(()=>t.remove(),300)},3500);
+    const toast = document.createElement('div');
+    toast.className = `toast${t === 'err' ? ' terror' : ''}`;
+    toast.appendChild(wrap);
+    c.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(8px)';
+      toast.style.transition = '.3s';
+      setTimeout(() => toast.remove(), 300);
+    }, 3500);
   },
 
   /* ── TALENTS ── */
@@ -3224,7 +3565,7 @@ const app = {
       const p = document.createElement('p'); p.textContent = t.desc||''; infoDiv.appendChild(p);
       (t.grades||[]).forEach(g => {
         const sp = document.createElement('span');
-        sp.style.cssText = 'font-family:var(--fm);font-size:.63rem;color:var(--blood);display:block;margin-top:3px';
+        sp.className = 'js-grade-block';
         sp.textContent = `G${g.g}: ${g.d}`;
         infoDiv.appendChild(sp);
       });
@@ -3261,30 +3602,7 @@ const app = {
   },
 
   _confirmInContainer(container, title, body, confirmLabel, onConfirm) {
-    const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;border-radius:inherit';
-    const card = document.createElement('div');
-    card.style.cssText = 'background:var(--panel);border:1px solid var(--border);border-radius:var(--rl);padding:20px;max-width:300px;width:100%;text-align:center;position:relative;z-index:10000';
-    const tEl = document.createElement('div');
-    tEl.style.cssText = 'font-family:var(--fd);color:var(--gold);font-size:.9rem;letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px';
-    tEl.textContent = title;
-    const bEl = document.createElement('div');
-    bEl.style.cssText = 'font-size:.82rem;color:var(--muted);margin-bottom:16px';
-    bEl.textContent = body;
-    const btnRow = document.createElement('div');
-    btnRow.style.cssText = 'display:flex;gap:8px';
-    const cancelBtn = document.createElement('button');
-    cancelBtn.className = 'btn btn-g'; cancelBtn.style.flex = '1'; cancelBtn.textContent = 'Cancelar';
-    const okBtn = document.createElement('button');
-    okBtn.className = 'btn btn-p'; okBtn.style.flex = '1'; okBtn.textContent = confirmLabel;
-    btnRow.appendChild(cancelBtn); btnRow.appendChild(okBtn);
-    card.appendChild(tEl); card.appendChild(bEl); card.appendChild(btnRow);
-    overlay.appendChild(card);
-    const prevPosition = container.style.position;
-    if (getComputedStyle(container).position === 'static') container.style.position = 'relative';
-    container.appendChild(overlay);
-    cancelBtn.onclick = () => { overlay.remove(); container.style.position = prevPosition; };
-    okBtn.onclick = () => { overlay.remove(); container.style.position = prevPosition; onConfirm(); };
+    this._confirm(title, body, confirmLabel, onConfirm, container);
   },
 
   _doCleanTalents() {
@@ -3320,10 +3638,10 @@ const app = {
         const d = document.createElement('div');
         d.style.cssText='background:var(--raised);border:1px solid var(--rim);border-radius:var(--r);padding:6px 10px';
         const title = document.createElement('div');
-        title.style.cssText='font-family:var(--fd);font-size:.8rem;color:var(--gold);margin-bottom:2px';
+        title.className = 'js-talent-title';
         title.textContent = String(h.value || '');
         const desc = document.createElement('div');
-        desc.style.cssText='font-size:.75rem;color:var(--text)';
+        desc.className = 'js-talent-desc';
         desc.textContent = String(h.getAttribute('data-desc') || '');
         d.appendChild(title); d.appendChild(desc);
         list.appendChild(d);
@@ -3347,18 +3665,18 @@ const app = {
       db.innerHTML = '';
       // txt paragraph (DB content — sanitized)
       const dtxt = document.createElement('p');
-      dtxt.style.cssText = 'font-size:.82rem;color:var(--text);line-height:1.6;margin-bottom:8px';
+      dtxt.className = 'js-detail-txt';
       dtxt.textContent = this._sanitize(desc.txt||'');
       db.appendChild(dtxt);
       if (desc.bonus) {
         const bw = document.createElement('div'); bw.style.marginBottom='8px';
         const bs = document.createElement('span');
-        bs.style.cssText='font-family:var(--fm);font-size:.72rem;color:var(--gold);background:rgba(200,169,110,.1);border:1px solid rgba(200,169,110,.3);border-radius:20px;padding:2px 10px';
+        bs.className = 'js-badge-gold';
         bs.textContent = '📈 '+this._sanitize(desc.bonus); bw.appendChild(bs); db.appendChild(bw);
       }
       if (desc.grant?.length) {
         const gl = document.createElement('div');
-        gl.style.cssText='font-family:var(--fd);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px';
+        gl.className = 'js-section-lbl';
         gl.textContent='Rasgos'; db.appendChild(gl);
         const gw = document.createElement('div'); gw.style.cssText='display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px';
         desc.grant.forEach(g => { const s=document.createElement('span'); s.className='tbadge'; s.textContent='✦ '+this._sanitize(String(g)); gw.appendChild(s); });
@@ -3366,7 +3684,7 @@ const app = {
       }
       if (desc.mods && Object.keys(desc.mods).length) {
         const ml = document.createElement('div');
-        ml.style.cssText='font-family:var(--fd);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px';
+        ml.className = 'js-section-lbl';
         ml.textContent='Modificadores'; db.appendChild(ml);
         const mw = document.createElement('div'); mw.style.cssText='display:flex;flex-wrap:wrap;gap:4px';
         Object.entries(desc.mods).forEach(([k,v]) => {
@@ -3385,7 +3703,7 @@ const app = {
       at.textContent = 'Arquetipo: '+this._sanitize(arq.name);
       ab.innerHTML = '';
       const atxt = document.createElement('p');
-      atxt.style.cssText='font-size:.82rem;color:var(--text);line-height:1.6;margin-bottom:8px';
+      atxt.className = 'js-detail-txt';
       atxt.textContent = this._sanitize(arq.txt||''); ab.appendChild(atxt);
       // Resource formulas grid
       const rg = document.createElement('div'); rg.className='g3'; rg.style.marginBottom='8px';
@@ -3394,9 +3712,10 @@ const app = {
       const ingFormula = `INT/SAB/CAR + Niv + ${Number(arq.ing_bonus)||0}`;
       const mkResBox = (bg,bc,lc,lbl,val) => {
         const d=document.createElement('div');
-        d.style.cssText=`text-align:center;background:${bg};border:1px solid ${bc};border-radius:var(--r);padding:6px`;
-        const l=document.createElement('div'); l.style.cssText=`font-family:var(--fm);font-size:.56rem;color:${lc};text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px`; l.textContent=lbl;
-        const v=document.createElement('div'); v.style.cssText=`font-family:var(--fd);font-size:.82rem;color:var(--bright);font-weight:700`; v.textContent=val;
+        d.className = 'js-res-formula';
+        d.style.cssText=`background:${bg};border:1px solid ${bc}`;
+        const l=document.createElement('div'); l.className='js-res-formula-lbl'; l.style.color=lc; l.textContent=lbl;
+        const v=document.createElement('div'); v.className='js-res-formula-val'; v.textContent=val;
         d.appendChild(l); d.appendChild(v); return d;
       };
       rg.appendChild(mkResBox('rgba(176,48,64,.12)','rgba(176,48,64,.3)','var(--blood)','PV Base',pvFormula));
@@ -3404,14 +3723,14 @@ const app = {
       rg.appendChild(mkResBox('rgba(74,158,202,.1)','rgba(74,158,202,.3)','var(--ice)','Ingenio',ingFormula));
       ab.appendChild(rg);
       if (filoVal) {
-        const fl=document.createElement('div'); fl.style.cssText='font-family:var(--fd);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px'; fl.textContent='Filo Seleccionado'; ab.appendChild(fl);
+        const fl=document.createElement('div'); fl.className='js-section-lbl'; fl.textContent='Filo Seleccionado'; ab.appendChild(fl);
         const fw=document.createElement('div'); fw.style.marginBottom='8px'; const fb=document.createElement('span'); fb.className='tbadge'; fb.textContent='⚔ '+this._sanitize(filoVal); fw.appendChild(fb); ab.appendChild(fw);
       }
       const selSkills = [...new Set([...Array.from(document.querySelectorAll('input[name="chk_arq"]:checked')).map(e=>e.value),...Array.from(document.querySelectorAll('input[name="chk_bg"]:checked')).map(e=>e.value)])];
       if (selSkills.length) {
-        const sl=document.createElement('div'); sl.style.cssText='font-family:var(--fd);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px'; sl.textContent='Habilidades Seleccionadas'; ab.appendChild(sl);
+        const sl=document.createElement('div'); sl.className='js-section-lbl'; sl.textContent='Habilidades Seleccionadas'; ab.appendChild(sl);
         const sw=document.createElement('div'); sw.style.cssText='display:flex;flex-wrap:wrap;gap:4px';
-        selSkills.forEach(s => { const sp=document.createElement('span'); sp.style.cssText='font-family:var(--fm);font-size:.7rem;background:var(--raised);border:1px solid var(--border);border-radius:20px;padding:2px 8px;color:var(--text)'; sp.textContent=this._sanitize(String(s)); sw.appendChild(sp); });
+        selSkills.forEach(s => { const sp=document.createElement('span'); sp.className='js-tag-neutral'; sp.textContent=this._sanitize(String(s)); sw.appendChild(sp); });
         ab.appendChild(sw);
       }
     } else { at.textContent='Arquetipo: —'; ab.innerHTML='<p style="color:var(--muted);font-size:.8rem;font-style:italic">Selecciona un Arquetipo.</p>'; }
@@ -3437,7 +3756,7 @@ const app = {
       // Grades (from DB — sanitized)
       grades.forEach(g => {
         const gd=document.createElement('div');
-        gd.style.cssText='font-family:var(--fm);font-size:.66rem;color:var(--blood);margin-top:4px;padding:3px 6px;background:rgba(125,28,42,.15);border-radius:3px';
+        gd.className = 'js-grade-block';
         gd.textContent='G'+Number(g.g)+': '+this._sanitize(String(g.d||''));
         dcb.appendChild(gd);
       });
@@ -3451,6 +3770,21 @@ const app = {
   _aptSel: { tricks: new Set(), spells: new Set() },
   _aptMode: 'tricks',
 
+  /** Returns true if the spell entry is classified as a trick (not a full spell). */
+  _isTrickEntry(s) {
+    // Match type flag OR cost that starts with "adr" as a standalone token
+    // (e.g. "Adr 1", "ADR", "adr") — avoids false positives like "Reduce ADR del enemigo".
+    return s.type === 'trick' || (s.cost && /^adr\b/i.test(s.cost.trim()));
+  },
+
+  /** Returns all DB spell keys that belong to the given section ('tricks' | 'spells'). */
+  _aptKeysForSection(sec) {
+    return Object.keys(this.DB.spells || {}).filter(k => {
+      const isTrick = this._isTrickEntry(this.DB.spells[k]);
+      return sec === 'tricks' ? isTrick : !isTrick;
+    });
+  },
+
   buildAptitudesPage() {
     this._renderAptSummary('tricks');
     this._renderAptSummary('spells');
@@ -3461,17 +3795,12 @@ const app = {
     const countEl = document.getElementById(`${sec}_count`);
     const sel = this._aptSel[sec];
     if (!sumList) return;
-    const spellKeys = Object.keys(this.DB.spells||{});
-    const items = spellKeys.filter(k => {
-      const s = this.DB.spells[k];
-      const isTrick = s.type==='trick'||(s.cost&&s.cost.toLowerCase().includes('adr'));
-      return sec==='tricks' ? isTrick : !isTrick;
-    }).filter(k => sel.has(k));
 
+    const items = this._aptKeysForSection(sec).filter(k => sel.has(k));
     if (countEl) countEl.textContent = items.length;
 
     if (!items.length) {
-      const label = sec==='tricks' ? 'trucos' : 'conjuros';
+      const label = sec === 'tricks' ? 'trucos' : 'conjuros';
       sumList.innerHTML = `<p class="txt-it-c">Sin ${label} seleccionados.</p>`;
       return;
     }
@@ -3505,12 +3834,7 @@ const app = {
   _renderAptManager() {
     const sec = this._aptMode;
     const sel = this._aptSel[sec];
-    const spellKeys = Object.keys(this.DB.spells||{});
-    const allItems = spellKeys.filter(k => {
-      const s = this.DB.spells[k];
-      const isTrick = s.type==='trick'||(s.cost&&s.cost.toLowerCase().includes('adr'));
-      return sec==='tricks' ? isTrick : !isTrick;
-    });
+    const allItems = this._aptKeysForSection(sec);
 
     const availList = document.getElementById('apt_available_list');
     const selList   = document.getElementById('apt_selected_list');
@@ -3518,48 +3842,78 @@ const app = {
     const selCount  = document.getElementById('apt_sel_count');
     availList.innerHTML = ''; selList.innerHTML = '';
 
+    /** Build a card. Click handler toggles classes in-place and moves the card
+     *  between lists — no full re-render needed on every interaction. */
     const makeCard = (k, isSelected) => {
-      const s = this.DB.spells[k];
+      const s    = this.DB.spells[k];
       const card = document.createElement('div');
-      card.style.cssText = `background:${isSelected?'rgba(74,158,202,.08)':'var(--raised)'};border:1px solid ${isSelected?'rgba(74,158,202,.4)':'var(--rim)'};border-radius:var(--r);padding:6px 9px;cursor:pointer;transition:all .15s`;
+      card.className = 'apt-card' + (isSelected ? ' apt-card--sel' : '');
+
       const topRow = document.createElement('div');
-      topRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:6px';
+      topRow.className = 'apt-card__row';
+
       const nameSpan = document.createElement('span');
-      nameSpan.style.cssText = `font-family:var(--fd);font-size:.78rem;color:${isSelected?'var(--ice)':'var(--gold)'};font-weight:600`;
-      nameSpan.textContent = s.name||k;
+      nameSpan.className = 'apt-card__name';
+      nameSpan.textContent = s.name || k;
+
       const badge = document.createElement('span');
-      badge.style.cssText = `font-family:var(--fm);font-size:.6rem;padding:1px 7px;border-radius:10px;background:${isSelected?'rgba(74,158,202,.2)':'rgba(200,169,110,.1)'};color:${isSelected?'var(--ice)':'var(--muted)'};white-space:nowrap;flex-shrink:0`;
+      badge.className = 'apt-card__badge';
       badge.textContent = isSelected ? '✓ Quitar' : '+ Añadir';
-      topRow.appendChild(nameSpan); topRow.appendChild(badge);
+
+      topRow.appendChild(nameSpan);
+      topRow.appendChild(badge);
+      card.appendChild(topRow);
+
       if (s.txt) {
         const desc = document.createElement('div');
-        desc.style.cssText = 'font-size:.72rem;color:var(--muted);margin-top:3px;line-height:1.4';
-        desc.textContent = s.txt.length > 90 ? s.txt.slice(0,90)+'…' : s.txt;
-        card.appendChild(topRow); card.appendChild(desc);
-      } else { card.appendChild(topRow); }
+        desc.className = 'apt-card__desc';
+        desc.textContent = s.txt.length > 90 ? s.txt.slice(0, 90) + '…' : s.txt;
+        card.appendChild(desc);
+      }
+
       card.onclick = () => {
-        if (isSelected) sel.delete(k); else sel.add(k);
-        this._renderAptManager();
+        const nowSelected = sel.has(k);
+        if (nowSelected) {
+          sel.delete(k);
+          card.classList.remove('apt-card--sel');
+          badge.textContent = '+ Añadir';
+          // Move card back to available list
+          availList.insertBefore(card, availList.firstChild);
+        } else {
+          sel.add(k);
+          card.classList.add('apt-card--sel');
+          badge.textContent = '✓ Quitar';
+          // Move card to selected list
+          selList.appendChild(card);
+        }
+        // Update counters and summary without full re-render
+        const count = selList.querySelectorAll('.apt-card').length;
+        if (selCount) selCount.textContent = count;
+        if (selEmpty) selEmpty.style.display = count ? 'none' : 'block';
         this._renderAptSummary(sec);
       };
-      card.onmouseenter = () => card.style.borderColor = isSelected?'var(--blood)':'var(--gold)';
-      card.onmouseleave = () => card.style.borderColor = isSelected?'rgba(74,158,202,.4)':'var(--rim)';
+
       return card;
     };
 
-    const notSel = allItems.filter(k=>!sel.has(k));
-    const isSel  = allItems.filter(k=> sel.has(k));
+    const notSel = allItems.filter(k => !sel.has(k));
+    const isSel  = allItems.filter(k =>  sel.has(k));
 
     if (!allItems.length) {
-      const label = sec==='tricks'?'trucos':'conjuros';
+      const label = sec === 'tricks' ? 'trucos' : 'conjuros';
       availList.innerHTML = `<div class="apt-empty"><p>No hay ${label} en la base de datos.<br>Añádelos en el Editor de Reglas.</p><button class="btn btn-g" style="font-size:.68rem" onclick="document.getElementById('db_editor_modal').showModal()">⚙ Editor de Reglas</button></div>`;
     } else {
       notSel.forEach(k => availList.appendChild(makeCard(k, false)));
-      if (!notSel.length) { const d=document.createElement('p'); d.className='txt-it-c'; d.textContent='Todos añadidos.'; availList.appendChild(d); }
+      if (!notSel.length) {
+        const d = document.createElement('p');
+        d.className = 'txt-it-c';
+        d.textContent = 'Todos añadidos.';
+        availList.appendChild(d);
+      }
     }
 
     isSel.forEach(k => selList.appendChild(makeCard(k, true)));
-    selEmpty.style.display = isSel.length ? 'none' : 'block';
+    if (selEmpty) selEmpty.style.display = isSel.length ? 'none' : 'block';
     if (selCount) selCount.textContent = isSel.length;
   },
 
@@ -3626,18 +3980,21 @@ const app = {
       existing = this.DB[cat]?.[key];
     }
 
+    // Shorthand: escapes DB values interpolated into HTML attribute strings
+    const _e = v => this._esc(String(v ?? ''));
+
     let formHtml = `<h3 style="font-family:var(--fd);font-size:.78rem;color:var(--gold);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">${key==='new'?'Nuevo':'Editar'} Entrada</h3>`;
 
     if (cat === 'descriptors') {
       formHtml += `<div style="margin-bottom:10px">
         <span class="dfl">Clave <span style="font-family:var(--fb);font-size:.62rem;color:var(--dim);text-transform:none;letter-spacing:0;font-style:italic;font-weight:400">— ID interno único</span></span>
-        <input type="text" id="db_key" value="${key==='new'?'':key}" placeholder="ej: elfo_oscuro" autocomplete="off" spellcheck="false">
+        <input type="text" id="db_key" value="${key==='new'?'':_e(key)}" placeholder="ej: elfo_oscuro" autocomplete="off" spellcheck="false">
         <div style="font-family:var(--fb);font-size:.66rem;color:var(--muted);font-style:italic;margin-top:3px;line-height:1.4;padding-left:2px">Sin espacios ni acentos. Solo letras, números y guión bajo. Ej: <em>elfo_oscuro</em>, <em>humano_variante</em></div>
       </div>
-      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Descripción</span><textarea id="db_txt" style="min-height:56px">${existing?.txt||''}</textarea></div>
-      <div style="margin-bottom:6px"><span class="dfl">Bono</span><input type="text" id="db_bonus" value="${existing?.bonus||''}" placeholder="ej: +1 DES"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Rasgos (separados por coma)</span><input type="text" id="db_grant" value="${(existing?.grant||[]).join(', ')}" placeholder="ej: Visión en la oscuridad, Resistencia"></div>
+      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${_e(existing?.name)}"></div>
+      <div style="margin-bottom:6px"><span class="dfl">Descripción</span><textarea id="db_txt" style="min-height:56px">${_e(existing?.txt)}</textarea></div>
+      <div style="margin-bottom:6px"><span class="dfl">Bono</span><input type="text" id="db_bonus" value="${_e(existing?.bonus)}" placeholder="ej: +1 DES"></div>
+      <div style="margin-bottom:6px"><span class="dfl">Rasgos (separados por coma)</span><input type="text" id="db_grant" value="${_e((existing?.grant||[]).join(', '))}" placeholder="ej: Visión en la oscuridad, Resistencia"></div>
       <div style="margin-bottom:6px"><span class="dfl">Modificadores de Atributo</span>
         <div class="g6" style="gap:4px">
           ${['FUE','DES','CON','INT','SAB','CAR'].map(s=>`<div><span class="dfl">${s}</span><input type="number" id="db_mod_${s}" value="${existing?.mods?.[s]||0}" min="-5" max="5" style="font-family:var(--fm);font-size:.8rem;text-align:center;padding:3px"></div>`).join('')}
@@ -3646,37 +4003,37 @@ const app = {
     } else if (cat === 'archetypes') {
       formHtml += `<div style="margin-bottom:10px">
         <span class="dfl">Clave <span style="font-family:var(--fb);font-size:.62rem;color:var(--dim);text-transform:none;letter-spacing:0;font-style:italic;font-weight:400">— ID interno único</span></span>
-        <input type="text" id="db_key" value="${key==='new'?'':key}" placeholder="ej: paladin" autocomplete="off" spellcheck="false">
+        <input type="text" id="db_key" value="${key==='new'?'':_e(key)}" placeholder="ej: paladin" autocomplete="off" spellcheck="false">
         <div style="font-family:var(--fb);font-size:.66rem;color:var(--muted);font-style:italic;margin-top:3px;line-height:1.4;padding-left:2px">Sin espacios ni acentos. Ej: <em>paladin</em>, <em>brujo_pacto</em></div>
       </div>
-      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Descripción</span><textarea id="db_txt" style="min-height:56px">${existing?.txt||''}</textarea></div>
+      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${_e(existing?.name)}"></div>
+      <div style="margin-bottom:6px"><span class="dfl">Descripción</span><textarea id="db_txt" style="min-height:56px">${_e(existing?.txt)}</textarea></div>
       <div class="g3" style="gap:6px;margin-bottom:6px">
         <div><span class="dfl">PV Base</span><input type="number" id="db_pv" value="${existing?.pv||8}"></div>
         <div><span class="dfl">Adrenalina</span><input type="number" id="db_adr" value="${existing?.adr_bonus??existing?.adr??2}"></div>
         <div><span class="dfl">Ingenio</span><input type="number" id="db_ing" value="${existing?.ing_bonus??existing?.ing??0}"></div>
       </div>
-      <div style="margin-bottom:6px"><span class="dfl">Filos (separados por coma)</span><input type="text" id="db_edges" value="${(existing?.edges||[]).join(', ')}"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Habilidades (separadas por coma)</span><input type="text" id="db_skills" value="${(existing?.skills||[]).join(', ')}"></div>`;
+      <div style="margin-bottom:6px"><span class="dfl">Filos (separados por coma)</span><input type="text" id="db_edges" value="${_e((existing?.edges||[]).join(', '))}"></div>
+      <div style="margin-bottom:6px"><span class="dfl">Habilidades (separadas por coma)</span><input type="text" id="db_skills" value="${_e((existing?.skills||[]).join(', '))}"></div>`;
     } else if (cat === 'backgrounds') {
       formHtml += `<div style="margin-bottom:10px">
         <span class="dfl">Clave <span style="font-family:var(--fb);font-size:.62rem;color:var(--dim);text-transform:none;letter-spacing:0;font-style:italic;font-weight:400">— ID interno único</span></span>
-        <input type="text" id="db_key" value="${key==='new'?'':key}" placeholder="ej: marinero" autocomplete="off" spellcheck="false">
+        <input type="text" id="db_key" value="${key==='new'?'':_e(key)}" placeholder="ej: marinero" autocomplete="off" spellcheck="false">
         <div style="font-family:var(--fb);font-size:.66rem;color:var(--muted);font-style:italic;margin-top:3px;line-height:1.4;padding-left:2px">Sin espacios ni acentos. Ej: <em>marinero</em>, <em>ex_soldado</em></div>
       </div>
-      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Descripción</span><textarea id="db_txt" style="min-height:56px">${existing?.txt||''}</textarea></div>
-      <div style="margin-bottom:6px"><span class="dfl">Rasgos (coma)</span><input type="text" id="db_grant" value="${(existing?.grant||[]).join(', ')}"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Habilidades (coma)</span><input type="text" id="db_skills" value="${(existing?.skills||[]).join(', ')}"></div>`;
+      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${_e(existing?.name)}"></div>
+      <div style="margin-bottom:6px"><span class="dfl">Descripción</span><textarea id="db_txt" style="min-height:56px">${_e(existing?.txt)}</textarea></div>
+      <div style="margin-bottom:6px"><span class="dfl">Rasgos (coma)</span><input type="text" id="db_grant" value="${_e((existing?.grant||[]).join(', '))}"></div>
+      <div style="margin-bottom:6px"><span class="dfl">Habilidades (coma)</span><input type="text" id="db_skills" value="${_e((existing?.skills||[]).join(', '))}"></div>`;
     } else if (cat === 'weapons') {
       formHtml += `<div style="margin-bottom:10px">
         <span class="dfl">Clave <span style="font-family:var(--fb);font-size:.62rem;color:var(--dim);text-transform:none;letter-spacing:0;font-style:italic;font-weight:400">— ID interno único</span></span>
-        <input type="text" id="db_key" value="${key==='new'?'':key}" placeholder="ej: espada_larga" autocomplete="off" spellcheck="false">
+        <input type="text" id="db_key" value="${key==='new'?'':_e(key)}" placeholder="ej: espada_larga" autocomplete="off" spellcheck="false">
         <div style="font-family:var(--fb);font-size:.66rem;color:var(--muted);font-style:italic;margin-top:3px;line-height:1.4;padding-left:2px">Sin espacios ni acentos. Ej: <em>espada_larga</em>, <em>ballesta_mano</em></div>
       </div>
-      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
+      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${_e(existing?.name)}"></div>
       <div class="g2" style="gap:6px;margin-bottom:6px">
-        <div><span class="dfl">Daño (ej: 1d8)</span><input type="text" id="db_dmg" value="${existing?.dmg||'1d6'}"></div>
+        <div><span class="dfl">Daño (ej: 1d8)</span><input type="text" id="db_dmg" value="${_e(existing?.dmg||'1d6')}"></div>
         <div><span class="dfl">Tipo</span><select id="db_wtype"><option value="light"${existing?.type==='light'?' selected':''}>Ligera</option><option value="medium"${existing?.type==='medium'?' selected':''}>Media</option><option value="heavy"${existing?.type==='heavy'?' selected':''}>Pesada</option><option value="ranged"${existing?.type==='ranged'?' selected':''}>Distancia</option><option value="reach"${existing?.type==='reach'?' selected':''}>Alcance</option></select></div>
       </div>
       <div class="g3" style="gap:6px;margin-bottom:6px">
@@ -3687,10 +4044,10 @@ const app = {
     } else if (cat === 'armors') {
       formHtml += `<div style="margin-bottom:10px">
         <span class="dfl">Clave <span style="font-family:var(--fb);font-size:.62rem;color:var(--dim);text-transform:none;letter-spacing:0;font-style:italic;font-weight:400">— ID interno único</span></span>
-        <input type="text" id="db_key" value="${key==='new'?'':key}" placeholder="ej: cota_malla" autocomplete="off" spellcheck="false">
+        <input type="text" id="db_key" value="${key==='new'?'':_e(key)}" placeholder="ej: cota_malla" autocomplete="off" spellcheck="false">
         <div style="font-family:var(--fb);font-size:.66rem;color:var(--muted);font-style:italic;margin-top:3px;line-height:1.4;padding-left:2px">Sin espacios ni acentos. Ej: <em>cota_malla</em>, <em>cuero_tachonado</em></div>
       </div>
-      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
+      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${_e(existing?.name)}"></div>
       <div class="g3" style="gap:6px;margin-bottom:6px">
         <div><span class="dfl">CA Base</span><input type="number" id="db_ca" value="${existing?.ca||10}"></div>
         <div><span class="dfl">Tipo</span><select id="db_atype"><option value="none"${existing?.type==='none'?' selected':''}>Sin armadura</option><option value="light"${existing?.type==='light'?' selected':''}>Ligera</option><option value="medium"${existing?.type==='medium'?' selected':''}>Media</option><option value="heavy"${existing?.type==='heavy'?' selected':''}>Pesada</option></select></div>
@@ -3699,10 +4056,10 @@ const app = {
     } else if (cat === 'shields') {
       formHtml += `<div style="margin-bottom:10px">
         <span class="dfl">Clave <span style="font-family:var(--fb);font-size:.62rem;color:var(--dim);text-transform:none;letter-spacing:0;font-style:italic;font-weight:400">— ID interno único</span></span>
-        <input type="text" id="db_key" value="${key==='new'?'':key}" placeholder="ej: escudo_torre" autocomplete="off" spellcheck="false">
+        <input type="text" id="db_key" value="${key==='new'?'':_e(key)}" placeholder="ej: escudo_torre" autocomplete="off" spellcheck="false">
         <div style="font-family:var(--fb);font-size:.66rem;color:var(--muted);font-style:italic;margin-top:3px;line-height:1.4;padding-left:2px">Sin espacios ni acentos. Ej: <em>escudo_madera</em>, <em>escudo_torre</em></div>
       </div>
-      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
+      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${_e(existing?.name)}"></div>
       <div class="g2" style="gap:6px;margin-bottom:6px">
         <div><span class="dfl">Bono CA</span><input type="number" id="db_bonus_ca" value="${existing?.bonus||1}"></div>
         <div><span class="dfl">Slots</span><input type="number" id="db_slots" value="${existing?.slots||1}"></div>
@@ -3710,24 +4067,24 @@ const app = {
     } else if (cat === 'spells') {
       formHtml += `<div style="margin-bottom:10px">
         <span class="dfl">Clave <span style="font-family:var(--fb);font-size:.62rem;color:var(--dim);text-transform:none;letter-spacing:0;font-style:italic;font-weight:400">— ID interno único</span></span>
-        <input type="text" id="db_key" value="${key==='new'?'':key}" placeholder="ej: bola_fuego" autocomplete="off" spellcheck="false">
+        <input type="text" id="db_key" value="${key==='new'?'':_e(key)}" placeholder="ej: bola_fuego" autocomplete="off" spellcheck="false">
         <div style="font-family:var(--fb);font-size:.66rem;color:var(--muted);font-style:italic;margin-top:3px;line-height:1.4;padding-left:2px">Sin espacios ni acentos. Ej: <em>bola_fuego</em>, <em>truco_luz</em>, <em>rayo_helado</em></div>
       </div>
-      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Descripción</span><textarea id="db_txt" style="min-height:60px">${existing?.txt||''}</textarea></div>
+      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${_e(existing?.name)}"></div>
+      <div style="margin-bottom:6px"><span class="dfl">Descripción</span><textarea id="db_txt" style="min-height:60px">${_e(existing?.txt)}</textarea></div>
       <div class="g2" style="gap:6px;margin-bottom:6px">
         <div><span class="dfl">Tipo</span><select id="db_stype"><option value="spell"${existing?.type==='spell'?' selected':''}>Conjuro</option><option value="trick"${(existing?.type==='trick'||existing?.type==='power')?'selected':''}>Truco</option></select></div>
-        <div><span class="dfl">Coste</span><input type="text" id="db_cost" value="${existing?.cost||''}" placeholder="ej: 2 Ing"></div>
+        <div><span class="dfl">Coste</span><input type="text" id="db_cost" value="${_e(existing?.cost)}" placeholder="ej: 2 Ing"></div>
       </div>`;
     } else if (isTalent) {
-      formHtml += `<div style="margin-bottom:6px"><span class="dfl">Categoría (existente)</span><input type="text" id="db_tcat" value="${talentSub}" placeholder="ej: acero"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${existing?.name||''}"></div>
-      <div style="margin-bottom:6px"><span class="dfl">Descripción</span><textarea id="db_txt" style="min-height:56px">${existing?.desc||''}</textarea></div>`;
+      formHtml += `<div style="margin-bottom:6px"><span class="dfl">Categoría (existente)</span><input type="text" id="db_tcat" value="${_e(talentSub)}" placeholder="ej: acero"></div>
+      <div style="margin-bottom:6px"><span class="dfl">Nombre</span><input type="text" id="db_name" value="${_e(existing?.name)}"></div>
+      <div style="margin-bottom:6px"><span class="dfl">Descripción</span><textarea id="db_txt" style="min-height:56px">${_e(existing?.desc)}</textarea></div>`;
     }
 
     formHtml += `<div style="display:flex;gap:8px;margin-top:12px">
       <button class="btn btn-g" style="flex:1" onclick="document.getElementById('db_form_container').style.display='none'">Cancelar</button>
-      <button class="btn btn-p" style="flex:1" onclick="app.dbSaveEntry('${key}')">✓ Guardar</button>
+      <button class="btn btn-p" style="flex:1" onclick="app.dbSaveEntry('${_e(key)}')">✓ Guardar</button>
     </div>`;
     fc.innerHTML = formHtml;
     fc.scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -3829,8 +4186,9 @@ const app = {
 
   exportRulesDB() {
     const a = document.createElement('a');
-    a.href = 'data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(this.DB,null,2));
-    a.download = 'sands_rules.json'; document.body.appendChild(a); a.click(); a.remove();
+    a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(this.DB, null, 2));
+    a.download = 'sands_rules.json';
+    a.click();
   },
 
   /* ══ CROPPER ══
@@ -4194,6 +4552,9 @@ const app = {
         };
         app.DB = sanitizeObj(rules);
         app.saveRulesToLocal();
+        // Reset aptitude selection so stale keys from a previous character
+        // don't carry over into the newly loaded rule set.
+        app._aptSel = { tricks: new Set(), spells: new Set() };
         app.unlockApp();
         app.toast('Reglas cargadas','ok');
       } catch(err) { app.toast(err.message || 'Formato JSON inválido','err'); }
@@ -4254,7 +4615,14 @@ const app = {
     if (data.concept) document.getElementById('char_concept').value = data.concept;
     if (data.notes) document.getElementById('char_notes').value = data.notes;
     // Alignment
-    if (data.alignment) document.querySelectorAll('.aopt').forEach(b=>b.classList.toggle('active',b.dataset.ali===data.alignment));
+    if (data.alignment) this._syncAlignmentUI();
+    // Restaurar selección de skills antes de llamar updateOptions,
+    // para que buildSkills pueda marcar los checkboxes correctamente.
+    const skillChecks = (data.checks||[]).filter(c => c.name==='chk_arq'||c.name==='chk_bg');
+    this._skillsSel = {
+      arq: new Set(skillChecks.filter(c=>c.name==='chk_arq').map(c=>c.value)),
+      bg:  new Set(skillChecks.filter(c=>c.name==='chk_bg').map(c=>c.value))
+    };
     // Apply identity selects FIRST so updateOptions can read them and build sel_filo options
     ['sel_desc','sel_arq','sel_bg'].forEach(id=>{const el=document.getElementById(id);if(el&&data.selects[id])el.value=data.selects[id];});
     this.updateOptions(false);
@@ -4274,14 +4642,22 @@ const app = {
 
   saveChar() {
     if (this._saving) return; this._saving = true;
-    setTimeout(() => { this._saving = false; }, 800);
+    const releaseSaving = () => { this._saving = false; };
     const name = document.getElementById('char_name').value.trim();
-    if (!name) { this._saving = false; this.toast('¡Se requiere nombre!','err'); return; }
+    if (!name) { releaseSaving(); this.toast('¡Se requiere nombre!','err'); return; }
     const roster = STORAGE.loadRoster();
     if (roster[name]) {
-      this._confirm('¿Sobreescribir personaje?', `El personaje "${this._esc(name)}" ya existe y será reemplazado.`, '✓ Sobreescribir', () => this._doSaveChar(name));
+      this._confirm('¿Sobreescribir personaje?', `El personaje "${this._esc(name)}" ya existe y será reemplazado.`, '✓ Sobreescribir', () => {
+        this._doSaveChar(name, roster);
+        releaseSaving();
+      });
+      // Also release if user cancels the dialog (cancelBtn path in _confirm)
+      // _confirm doesn't expose a cancel callback, so use a short safety timeout
+      // only as a fallback — long enough to not interfere with a slow confirm click.
+      setTimeout(releaseSaving, 10000);
     } else {
-      this._doSaveChar(name);
+      this._doSaveChar(name, roster);
+      releaseSaving();
     }
   },
 
@@ -4296,11 +4672,13 @@ const app = {
     }
   },
 
-  _doSaveChar(name) {
-    const ok = STORAGE.saveChar(name, this.gatherCharData());
+  /** @param {string} name  @param {Object} [roster]  Pre-loaded roster to avoid a second localStorage read */
+  _doSaveChar(name, roster) {
+    roster = roster || STORAGE.loadRoster();
+    roster[String(name)] = this.gatherCharData();
+    const ok = STORAGE.saveRoster(roster);
     if (ok) {
-      const now = new Date();
-      const ts = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+      const ts  = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', hour12: false });
       const lbl = document.getElementById('last_saved_lbl');
       if (lbl) {
         lbl.classList.remove('unsaved');
@@ -4316,10 +4694,11 @@ const app = {
   },
 
   exportJSON() {
-    const name = (document.getElementById('char_name').value.trim()||'aventurero').replace(/ /g,'_');
+    const name = (document.getElementById('char_name').value.trim() || 'aventurero').replace(/ /g, '_');
     const a = document.createElement('a');
-    a.href = 'data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(this.gatherCharData(),null,2));
-    a.download = name+'.json'; document.body.appendChild(a); a.click(); a.remove();
+    a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(this.gatherCharData(), null, 2));
+    a.download = name + '.json';
+    a.click();
   },
 
   loadJSON(input) {
@@ -4370,7 +4749,8 @@ const app = {
     const lvlEl=document.getElementById('char_lvl');if(lvlEl)lvlEl.value=1;
     ['char_xp','cur_pv','cur_adr','cur_ing','cur_carne'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=0});
     this.inventory=[]; this.gold=0; this.alignment=''; this._aptSel={tricks:new Set(),spells:new Set()};
-    document.querySelectorAll('.aopt').forEach(b=>b.classList.remove('active'));
+    this._skillsSel = { arq: new Set(), bg: new Set() };
+    this._syncAlignmentUI();
     document.querySelectorAll('input[type=checkbox],input[type=radio]').forEach(c=>c.checked=false);
     document.querySelectorAll('input[name="chk_talents_hidden"]').forEach(el=>el.remove());
     document.getElementById('char_img').src = DEFAULT_PORTRAIT;
@@ -4415,19 +4795,48 @@ const app = {
     this.setFontSize(saved);
   },
 
+  _restoreScrollPreserve() {
+    this.scrollPreserve = localStorage.getItem(STORAGE.KEYS.scrollPreserve) === '1';
+    this._syncScrollPreserveBtn();
+  },
+
+  toggleScrollPreserve() {
+    this.scrollPreserve = !this.scrollPreserve;
+    this._pageScrolls = {}; // reset saved positions when toggling
+    localStorage.setItem(STORAGE.KEYS.scrollPreserve, this.scrollPreserve ? '1' : '0');
+    this._syncScrollPreserveBtn();
+  },
+
+  _syncScrollPreserveBtn() {
+    const btn = document.getElementById('scroll_preserve_btn');
+    const lbl = document.getElementById('scroll_preserve_lbl');
+    if (btn) btn.setAttribute('aria-pressed', String(this.scrollPreserve));
+    if (lbl) lbl.textContent = this.scrollPreserve
+      ? 'Desactivar recordar posición al volver'
+      : 'Activar recordar posición al volver';
+  },
+
   /* ── LETHALITY ── */
   lethality: 1,
 
   setLethality(n) {
     this.lethality = n;
-    [1,2,3].forEach(i=>{
-      const el=document.getElementById('leth_'+i);
-      if(el) el.classList.toggle('active', i===n);
+    // Toggle active on cards
+    [1,2,3].forEach(i => {
+      const el = document.getElementById('leth_'+i);
+      if (el) el.classList.toggle('active', i === n);
     });
-    // Update summary label
-    const labels = {1:'Letalidad 1 — +1 PV/nivel', 2:'Letalidad 2 — +2 PV/nivel', 3:'Letalidad 3 — +3 PV/nivel'};
-    const lbl = document.getElementById('campana_leth_label');
-    if(lbl) lbl.textContent = labels[n]||labels[1];
+    // Update summary badge
+    const TIERS = {
+      1: { label:'Letalidad 1 — +1 PV/nivel', tier:'1' },
+      2: { label:'Letalidad 2 — +2 PV/nivel', tier:'2' },
+      3: { label:'Letalidad 3 — +3 PV/nivel', tier:'3' },
+    };
+    const t = TIERS[n] || TIERS[1];
+    const badge = document.getElementById('campana_leth_badge');
+    const lbl   = document.getElementById('campana_leth_label');
+    if (badge) badge.dataset.tier = t.tier;
+    if (lbl)   lbl.textContent    = t.label;
     this.calc();
   },
 
@@ -4445,22 +4854,31 @@ const app = {
 
   _setupEscapeKey() {
     document.addEventListener('keydown', e => {
-      // Ctrl+S / Cmd+S → save
+      // ── Ctrl+S / Cmd+S → save current character ──
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
         const appScreen = document.getElementById('app-screen');
         if (appScreen && !appScreen.classList.contains('hidden')) this.saveChar();
         return;
       }
+
       if (e.key !== 'Escape') return;
-      // Close sdial menu (and fire the same close path toggleDial uses)
+
+      // ── Escape → close the top-most open layer ──
+      // 1. Speed dial menu
       const menu = document.getElementById('sdial_menu');
       const btn  = document.querySelector('.sdial-btn');
       if (menu?.classList.contains('open')) {
         menu.classList.remove('open');
         btn?.classList.remove('open');
-        // Dispatch a synthetic click outside sdial so the _close listener self-removes
-        document.dispatchEvent(new MouseEvent('click', {bubbles:true}));
+        btn?.setAttribute('aria-expanded', 'false');
+        return;
+      }
+      // 2. Dice overlay
+      const dice = document.getElementById('dice-overlay');
+      if (dice?.classList.contains('active')) {
+        this.closeDiceOverlay();
+        return;
       }
     });
   },
@@ -4472,10 +4890,13 @@ const app = {
     btn.classList.toggle('open', open);
     btn.setAttribute('aria-expanded', String(open));
     if (open) {
-      // Close on next outside click — {once:true} auto-removes the listener
+      // Close on next outside click — {once:true} auto-removes the listener.
+      // Guard: if the click is on the dial button itself, let toggleDial handle it
+      // naturally on the next call instead of fighting for the closed state.
       setTimeout(() => {
         document.addEventListener('click', function _close(e) {
-          if (!document.getElementById('sdial')?.contains(e.target)) {
+          const dialEl = document.getElementById('sdial');
+          if (!dialEl?.contains(e.target)) {
             menu.classList.remove('open');
             btn.classList.remove('open');
             btn.setAttribute('aria-expanded', 'false');
@@ -4489,8 +4910,15 @@ const app = {
     this._confirm('¿Resetear hoja?', 'Se borrarán todos los datos del personaje actual.', '✓ Resetear', () => {
       this.clearCharData();
       if (this.DB.descriptors) this.unlockApp();
+      // Anclar la vista en página 0 ANTES de abrir secciones en masa.
+      // Sin esto el requestAnimationFrame de editSection('combat'/'equipment')
+      // gana la carrera a goToPage y desplaza el pages-track a página 3.
+      this.goToPage(0);
+      this._pageScrolls = {}; // limpiar posiciones guardadas obsoletas
+      this._bulkEditing = true;
       this.editSection('personal');
       ['identity','stats','saves','skills','combat','equipment'].forEach(s=>this.editSection(s));
+      this._bulkEditing = false;
       this.toast('Hoja reseteada','ok');
     });
   },
@@ -4498,8 +4926,12 @@ const app = {
   /* ── RANDOMIZE ── */
   randomize() {
     if (!this.DB.archetypes) { this.toast('Carga reglas primero','err'); return; }
+    // Anclar vista en página 0 y suprimir _markUnsaved durante la generación
+    this._charLoading = true;
     this.clearCharData();
     this.unlockApp();
+    this.goToPage(0);
+    this._pageScrolls = {}; // limpiar posiciones guardadas obsoletas
 
     // 1. Stats (3d6 cada uno)
     STATS.forEach(s => {
@@ -4528,7 +4960,7 @@ const app = {
     // 5. Alineamiento aleatorio
     const ali = ALIGNMENTS[Math.floor(Math.random()*ALIGNMENTS.length)];
     this.alignment = ali;
-    document.querySelectorAll('.aopt').forEach(b=>b.classList.toggle('active',b.dataset.ali===ali));
+    this._syncAlignmentUI();
 
     // 6. updateOptions para construir filos y habilidades (ya tiene arq/desc/bg en los selects)
     this.updateOptions(true);
@@ -4593,6 +5025,7 @@ const app = {
     ['identity','stats','saves','skills','combat','equipment'].forEach(s=>this.confirmSection(s));
 
     this.buildDetailPage();
+    this._charLoading = false;
     this.toast('Personaje aleatorio listo','ok');
   },
 
@@ -4625,16 +5058,6 @@ const app = {
     // Dismiss loader after init — short delay so first paint is ready
     setTimeout(dismissLoader, 300);
   }
-
-  // Keyboard shortcut: Ctrl+S / Cmd+S to save
-  document.addEventListener('keydown', e => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-      e.preventDefault();
-      if (document.getElementById('app-screen')?.classList.contains('hidden') === false) {
-        app.saveChar();
-      }
-    }
-  });
 
   // Register SW independently (non-blocking, no relation to app init)
   if ('serviceWorker' in navigator) {
